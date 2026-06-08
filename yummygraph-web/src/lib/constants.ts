@@ -137,6 +137,27 @@ export const FILTERABLE_LABELS: NodeLabel[] = [
   'Import',
 ];
 
+// Quick-filter preset label sets (for the Filters tab preset buttons).
+export const CODE_SYMBOL_LABELS: NodeLabel[] = [
+  'Class',
+  'Interface',
+  'Enum',
+  'Type',
+  'Function',
+  'Method',
+];
+export const STRUCTURE_LABELS: NodeLabel[] = ['Project', 'Package', 'Module', 'Folder', 'File'];
+// "Noise" leaf kinds that dominate node counts and clutter the graph.
+export const NOISE_LABELS: NodeLabel[] = ['Property', 'Variable', 'Const', 'Decorator', 'Import'];
+// Full toggleable + structural set — used by the "All" button.
+export const ALL_VISIBLE_LABELS: NodeLabel[] = ['Project', 'Package', 'Module', ...FILTERABLE_LABELS];
+
+export const LABEL_PRESETS: { id: string; label: string; labels: NodeLabel[] }[] = [
+  { id: 'code', label: 'Code only', labels: CODE_SYMBOL_LABELS },
+  { id: 'hideNoise', label: 'Hide noise', labels: ALL_VISIBLE_LABELS.filter((l) => !NOISE_LABELS.includes(l)) },
+  { id: 'structure', label: 'Structure', labels: STRUCTURE_LABELS },
+];
+
 // Edge/Relation types
 export type EdgeType = 'CONTAINS' | 'DEFINES' | 'IMPORTS' | 'CALLS' | 'EXTENDS' | 'IMPLEMENTS';
 

@@ -20,7 +20,14 @@ import {
 } from '@/lib/lucide-icons';
 import { useAppState } from '../hooks/useAppState';
 import { useTranslation } from 'react-i18next';
-import { FILTERABLE_LABELS, NODE_COLORS, ALL_EDGE_TYPES, EDGE_INFO } from '../lib/constants';
+import {
+  FILTERABLE_LABELS,
+  NODE_COLORS,
+  ALL_EDGE_TYPES,
+  EDGE_INFO,
+  LABEL_PRESETS,
+  ALL_VISIBLE_LABELS,
+} from '../lib/constants';
 import type { GraphNode, NodeLabel } from 'yummygraph-shared';
 
 // Tree node structure
@@ -220,6 +227,7 @@ export const FileTreePanel = ({ onFocusNode }: FileTreePanelProps) => {
     graph,
     visibleLabels,
     toggleLabelVisibility,
+    setVisibleLabelsBulk,
     visibleEdgeTypes,
     toggleEdgeVisibility,
     selectedNode,
@@ -419,6 +427,40 @@ export const FileTreePanel = ({ onFocusNode }: FileTreePanelProps) => {
               {t('graph:fileTree.nodeTypes')}
             </h3>
             <p className="mb-3 text-[11px] text-text-muted">{t('graph:fileTree.nodeTypesDesc')}</p>
+          </div>
+
+          {/* Quick presets — one-click focused views */}
+          <div className="mb-3 flex flex-wrap gap-1">
+            {LABEL_PRESETS.map((preset) => {
+              const active =
+                preset.labels.length === visibleLabels.length &&
+                preset.labels.every((l) => visibleLabels.includes(l));
+              return (
+                <button
+                  key={preset.id}
+                  onClick={() => setVisibleLabelsBulk(preset.labels)}
+                  className={`rounded-md border px-2 py-1 text-[11px] font-medium transition-colors ${
+                    active
+                      ? 'border-accent bg-accent/20 text-accent'
+                      : 'border-border-subtle bg-elevated text-text-secondary hover:bg-hover hover:text-text-primary'
+                  }`}
+                >
+                  {preset.label}
+                </button>
+              );
+            })}
+            <button
+              onClick={() => setVisibleLabelsBulk(ALL_VISIBLE_LABELS)}
+              className="rounded-md border border-border-subtle bg-elevated px-2 py-1 text-[11px] font-medium text-text-secondary transition-colors hover:bg-hover hover:text-text-primary"
+            >
+              All
+            </button>
+            <button
+              onClick={() => setVisibleLabelsBulk([])}
+              className="rounded-md border border-border-subtle bg-elevated px-2 py-1 text-[11px] font-medium text-text-secondary transition-colors hover:bg-hover hover:text-text-primary"
+            >
+              None
+            </button>
           </div>
 
           <div className="flex flex-col gap-1">

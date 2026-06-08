@@ -10,6 +10,7 @@ interface GraphStateContextValue {
   setSelectedNode: (node: GraphNode | null) => void;
   visibleLabels: NodeLabel[];
   toggleLabelVisibility: (label: NodeLabel) => void;
+  setVisibleLabelsBulk: (labels: NodeLabel[]) => void;
   visibleEdgeTypes: EdgeType[];
   toggleEdgeVisibility: (edgeType: EdgeType) => void;
   depthFilter: number | null;
@@ -37,6 +38,8 @@ export const GraphStateProvider = ({ children }: { children: ReactNode }) => {
     );
   }, []);
 
+  const setVisibleLabelsBulk = useCallback((labels: NodeLabel[]) => setVisibleLabels(labels), []);
+
   const toggleEdgeVisibility = useCallback((edgeType: EdgeType) => {
     setVisibleEdgeTypes((prev) =>
       prev.includes(edgeType) ? prev.filter((e) => e !== edgeType) : [...prev, edgeType],
@@ -51,6 +54,7 @@ export const GraphStateProvider = ({ children }: { children: ReactNode }) => {
       setSelectedNode,
       visibleLabels,
       toggleLabelVisibility,
+      setVisibleLabelsBulk,
       visibleEdgeTypes,
       toggleEdgeVisibility,
       depthFilter,

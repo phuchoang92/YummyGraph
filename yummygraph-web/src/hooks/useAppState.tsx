@@ -116,6 +116,7 @@ interface AppState {
   // Filters
   visibleLabels: NodeLabel[];
   toggleLabelVisibility: (label: NodeLabel) => void;
+  setVisibleLabelsBulk: (labels: NodeLabel[]) => void;
   visibleEdgeTypes: EdgeType[];
   toggleEdgeVisibility: (edgeType: EdgeType) => void;
 
@@ -230,6 +231,7 @@ const AppStateProviderInner = ({ children }: { children: ReactNode }) => {
     setSelectedNode,
     visibleLabels,
     toggleLabelVisibility,
+    setVisibleLabelsBulk,
     visibleEdgeTypes,
     toggleEdgeVisibility,
     depthFilter,
@@ -1328,6 +1330,7 @@ const AppStateProviderInner = ({ children }: { children: ReactNode }) => {
     setHelpDialogBoxOpen,
     visibleLabels,
     toggleLabelVisibility,
+    setVisibleLabelsBulk,
     visibleEdgeTypes,
     toggleEdgeVisibility,
     depthFilter,
