@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 
 interface Window {
-  __GITNEXUS_CONFIG__?: {
+  __YUMMYGRAPH_CONFIG__?: {
     backendUrl?: string;
   };
 }

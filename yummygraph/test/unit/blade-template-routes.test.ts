@@ -89,7 +89,7 @@ describe('Blade/template static route extraction', () => {
   });
 
   it('links Blade static URL signals to matching route graph nodes without PHP parsing', async () => {
-    const repoPath = await fs.mkdtemp(path.join(os.tmpdir(), 'gitnexus-blade-routes-'));
+    const repoPath = await fs.mkdtemp(path.join(os.tmpdir(), 'yummygraph-blade-routes-'));
     try {
       await fs.mkdir(path.join(repoPath, 'routes'), { recursive: true });
       await fs.mkdir(path.join(repoPath, 'resources/views/orders'), { recursive: true });

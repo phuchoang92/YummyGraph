@@ -260,7 +260,7 @@ describe('worker pool integration', () => {
 
   it('treats warning messages as non-terminal and still resolves the worker result', async () => {
     const { tempDir, workerPath } = writeTempWorker(
-      'gitnexus-worker-warning-',
+      'yummygraph-worker-warning-',
       `
       const { parentPort } = require('node:worker_threads');
       parentPort.on('message', (msg) => {
@@ -295,7 +295,7 @@ describe('worker pool integration', () => {
 
   it('keeps a slow sub-batch alive when the worker reports progress', async () => {
     const { tempDir, workerPath } = writeTempWorker(
-      'gitnexus-worker-progress-',
+      'yummygraph-worker-progress-',
       `
       const { parentPort } = require('node:worker_threads');
       parentPort.on('message', (msg) => {
@@ -338,7 +338,7 @@ describe('worker pool integration', () => {
   });
 
   it('replaces a timed-out worker and retries with a longer timeout', async () => {
-    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-worker-retry-'));
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-worker-retry-'));
     const markerPath = path.join(tempDir, 'first-attempt.txt');
     const workerPath = path.join(tempDir, 'worker.js');
     writeReadyWorker(
@@ -384,7 +384,7 @@ describe('worker pool integration', () => {
   });
 
   it('rejects dispatch when replacement worker crashes during startup', async () => {
-    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-worker-replace-fail-'));
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-worker-replace-fail-'));
     const markerPath = path.join(tempDir, 'first-attempt.txt');
     const workerPath = path.join(tempDir, 'worker.js');
     writeReadyWorker(
@@ -448,7 +448,7 @@ describe('worker pool integration', () => {
   });
 
   it('preserves global path order across split-and-retry', async () => {
-    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-worker-split-'));
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-worker-split-'));
     const markerPath = path.join(tempDir, 'stalled-once.txt');
     const workerPath = path.join(tempDir, 'worker.js');
     writeReadyWorker(
@@ -520,7 +520,7 @@ describe('worker pool integration', () => {
     // files parsed). Subsequent dispatches with the same path filter it
     // out via the pool's quarantine.
     const { tempDir, workerPath } = writeTempWorker(
-      'gitnexus-worker-stalled-',
+      'yummygraph-worker-stalled-',
       `
       const { parentPort } = require('node:worker_threads');
       parentPort.on('message', (msg) => {
@@ -546,7 +546,7 @@ describe('worker pool integration', () => {
   });
 
   it('does not resolve early when a stalled peer job is requeued during another worker finish', async () => {
-    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-worker-race-'));
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-worker-race-'));
     const markerPath = path.join(tempDir, 'stalled-once.txt');
     const workerPath = path.join(tempDir, 'worker.js');
     writeReadyWorker(
@@ -619,7 +619,7 @@ describe('worker pool integration', () => {
   it('completes split-and-retry when the timed-out worker is the only active worker', async () => {
     // Regression test for: the split-and-retry path resolving early when no other
     // workers are active (activeWorkers === 0 during await replaceWorker).
-    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-worker-sole-active-'));
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-worker-sole-active-'));
     const markerPath = path.join(tempDir, 'stalled-once.txt');
     const workerPath = path.join(tempDir, 'worker.js');
     writeReadyWorker(
@@ -675,7 +675,7 @@ describe('worker pool integration', () => {
 
   it('fails fast on a result message that violates the worker protocol', async () => {
     const { tempDir, workerPath } = writeTempWorker(
-      'gitnexus-worker-protocol-',
+      'yummygraph-worker-protocol-',
       `
       const { parentPort } = require('node:worker_threads');
       parentPort.on('message', (msg) => {
@@ -706,7 +706,7 @@ describe('worker pool integration', () => {
 
   it('bounds worker jobs by byte budget as well as file count', async () => {
     const { tempDir, workerPath } = writeTempWorker(
-      'gitnexus-worker-byte-budget-',
+      'yummygraph-worker-byte-budget-',
       `
       const { parentPort } = require('node:worker_threads');
       let current = [];
@@ -768,7 +768,7 @@ describe('worker pool integration', () => {
     // processes whatever lands in its sub-batch successfully. Exercises
     // Layer 1 auto-respawn + Layer 3 quarantine end-to-end through real
     // worker IPC and real waitForWorkerOnline timing.
-    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-resilience-respawn-'));
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-resilience-respawn-'));
     const markerPath = path.join(tempDir, 'crashed-once.txt');
     const workerPath = path.join(tempDir, 'worker.js');
     writeReadyWorker(
@@ -826,7 +826,7 @@ describe('worker pool integration', () => {
     // pool must quarantine exactly that file (not items[0] from the
     // heuristic). Validates Layer 4 end-to-end through real IPC ordering.
     const { tempDir, workerPath } = writeTempWorker(
-      'gitnexus-resilience-attribution-',
+      'yummygraph-resilience-attribution-',
       `
       const { parentPort } = require('node:worker_threads');
       let current = [];
@@ -877,7 +877,7 @@ describe('worker pool integration', () => {
     // must NOT include X in the sub-batch the worker receives. Records
     // the paths each sub-batch sees.
     const tempDir = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'gitnexus-resilience-quarantine-filter-'),
+      path.join(os.tmpdir(), 'yummygraph-resilience-quarantine-filter-'),
     );
     const seenPath = path.join(tempDir, 'sub-batches.json');
     const markerPath = path.join(tempDir, 'crashed-once.txt');
@@ -970,7 +970,7 @@ describe('worker pool integration', () => {
     // depends only on which chunk contains the poison files, which is
     // deterministic given the dispatch ordering of [a,b,c,d] with
     // subBatchSize=2.
-    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-resilience-slot-drop-'));
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-resilience-slot-drop-'));
     const workerPath = path.join(tempDir, 'worker.js');
     writeReadyWorker(
       workerPath,
@@ -1033,7 +1033,7 @@ describe('worker pool integration', () => {
     // on every job; after 2 consecutive deaths on slot 0 the breaker
     // trips and dispatch rejects with WorkerPoolDispatchError.
     const { tempDir, workerPath } = writeTempWorker(
-      'gitnexus-resilience-breaker-',
+      'yummygraph-resilience-breaker-',
       `
       const { parentPort } = require('node:worker_threads');
       parentPort.on('message', (msg) => {
@@ -1086,7 +1086,7 @@ describe('worker pool integration', () => {
     // Worker throws an uncaught error on first sub-batch (triggers Node
     // Worker 'error' event), then the replacement succeeds. Validates
     // recoverAndResume on the errorHandler path with real async timing.
-    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-resilience-error-event-'));
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-resilience-error-event-'));
     const markerPath = path.join(tempDir, 'thrown-once.txt');
     const workerPath = path.join(tempDir, 'worker.js');
     writeReadyWorker(

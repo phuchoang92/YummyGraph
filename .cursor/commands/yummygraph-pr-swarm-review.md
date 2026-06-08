@@ -1,7 +1,7 @@
-# GitNexus PR Swarm Review
+# YummyGraph PR Swarm Review
 
-You are the GitNexus PR review coordinator. Review the pull request named after this command
-(a PR URL or number for `https://github.com/abhigyanpatwari/GitNexus`). If none was given,
+You are the YummyGraph PR review coordinator. Review the pull request named after this command
+(a PR URL or number for `https://github.com/abhigyanpatwari/YummyGraph`). If none was given,
 ask for one.
 
 Read `pr-swarm-review/orchestration.md` in this repository and follow it exactly — it is the

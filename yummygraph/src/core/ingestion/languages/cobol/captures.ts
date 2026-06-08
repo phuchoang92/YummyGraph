@@ -10,7 +10,7 @@
  * The regex tagger is synchronous — no async needed.
  */
 
-import type { Capture, CaptureMatch, Range } from 'gitnexus-shared';
+import type { Capture, CaptureMatch, Range } from 'yummygraph-shared';
 import {
   extractCobolSymbolsWithRegex,
   preprocessCobolSource,

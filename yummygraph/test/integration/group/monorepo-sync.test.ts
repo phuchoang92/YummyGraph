@@ -26,7 +26,7 @@ const makeHandle = (): RepoHandle => ({
   id: 'test-monorepo',
   path: REPO_GROUP_PATH,
   repoPath: MONOREPO_DIR,
-  storagePath: path.join(MONOREPO_DIR, '.gitnexus'),
+  storagePath: path.join(MONOREPO_DIR, '.yummygraph'),
 });
 
 describe('Monorepo sync integration', () => {

@@ -10,7 +10,7 @@ import {
 import { namespaceList, resources } from './resources';
 
 const DEFAULT_NAMESPACE = 'common';
-export const LANGUAGE_STORAGE_KEY = 'gitnexus.lng';
+export const LANGUAGE_STORAGE_KEY = 'yummygraph.lng';
 
 function syncDocumentLanguage(language: string | undefined): void {
   if (typeof document === 'undefined') return;

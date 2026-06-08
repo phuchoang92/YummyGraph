@@ -23,7 +23,7 @@ const adapterSource = path.join(
   packageRoot,
   'hooks',
   'antigravity',
-  'gitnexus-antigravity-hook.cjs',
+  'yummygraph-antigravity-hook.cjs',
 );
 
 describe('setupCommand Antigravity integration', () => {
@@ -57,19 +57,19 @@ describe('setupCommand Antigravity integration', () => {
     await fs.mkdir(antigravityDir, { recursive: true });
   });
 
-  it('writes mcp_config.json with a valid mcpServers.gitnexus entry', async () => {
+  it('writes mcp_config.json with a valid mcpServers.yummygraph entry', async () => {
     await setupCommand();
 
     const raw = await fs.readFile(path.join(antigravityDir, 'mcp_config.json'), 'utf-8');
     const config = JSON.parse(raw);
 
     expect(config.mcpServers).toBeDefined();
-    expect(config.mcpServers.gitnexus).toBeDefined();
-    expect(typeof config.mcpServers.gitnexus.command).toBe('string');
-    expect(Array.isArray(config.mcpServers.gitnexus.args)).toBe(true);
+    expect(config.mcpServers.yummygraph).toBeDefined();
+    expect(typeof config.mcpServers.yummygraph.command).toBe('string');
+    expect(Array.isArray(config.mcpServers.yummygraph.args)).toBe(true);
     // mcp is always the final positional regardless of which command shape
     // (global binary, npx, or cmd /c npx wrapper) is chosen
-    expect(config.mcpServers.gitnexus.args).toContain('mcp');
+    expect(config.mcpServers.yummygraph.args).toContain('mcp');
   });
 
   it('registers an AfterTool entry in ~/.gemini/settings.json with the canonical matcher', async () => {
@@ -89,18 +89,18 @@ describe('setupCommand Antigravity integration', () => {
 
     const hook = entry.hooks[0];
     expect(hook.type).toBe('command');
-    expect(hook.name).toBe('gitnexus');
-    expect(hook.command).toMatch(/gitnexus-antigravity-hook\.cjs/);
+    expect(hook.name).toBe('yummygraph');
+    expect(hook.command).toMatch(/yummygraph-antigravity-hook\.cjs/);
     // ms — Gemini CLI uses milliseconds; 10000 ms = 10 s
     expect(hook.timeout).toBe(10000);
   });
 
-  it('copies the adapter and all required helpers (including win-rm-list-json.ps1) to ~/.gemini/config/hooks/gitnexus/', async () => {
+  it('copies the adapter and all required helpers (including win-rm-list-json.ps1) to ~/.gemini/config/hooks/yummygraph/', async () => {
     await setupCommand();
 
-    const hooksDir = path.join(geminiDir, 'config', 'hooks', 'gitnexus');
+    const hooksDir = path.join(geminiDir, 'config', 'hooks', 'yummygraph');
     for (const file of [
-      'gitnexus-antigravity-hook.cjs',
+      'yummygraph-antigravity-hook.cjs',
       'hook-lock.cjs',
       'hook-db-lock-probe.cjs',
       // Required by hook-db-lock-probe.cjs on Windows; without it the MCP
@@ -119,14 +119,14 @@ describe('setupCommand Antigravity integration', () => {
     await setupCommand();
 
     const installed = await fs.readFile(
-      path.join(geminiDir, 'config', 'hooks', 'gitnexus', 'gitnexus-antigravity-hook.cjs'),
+      path.join(geminiDir, 'config', 'hooks', 'yummygraph', 'yummygraph-antigravity-hook.cjs'),
       'utf-8',
     );
     const source = await fs.readFile(adapterSource, 'utf-8');
 
     // The source default uses path.resolve(__dirname, '..', '..', 'dist', ...)
     // which would resolve incorrectly when the adapter is installed outside
-    // the gitnexus package tree (issue #108 regression class). Setup must
+    // the yummygraph package tree (issue #108 regression class). Setup must
     // replace it with a JSON-string absolute literal pointing at the real CLI.
     // Under vitest/tsx the resolved __dirname of setup.ts is src/cli/, so the
     // rewrite resolves to src/cli/index.js; under a packaged install it
@@ -140,17 +140,17 @@ describe('setupCommand Antigravity integration', () => {
     expect(installed).toMatch(/let cliPath = "[^"]*(?:src|dist)\/cli\/index\.js"/);
   });
 
-  it('installs gitnexus skills into ~/.gemini/antigravity/skills/<name>/SKILL.md', async () => {
+  it('installs yummygraph skills into ~/.gemini/antigravity/skills/<name>/SKILL.md', async () => {
     await setupCommand();
 
     const skillsDir = path.join(antigravityDir, 'skills');
     const entries = await fs.readdir(skillsDir, { withFileTypes: true });
     const skillNames = entries.filter((e) => e.isDirectory()).map((e) => e.name);
 
-    expect(skillNames).toContain('gitnexus-cli');
+    expect(skillNames).toContain('yummygraph-cli');
 
-    const cliSkill = await fs.readFile(path.join(skillsDir, 'gitnexus-cli', 'SKILL.md'), 'utf-8');
-    expect(cliSkill).toMatch(/GitNexus/i);
+    const cliSkill = await fs.readFile(path.join(skillsDir, 'yummygraph-cli', 'SKILL.md'), 'utf-8');
+    expect(cliSkill).toMatch(/YummyGraph/i);
   });
 
   it('preserves user hooks under BeforeTool and other AfterTool matchers (polite-neighbor merge)', async () => {
@@ -195,7 +195,7 @@ describe('setupCommand Antigravity integration', () => {
     // Our AfterTool entry appended after the user's
     expect(config.hooks.AfterTool).toHaveLength(2);
     expect(config.hooks.AfterTool[0].hooks[0].command).toBe('echo after');
-    expect(config.hooks.AfterTool[1].hooks[0].command).toMatch(/gitnexus-antigravity-hook/);
+    expect(config.hooks.AfterTool[1].hooks[0].command).toMatch(/yummygraph-antigravity-hook/);
   });
 
   it('is idempotent — re-running setupCommand does not duplicate the AfterTool entry', async () => {
@@ -209,9 +209,9 @@ describe('setupCommand Antigravity integration', () => {
     const mcpConfig = JSON.parse(
       await fs.readFile(path.join(antigravityDir, 'mcp_config.json'), 'utf-8'),
     );
-    // Re-running setup should also leave mcpServers.gitnexus as the single
+    // Re-running setup should also leave mcpServers.yummygraph as the single
     // canonical entry, not duplicate it.
-    expect(Object.keys(mcpConfig.mcpServers)).toEqual(['gitnexus']);
+    expect(Object.keys(mcpConfig.mcpServers)).toEqual(['yummygraph']);
   });
 
   it('skips Antigravity setup entirely when ~/.gemini/antigravity is absent', async () => {
@@ -246,7 +246,7 @@ describe('setupCommand Antigravity integration', () => {
     );
     expect(config.existingKey).toBe('keep-me');
     expect(config.mcpServers.other).toEqual({ command: 'foo', args: ['bar'] });
-    expect(config.mcpServers.gitnexus).toBeDefined();
+    expect(config.mcpServers.yummygraph).toBeDefined();
   });
 
   it('leaves a corrupt mcp_config.json untouched rather than overwriting user data', async () => {

@@ -11,7 +11,7 @@ function normalizeCliLanguage(raw: string): SupportedCliLanguage {
   const normalized = raw.trim().split('.')[0]?.replace(/_/g, '-').toLowerCase() ?? '';
   if (!normalized) return 'en';
 
-  // GitNexus currently ships Simplified Chinese only. Do not map Traditional
+  // YummyGraph currently ships Simplified Chinese only. Do not map Traditional
   // Chinese locales (zh-TW/zh-HK/zh-Hant) to zh-CN just because they start
   // with "zh".
   if (
@@ -28,7 +28,7 @@ function normalizeCliLanguage(raw: string): SupportedCliLanguage {
 }
 
 export function detectCliLanguage(env: NodeJS.ProcessEnv = process.env): SupportedCliLanguage {
-  const raw = env.GITNEXUS_LANG || env.LC_ALL || env.LC_MESSAGES || env.LANG || '';
+  const raw = env.YUMMYGRAPH_LANG || env.LC_ALL || env.LC_MESSAGES || env.LANG || '';
   return normalizeCliLanguage(raw);
 }
 

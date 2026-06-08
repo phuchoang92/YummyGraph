@@ -155,7 +155,7 @@ describe('syncGroup', () => {
         id: groupPath,
         path: groupPath,
         repoPath: '/tmp/' + groupPath,
-        storagePath: '/tmp/' + groupPath + '/.gitnexus',
+        storagePath: '/tmp/' + groupPath + '/.yummygraph',
       }),
       skipWrite: true,
     });
@@ -187,7 +187,7 @@ describe('syncGroup', () => {
           id: groupPath.replace(/\//g, '-'),
           path: groupPath,
           repoPath: '/tmp/' + groupPath,
-          storagePath: '/tmp/' + groupPath + '/.gitnexus',
+          storagePath: '/tmp/' + groupPath + '/.yummygraph',
         }),
         skipWrite: true,
       }).catch(() => {});
@@ -308,7 +308,7 @@ describe('syncGroup', () => {
   });
 
   it('keeps wildcard thrift links to multiple extracted IDL provider methods', async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-sync-thrift-wildcard-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-sync-thrift-wildcard-'));
     fs.mkdirSync(path.join(tmpDir, 'idl'), { recursive: true });
     fs.writeFileSync(
       path.join(tmpDir, 'idl', 'order.thrift'),
@@ -328,7 +328,7 @@ service OrderService {
           id: 'provider-repo',
           path: 'app/provider',
           repoPath: tmpDir,
-          storagePath: path.join(tmpDir, '.gitnexus'),
+          storagePath: path.join(tmpDir, '.yummygraph'),
         })
       )
         .filter((c) => c.role === 'provider')
@@ -406,7 +406,7 @@ service OrderService {
   });
 
   it('keeps exact thrift links to extracted IDL and Java providers for same method', async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-sync-thrift-exact-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-sync-thrift-exact-'));
     fs.mkdirSync(path.join(tmpDir, 'idl'), { recursive: true });
     fs.mkdirSync(path.join(tmpDir, 'src', 'main', 'java', 'example'), { recursive: true });
     fs.writeFileSync(
@@ -436,7 +436,7 @@ class IfaceOrderHandler implements OrderService.Iface {
           id: 'provider-repo',
           path: 'app/provider',
           repoPath: tmpDir,
-          storagePath: path.join(tmpDir, '.gitnexus'),
+          storagePath: path.join(tmpDir, '.yummygraph'),
         })
       )
         .filter((c) => c.role === 'provider')
@@ -482,8 +482,8 @@ class IfaceOrderHandler implements OrderService.Iface {
   });
 
   it('extracts thrift contracts during real sync when thrift detection is enabled', async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-sync-thrift-'));
-    const storageDir = path.join(tmpDir, '.gitnexus');
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-sync-thrift-'));
+    const storageDir = path.join(tmpDir, '.yummygraph');
     fs.mkdirSync(path.join(tmpDir, 'services', 'billing', 'idl'), { recursive: true });
     fs.mkdirSync(path.join(tmpDir, 'services', 'billing', 'src'), { recursive: true });
     fs.mkdirSync(storageDir, { recursive: true });
@@ -543,8 +543,8 @@ service OrderService {
   });
 
   it('does not extract thrift contracts during real sync when thrift detection is disabled', async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-sync-thrift-off-'));
-    const storageDir = path.join(tmpDir, '.gitnexus');
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-sync-thrift-off-'));
+    const storageDir = path.join(tmpDir, '.yummygraph');
     fs.mkdirSync(path.join(tmpDir, 'services', 'billing', 'idl'), { recursive: true });
     fs.mkdirSync(storageDir, { recursive: true });
     fs.writeFileSync(
@@ -588,8 +588,8 @@ service OrderService {
     // PR #1156 Codex follow-up: ce-code-review T1 — verifies the gate at
     // sync.ts:174 honors `detect.includes: false`. Mirrors the existing
     // thrift-off pattern at sync.test.ts:545.
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-sync-includes-off-'));
-    const storageDir = path.join(tmpDir, '.gitnexus');
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-sync-includes-off-'));
+    const storageDir = path.join(tmpDir, '.yummygraph');
     fs.mkdirSync(path.join(tmpDir, 'src'), { recursive: true });
     fs.mkdirSync(storageDir, { recursive: true });
     fs.writeFileSync(path.join(tmpDir, 'src', 'view.h'), '#pragma once\nclass View {};');
@@ -712,7 +712,7 @@ service OrderService {
   });
 
   it('writes registry to groupDir when skipWrite is false', async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-sync-write-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-sync-write-'));
 
     try {
       const config = makeConfig({});
@@ -776,7 +776,7 @@ service OrderService {
     });
 
     it('workspace_deps: true discovers Rust crate links through syncGroup', async () => {
-      tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-sync-ws-'));
+      tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-sync-ws-'));
 
       writeFileSync(
         'crate-a/Cargo.toml',
@@ -794,14 +794,14 @@ service OrderService {
         {
           name: 'mathlex',
           path: path.join(tmpDir, 'crate-a'),
-          storagePath: path.join(tmpDir, 'crate-a', '.gitnexus'),
+          storagePath: path.join(tmpDir, 'crate-a', '.yummygraph'),
           indexedAt: '',
           lastCommit: '',
         },
         {
           name: 'thales',
           path: path.join(tmpDir, 'crate-b'),
-          storagePath: path.join(tmpDir, 'crate-b', '.gitnexus'),
+          storagePath: path.join(tmpDir, 'crate-b', '.yummygraph'),
           indexedAt: '',
           lastCommit: '',
         },
@@ -825,7 +825,7 @@ service OrderService {
     });
 
     it('workspace_deps: false skips workspace extraction entirely', async () => {
-      tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-sync-ws-off-'));
+      tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-sync-ws-off-'));
 
       writeFileSync(
         'crate-a/Cargo.toml',
@@ -857,7 +857,7 @@ service OrderService {
     });
 
     it('discovered workspace links merge with explicit manifest links', async () => {
-      tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-sync-ws-merge-'));
+      tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-sync-ws-merge-'));
 
       writeFileSync(
         'crate-a/Cargo.toml',
@@ -875,14 +875,14 @@ service OrderService {
         {
           name: 'mathlex',
           path: path.join(tmpDir, 'crate-a'),
-          storagePath: path.join(tmpDir, 'crate-a', '.gitnexus'),
+          storagePath: path.join(tmpDir, 'crate-a', '.yummygraph'),
           indexedAt: '',
           lastCommit: '',
         },
         {
           name: 'thales',
           path: path.join(tmpDir, 'crate-b'),
-          storagePath: path.join(tmpDir, 'crate-b', '.gitnexus'),
+          storagePath: path.join(tmpDir, 'crate-b', '.yummygraph'),
           indexedAt: '',
           lastCommit: '',
         },
@@ -934,7 +934,7 @@ service OrderService {
     });
 
     it('discovers Node workspace links through syncGroup orchestrator', async () => {
-      tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-sync-ws-node-'));
+      tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-sync-ws-node-'));
 
       writeFileSync('shared/package.json', '{"name": "@myorg/shared", "version": "1.0.0"}');
       writeFileSync('shared/src/index.ts', 'export class Config {}\n');
@@ -949,14 +949,14 @@ service OrderService {
         {
           name: 'shared',
           path: path.join(tmpDir, 'shared'),
-          storagePath: path.join(tmpDir, 'shared', '.gitnexus'),
+          storagePath: path.join(tmpDir, 'shared', '.yummygraph'),
           indexedAt: '',
           lastCommit: '',
         },
         {
           name: 'app',
           path: path.join(tmpDir, 'app'),
-          storagePath: path.join(tmpDir, 'app', '.gitnexus'),
+          storagePath: path.join(tmpDir, 'app', '.yummygraph'),
           indexedAt: '',
           lastCommit: '',
         },
@@ -1039,7 +1039,7 @@ service OrderService {
           id: groupPath.replace(/\//g, '-'),
           path: groupPath,
           repoPath: '/tmp/' + groupPath,
-          storagePath: '/tmp/' + groupPath + '/.gitnexus',
+          storagePath: '/tmp/' + groupPath + '/.yummygraph',
         }),
         skipWrite: true,
       });
@@ -1110,7 +1110,7 @@ describe('stableRepoPoolId', () => {
     const entry: RegistryEntry = {
       name: 'MyRepo',
       path: '/a/MyRepo',
-      storagePath: '/a/MyRepo/.gitnexus',
+      storagePath: '/a/MyRepo/.yummygraph',
       indexedAt: '',
       lastCommit: '',
     };
@@ -1122,14 +1122,14 @@ describe('stableRepoPoolId', () => {
     const entry1: RegistryEntry = {
       name: 'repo',
       path: '/a/repo',
-      storagePath: '/a/repo/.gitnexus',
+      storagePath: '/a/repo/.yummygraph',
       indexedAt: '',
       lastCommit: '',
     };
     const entry2: RegistryEntry = {
       name: 'repo',
       path: '/b/repo',
-      storagePath: '/b/repo/.gitnexus',
+      storagePath: '/b/repo/.yummygraph',
       indexedAt: '',
       lastCommit: '',
     };

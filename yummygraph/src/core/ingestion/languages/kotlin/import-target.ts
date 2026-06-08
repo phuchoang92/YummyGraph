@@ -1,4 +1,4 @@
-import type { ParsedImport, WorkspaceIndex } from 'gitnexus-shared';
+import type { ParsedImport, WorkspaceIndex } from 'yummygraph-shared';
 
 export interface KotlinResolveContext {
   readonly fromFile: string;

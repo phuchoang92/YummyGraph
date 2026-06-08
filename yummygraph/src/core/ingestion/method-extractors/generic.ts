@@ -1,4 +1,4 @@
-// gitnexus/src/core/ingestion/method-extractors/generic.ts
+// yummygraph/src/core/ingestion/method-extractors/generic.ts
 
 /**
  * Generic table-driven method extractor factory.

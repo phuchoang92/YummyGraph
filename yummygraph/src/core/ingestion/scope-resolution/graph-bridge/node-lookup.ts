@@ -18,7 +18,7 @@
  * format that downstream consumers (queries, edges, MCP) expect.
  */
 
-import type { NodeLabel, ParameterTypeClass } from 'gitnexus-shared';
+import type { NodeLabel, ParameterTypeClass } from 'yummygraph-shared';
 import type { KnowledgeGraph } from '../../../graph/types.js';
 import { isOverloadableCallable } from '../../utils/callable-labels.js';
 import { templateConstraintsIdTag } from '../../utils/template-arguments.js';

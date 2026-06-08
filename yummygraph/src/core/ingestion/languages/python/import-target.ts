@@ -10,7 +10,7 @@
  * `linkStatus: 'unresolved'`.
  */
 
-import type { ParsedImport, WorkspaceIndex } from 'gitnexus-shared';
+import type { ParsedImport, WorkspaceIndex } from 'yummygraph-shared';
 import { resolvePythonImportInternal } from '../../import-resolvers/python.js';
 import { recordPythonFileIndexBuild } from './index-stats.js';
 

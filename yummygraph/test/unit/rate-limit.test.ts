@@ -30,7 +30,7 @@ beforeAll(async () => {
   // Real fs.readFile target so the route does the same kind of FS work
   // the production routes do — keeps the test honest about what it covers.
   tmpFile = path.join(
-    await fs.mkdtemp(path.join(os.tmpdir(), 'gitnexus-ratelimit-')),
+    await fs.mkdtemp(path.join(os.tmpdir(), 'yummygraph-ratelimit-')),
     'fixture.txt',
   );
   await fs.writeFile(tmpFile, 'hello\n', 'utf-8');

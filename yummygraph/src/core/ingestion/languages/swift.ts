@@ -5,8 +5,8 @@
  * LanguageProvider, following the Strategy pattern used by the pipeline.
  */
 
-import { SupportedLanguages } from 'gitnexus-shared';
-import type { NodeLabel, SymbolDefinition } from 'gitnexus-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
+import type { NodeLabel, SymbolDefinition } from 'yummygraph-shared';
 import { createClassExtractor } from '../class-extractors/generic.js';
 import { swiftClassConfig } from '../class-extractors/configs/swift.js';
 import { defineLanguage } from '../language-provider.js';

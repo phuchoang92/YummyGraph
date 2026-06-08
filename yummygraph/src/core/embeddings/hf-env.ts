@@ -1,7 +1,7 @@
 import os from 'node:os';
 import { join } from 'node:path';
 
-import { CircuitBreaker, withRetry } from 'gitnexus-shared';
+import { CircuitBreaker, withRetry } from 'yummygraph-shared';
 
 // ---------------------------------------------------------------------------
 // Download resilience defaults
@@ -27,7 +27,7 @@ export const HF_MAX_ATTEMPTS_CAP = 10;
  * (`core/embeddings/embedder.ts` + `mcp/core/embedder.ts`). Not part of the
  * public package API.
  *
- * Minimal subset of `@huggingface/transformers`' `env` object that gitnexus
+ * Minimal subset of `@huggingface/transformers`' `env` object that yummygraph
  * mutates. Defining a local structural type keeps this helper free of a
  * transitive dependency on transformers' generated `.d.ts` while still
  * giving full type-checking on the two fields we actually touch.
@@ -44,12 +44,12 @@ export interface HfEnvSubset {
  *
  * Apply user-controlled HuggingFace environment overrides to the
  * `@huggingface/transformers` `env` object. Centralises the two env-var
- * bridges so every gitnexus embedder entry point (the analyze pipeline
+ * bridges so every yummygraph embedder entry point (the analyze pipeline
  * and the MCP server) behaves identically.
  *
  * - **`HF_HOME`** → `env.cacheDir` (default: `~/.cache/huggingface`).
  *   transformers.js otherwise defaults to `./node_modules/.cache` inside
- *   its own install dir, which is unwritable when gitnexus is installed
+ *   its own install dir, which is unwritable when yummygraph is installed
  *   globally (e.g. `/usr/lib/node_modules/`).
  *
  * - **`HF_ENDPOINT`** → `env.remoteHost` (#1205). transformers.js does
@@ -114,7 +114,7 @@ export const CIRCUIT_OPEN_TAG = 'hf-circuit-open';
  * Module-level singleton shared by both embedder entry points
  * (`core/embeddings/embedder.ts` + `mcp/core/embedder.ts`). Per-process
  * only — not persisted across restarts. Backed by the shared
- * `CircuitBreaker` from `gitnexus-shared` (same state machine, same
+ * `CircuitBreaker` from `yummygraph-shared` (same state machine, same
  * semantics, plus the single-permit half-open gate that prevents
  * recovery-time stampedes).
  */
@@ -216,7 +216,7 @@ export async function withHfDownloadRetry<T>(
   // Resolve effective values — explicit options take precedence over env vars,
   // which take precedence over built-in defaults. This lets users lower the
   // per-attempt timeout without rebuilding (e.g.
-  //   HF_DOWNLOAD_TIMEOUT_MS=60000 npx gitnexus analyze --embeddings
+  //   HF_DOWNLOAD_TIMEOUT_MS=60000 npx yummygraph analyze --embeddings
   // reduces the worst-case wait from 15 minutes to ~3 minutes).
   //
   // Upper bounds are clamped to prevent accidental runaway configuration:
@@ -252,7 +252,7 @@ export async function withHfDownloadRetry<T>(
     );
   }
 
-  // Retry budget delegated to `withRetry` from gitnexus-shared. The
+  // Retry budget delegated to `withRetry` from yummygraph-shared. The
   // HF-specific bits — per-attempt timeout, network-vs-non-network
   // classification, circuit-breaker recording, onRetry callback — wire
   // through the `isRetryable` callback. `circuitTripped` is the

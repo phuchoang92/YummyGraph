@@ -7,7 +7,7 @@
  * To add a language to the registry-primary path:
  *
  *   1. Implement `ScopeResolver` in
- *      `gitnexus/src/core/ingestion/languages/<lang>/scope-resolver.ts`.
+ *      `yummygraph/src/core/ingestion/languages/<lang>/scope-resolver.ts`.
  *      Nine required fields (language, languageProvider,
  *      importEdgeReason, resolveImportTarget, mergeBindings,
  *      arityCompatibility, buildMro, populateOwners, isSuperReceiver)
@@ -24,11 +24,11 @@
  *   2. Export a thin entry point:
  *      `runYourLangScopeResolution(input) = runScopeResolution(input, yourScopeResolver)`.
  *   3. Register the provider in
- *      `gitnexus/src/core/ingestion/scope-resolution/pipeline/registry.ts`
+ *      `yummygraph/src/core/ingestion/scope-resolution/pipeline/registry.ts`
  *      (the `SCOPE_RESOLVERS` map). That registration is all it takes — the
  *      `scopeResolutionPhase` runs every registered resolver.
  *   4. Verify the resolver integration test at
- *      `gitnexus/test/integration/resolvers/<lang>.test.ts` passes (it runs
+ *      `yummygraph/test/integration/resolvers/<lang>.test.ts` passes (it runs
  *      in the standard test suite). Scope-resolution is the only resolution
  *      path — the legacy call-resolution DAG was removed in RING4-1 #942.
  *
@@ -59,7 +59,7 @@
  *
  * ## Reference implementation
  *
- * `gitnexus/src/core/ingestion/languages/python/scope-resolver.ts` —
+ * `yummygraph/src/core/ingestion/languages/python/scope-resolver.ts` —
  * `pythonScopeResolver` is the canonical example. Read that file when
  * migrating a new language; this interface lists the fields that
  * implementation populates.
@@ -230,7 +230,7 @@
  *
  * ## Semantic-model source of truth
  *
- * `ParsedFile` (from `gitnexus-shared/src/scope-resolution/parsed-file.ts`)
+ * `ParsedFile` (from `yummygraph-shared/src/scope-resolution/parsed-file.ts`)
  * is the single semantic model consumed by both the legacy DAG and the
  * scope-resolution pipeline. Scope-resolution passes MUST NOT build a
  * parallel parse representation; if a pass needs AST-level facts that
@@ -247,7 +247,7 @@
  *   - Edge vocabulary: `'import-resolved' | 'global' | 'local-call' |
  *     'same-file' | 'interface-dispatch' | 'read' | 'write'` — both
  *     paths emit the same reasons (see
- *     `gitnexus/src/core/ingestion/call-processor.ts` for the legacy
+ *     `yummygraph/src/core/ingestion/call-processor.ts` for the legacy
  *     emitter and `passes/receiver-bound-calls.ts` /
  *     `passes/free-call-fallback.ts` for the scope-resolution emitters).
  *   - Overload disambiguation: both paths use
@@ -270,7 +270,7 @@ import type {
   ScopeId,
   SupportedLanguages,
   SymbolDefinition,
-} from 'gitnexus-shared';
+} from 'yummygraph-shared';
 import type { KnowledgeGraph } from '../../../graph/types.js';
 import type { GraphNodeLookup } from '../graph-bridge/node-lookup.js';
 import { LanguageProvider } from '../../language-provider.js';
@@ -293,7 +293,7 @@ export type ArityVerdict = 'compatible' | 'unknown' | 'incompatible';
 
 /** Re-exported for ScopeResolver consumers — same shape as
  *  `RegistryProviders.constraintCompatibility`'s third parameter. */
-export type { ConstraintContext } from 'gitnexus-shared';
+export type { ConstraintContext } from 'yummygraph-shared';
 
 export interface ScopeResolver {
   /** Identity for telemetry + per-language flag check. */
@@ -980,7 +980,7 @@ export interface ScopeResolver {
    */
   readonly collectScopeContextPaths?: (options: {
     readonly primaryFilePaths: readonly string[];
-    readonly preExtractedByPath: ReadonlyMap<string, import('gitnexus-shared').ParsedFile>;
+    readonly preExtractedByPath: ReadonlyMap<string, import('yummygraph-shared').ParsedFile>;
     readonly entryFileContents: ReadonlyMap<string, string>;
     readonly allScannedPaths: ReadonlySet<string>;
     readonly resolutionConfig: unknown;

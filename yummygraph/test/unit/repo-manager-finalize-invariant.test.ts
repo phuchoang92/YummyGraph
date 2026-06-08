@@ -1,7 +1,7 @@
 /**
  * Regression tests for the analyze finalize invariant (#1169).
  *
- * Issue #1169: on Windows, `gitnexus analyze` was observed to exit
+ * Issue #1169: on Windows, `yummygraph analyze` was observed to exit
  * cleanly with `lbug.wal` written but `meta.json` missing AND no
  * registry entry for the repo. The user saw only the banner and exit
  * code 0, indistinguishable from a healthy index. {@link
@@ -28,7 +28,7 @@ import { createTempDir } from '../helpers/test-db.js';
 describe('assertAnalysisFinalized (#1169)', () => {
   let tmpHome: Awaited<ReturnType<typeof createTempDir>>;
   let tmpRepo: Awaited<ReturnType<typeof createTempDir>>;
-  let savedGitnexusHome: string | undefined;
+  let savedYummygraphHome: string | undefined;
 
   const meta: RepoMeta = {
     repoPath: '',
@@ -40,18 +40,18 @@ describe('assertAnalysisFinalized (#1169)', () => {
   beforeEach(async () => {
     tmpHome = await createTempDir('gn-1169-home-');
     tmpRepo = await createTempDir('gn-1169-repo-');
-    savedGitnexusHome = process.env.GITNEXUS_HOME;
-    process.env.GITNEXUS_HOME = tmpHome.dbPath;
+    savedYummygraphHome = process.env.YUMMYGRAPH_HOME;
+    process.env.YUMMYGRAPH_HOME = tmpHome.dbPath;
   });
 
   afterEach(async () => {
-    if (savedGitnexusHome === undefined) delete process.env.GITNEXUS_HOME;
-    else process.env.GITNEXUS_HOME = savedGitnexusHome;
+    if (savedYummygraphHome === undefined) delete process.env.YUMMYGRAPH_HOME;
+    else process.env.YUMMYGRAPH_HOME = savedYummygraphHome;
     await tmpHome.cleanup();
     await tmpRepo.cleanup();
   });
 
-  it('throws missing="meta" when .gitnexus/meta.json was never written (the #1169 symptom)', async () => {
+  it('throws missing="meta" when .yummygraph/meta.json was never written (the #1169 symptom)', async () => {
     // Reproduce the exact disk shape from the user's repro: lbug.wal
     // present, meta.json absent. analyze must report this as a hard
     // failure, not silently return success.

@@ -56,15 +56,15 @@ describe('registry persists remoteUrl', () => {
   let savedHome: string | undefined;
 
   beforeEach(async () => {
-    tmpHome = await createTempDir('gitnexus-sibling-home-');
-    tmpRepo = await createTempDir('gitnexus-sibling-repo-');
-    savedHome = process.env.GITNEXUS_HOME;
-    process.env.GITNEXUS_HOME = tmpHome.dbPath;
+    tmpHome = await createTempDir('yummygraph-sibling-home-');
+    tmpRepo = await createTempDir('yummygraph-sibling-repo-');
+    savedHome = process.env.YUMMYGRAPH_HOME;
+    process.env.YUMMYGRAPH_HOME = tmpHome.dbPath;
   });
 
   afterEach(async () => {
-    if (savedHome === undefined) delete process.env.GITNEXUS_HOME;
-    else process.env.GITNEXUS_HOME = savedHome;
+    if (savedHome === undefined) delete process.env.YUMMYGRAPH_HOME;
+    else process.env.YUMMYGRAPH_HOME = savedHome;
     await tmpHome.cleanup();
     await tmpRepo.cleanup();
   });
@@ -99,14 +99,14 @@ describe('findSiblingClones', () => {
   let savedHome: string | undefined;
 
   beforeEach(async () => {
-    tmpHome = await createTempDir('gitnexus-sibling-find-home-');
-    savedHome = process.env.GITNEXUS_HOME;
-    process.env.GITNEXUS_HOME = tmpHome.dbPath;
+    tmpHome = await createTempDir('yummygraph-sibling-find-home-');
+    savedHome = process.env.YUMMYGRAPH_HOME;
+    process.env.YUMMYGRAPH_HOME = tmpHome.dbPath;
   });
 
   afterEach(async () => {
-    if (savedHome === undefined) delete process.env.GITNEXUS_HOME;
-    else process.env.GITNEXUS_HOME = savedHome;
+    if (savedHome === undefined) delete process.env.YUMMYGRAPH_HOME;
+    else process.env.YUMMYGRAPH_HOME = savedHome;
     await tmpHome.cleanup();
   });
 
@@ -158,14 +158,14 @@ describe('checkCwdMatch', () => {
   let savedHome: string | undefined;
 
   beforeEach(async () => {
-    tmpHome = await createTempDir('gitnexus-cwd-match-home-');
-    savedHome = process.env.GITNEXUS_HOME;
-    process.env.GITNEXUS_HOME = tmpHome.dbPath;
+    tmpHome = await createTempDir('yummygraph-cwd-match-home-');
+    savedHome = process.env.YUMMYGRAPH_HOME;
+    process.env.YUMMYGRAPH_HOME = tmpHome.dbPath;
   });
 
   afterEach(async () => {
-    if (savedHome === undefined) delete process.env.GITNEXUS_HOME;
-    else process.env.GITNEXUS_HOME = savedHome;
+    if (savedHome === undefined) delete process.env.YUMMYGRAPH_HOME;
+    else process.env.YUMMYGRAPH_HOME = savedHome;
     await tmpHome.cleanup();
   });
 

@@ -23,7 +23,7 @@
  * Plan: `docs/plans/2026-04-20-001-refactor-emit-pipeline-generalization-plan.md`.
  */
 
-import type { ParsedFile, RegistryProviders } from 'gitnexus-shared';
+import type { ParsedFile, RegistryProviders } from 'yummygraph-shared';
 import type { KnowledgeGraph } from '../../../graph/types.js';
 import { generateId } from '../../../../lib/utils.js';
 import { lookupOwnedMembersByOwner } from '../../model/owned-members-lookup.js';
@@ -289,7 +289,7 @@ interface RunScopeResolutionInput {
    */
   readonly preExtractedParsedFiles?: ReadonlyMap<string, ParsedFile>;
   /**
-   * Out-of-core scope index (disk-backed scope seal). When set AND `GITNEXUS_DISK_SCOPE_INDEX` is
+   * Out-of-core scope index (disk-backed scope seal). When set AND `YUMMYGRAPH_DISK_SCOPE_INDEX` is
    * enabled, the per-language `scopeTree` is sealed to a disk-backed store at
    * this path after resolve (before emit), and the heavy `Scope.bindings`
    * payload is dropped from heap — lowering the per-language peak (kernel:
@@ -596,7 +596,7 @@ export function runScopeResolution(
   let emitParsedFiles: readonly ParsedFile[] = parsedFiles;
   if (
     input.scopeIndexStorePath !== undefined &&
-    parseTruthyEnv(process.env.GITNEXUS_DISK_SCOPE_INDEX) &&
+    parseTruthyEnv(process.env.YUMMYGRAPH_DISK_SCOPE_INDEX) &&
     indexes.scopeTree instanceof TransitionalScopeTree
   ) {
     logHeapProbe('sr-seal-pre', `lang=${provider.language}`);

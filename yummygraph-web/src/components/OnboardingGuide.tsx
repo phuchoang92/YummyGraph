@@ -207,7 +207,7 @@ interface OnboardingGuideProps {
 
 export const OnboardingGuide = ({ isPolling }: OnboardingGuideProps) => {
   const { t } = useTranslation('onboarding');
-  const primary = isDev ? 'npm run --prefix gitnexus serve' : 'npx gitnexus@latest serve';
+  const primary = isDev ? 'npm run --prefix yummygraph serve' : 'npx yummygraph@latest serve';
   const termLabel = isDev ? t('guide.startBackend') : t('guide.terminal');
 
   // Step states: step 1 = copy command, step 2 = run/wait, step 3 = auto-connect
@@ -228,7 +228,7 @@ export const OnboardingGuide = ({ isPolling }: OnboardingGuideProps) => {
           <div className="mb-2 inline-flex items-center gap-1.5">
             <Sparkles className="h-3.5 w-3.5 text-accent/70" />
             <span className="text-[11px] font-medium tracking-widest text-accent/80 uppercase">
-              GitNexus
+              YummyGraph
             </span>
           </div>
           <h2 className="text-lg leading-snug font-semibold text-text-primary">
@@ -268,7 +268,7 @@ export const OnboardingGuide = ({ isPolling }: OnboardingGuideProps) => {
                 <div className="h-px flex-1 bg-border-subtle" />
               </div>
               <TerminalWindow
-                command="npm install -g gitnexus && gitnexus serve"
+                command="npm install -g yummygraph && yummygraph serve"
                 label={t('guide.globalInstall')}
                 isActive={false}
               />

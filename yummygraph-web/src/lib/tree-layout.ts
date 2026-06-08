@@ -1,5 +1,5 @@
 import type { KnowledgeGraph } from '../core/graph/types';
-import type { GraphNode, NodeLabel } from 'gitnexus-shared';
+import type { GraphNode, NodeLabel } from 'yummygraph-shared';
 import { NODE_SIZES } from './constants';
 
 export interface TreeNodePosition {

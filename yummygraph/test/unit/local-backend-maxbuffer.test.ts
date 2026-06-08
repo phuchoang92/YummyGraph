@@ -5,7 +5,7 @@
  * by `git diff` on repos with large unstaged changes (e.g. unignored build
  * folders) — see the original bug report:
  *
- *   "spawnSync git ENOBUFS in gitnexus_detect_changes(scope=\"unstaged\")
+ *   "spawnSync git ENOBUFS in yummygraph_detect_changes(scope=\"unstaged\")
  *    due to missing maxBuffer".
  *
  * Every `execFileSync` call in `local-backend.ts` that captures stdout

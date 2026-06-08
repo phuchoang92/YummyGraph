@@ -8,8 +8,8 @@
  *   - mroStrategy: 'qualified-syntax' (Rust uses trait qualification, not MRO)
  */
 
-import { SupportedLanguages } from 'gitnexus-shared';
-import type { NodeLabel } from 'gitnexus-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
+import type { NodeLabel } from 'yummygraph-shared';
 import { createClassExtractor } from '../class-extractors/generic.js';
 import { rustClassConfig } from '../class-extractors/configs/rust.js';
 import { defineLanguage } from '../language-provider.js';

@@ -1,4 +1,4 @@
-import type { Range } from 'gitnexus-shared';
+import type { Range } from 'yummygraph-shared';
 
 export type ResolutionSuppressionReason =
   | 'adl-ordinary-lookup-blocked'

@@ -1,7 +1,7 @@
 /**
  * Git Clone Utility
  *
- * Shallow-clones repositories into ~/.gitnexus/repos/{name}/.
+ * Shallow-clones repositories into ~/.yummygraph/repos/{name}/.
  * If already cloned, does git pull instead.
  */
 
@@ -14,7 +14,7 @@ import { logger } from '../core/logger.js';
 import { parseRepoNameFromUrl } from '../storage/git.js';
 
 /** Root directory for all cloned repositories. Targets must resolve inside this. */
-const CLONE_ROOT = path.resolve(path.join(os.homedir(), '.gitnexus', 'repos'));
+const CLONE_ROOT = path.resolve(path.join(os.homedir(), '.yummygraph', 'repos'));
 
 // A valid git repository name is filesystem-safe: alphanumerics plus `. _ -`.
 // Rejecting anything else (including `..`, `/`, `\`, shell metacharacters)
@@ -329,7 +329,7 @@ export function getRemoteOriginUrl(cwd: string): Promise<string | null> {
  * Closes the wrong-repo silent-analysis vector that Codex's adversarial
  * review on PR #1325 surfaced: clone dirs are keyed by URL basename, so a
  * request for `https://gitlab.example/attacker/repo.git` would otherwise
- * collide with an existing `~/.gitnexus/repos/repo` cloned from a different
+ * collide with an existing `~/.yummygraph/repos/repo` cloned from a different
  * origin and `git pull --ff-only` would silently succeed against the wrong
  * remote.
  *
@@ -358,7 +358,7 @@ export async function assertRemoteMatchesRequestedUrl(
  * existing clone's remote.origin matches the requested URL).
  *
  * Security:
- *   - targetDir must resolve inside CLONE_ROOT (~/.gitnexus/repos/). The
+ *   - targetDir must resolve inside CLONE_ROOT (~/.yummygraph/repos/). The
  *     path.relative containment barrier below is the inline canonical idiom
  *     CodeQL's js/path-injection sanitizer recognizes.
  *   - validateGitUrl runs unconditionally on the requested URL — both the

@@ -1,4 +1,4 @@
-// gitnexus/src/core/ingestion/field-extractors/generic.ts
+// yummygraph/src/core/ingestion/field-extractors/generic.ts
 
 /**
  * Generic table-driven field extractor factory.
@@ -9,7 +9,7 @@
  */
 
 import type { SyntaxNode } from '../utils/ast-helpers.js';
-import { SupportedLanguages } from 'gitnexus-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 import { BaseFieldExtractor } from '../field-extractor.js';
 import type { FieldExtractor } from '../field-extractor.js';
 import type {

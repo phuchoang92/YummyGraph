@@ -10,7 +10,7 @@
  *   - http://127.0.0.1:<port>         → allowed
  *   - RFC 1918 private network ranges → allowed
  *       10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16
- *   - https://gitnexus.vercel.app     → allowed
+ *   - https://yummygraph.vercel.app     → allowed
  *   - Everything else                 → rejected
  */
 import { describe, it, expect } from 'vitest';
@@ -51,8 +51,8 @@ describe('isAllowedOrigin: localhost', () => {
 // ─── Deployed site ────────────────────────────────────────────────────
 
 describe('isAllowedOrigin: vercel.app', () => {
-  it('allows https://gitnexus.vercel.app', () => {
-    expect(isAllowedOrigin('https://gitnexus.vercel.app')).toBe(true);
+  it('allows https://yummygraph.vercel.app', () => {
+    expect(isAllowedOrigin('https://yummygraph.vercel.app')).toBe(true);
   });
 
   it('rejects other vercel.app subdomains', () => {
@@ -139,8 +139,8 @@ describe('isAllowedOrigin: rejected origins', () => {
     expect(isAllowedOrigin('http://8.8.8.8:3000')).toBe(false);
   });
 
-  it('rejects https://gitnexus.example.com (not the official domain)', () => {
-    expect(isAllowedOrigin('https://gitnexus.example.com')).toBe(false);
+  it('rejects https://yummygraph.example.com (not the official domain)', () => {
+    expect(isAllowedOrigin('https://yummygraph.example.com')).toBe(false);
   });
 
   it('rejects malformed origin string', () => {

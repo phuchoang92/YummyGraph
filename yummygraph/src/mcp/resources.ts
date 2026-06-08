@@ -2,7 +2,7 @@
  * MCP Resources (Multi-Repo)
  *
  * Provides structured on-demand data to AI agents.
- * All resources use repo-scoped URIs: gitnexus://repo/{name}/context
+ * All resources use repo-scoped URIs: yummygraph://repo/{name}/context
  */
 
 import type { LocalBackend } from './local/local-backend.js';
@@ -28,15 +28,15 @@ export interface ResourceTemplate {
 export function getResourceDefinitions(): ResourceDefinition[] {
   return [
     {
-      uri: 'gitnexus://repos',
+      uri: 'yummygraph://repos',
       name: 'All Indexed Repositories',
       description:
         'List of all indexed repos with stats. Read this first to discover available repos.',
       mimeType: 'text/yaml',
     },
     {
-      uri: 'gitnexus://setup',
-      name: 'GitNexus Setup Content',
+      uri: 'yummygraph://setup',
+      name: 'YummyGraph Setup Content',
       description: 'Returns AGENTS.md content for all indexed repos. Useful for setup/onboarding.',
       mimeType: 'text/markdown',
     },
@@ -49,50 +49,50 @@ export function getResourceDefinitions(): ResourceDefinition[] {
 export function getResourceTemplates(): ResourceTemplate[] {
   return [
     {
-      uriTemplate: 'gitnexus://repo/{name}/context',
+      uriTemplate: 'yummygraph://repo/{name}/context',
       name: 'Repo Overview',
       description: 'Codebase stats, staleness check, and available tools',
       mimeType: 'text/yaml',
     },
     {
-      uriTemplate: 'gitnexus://repo/{name}/clusters',
+      uriTemplate: 'yummygraph://repo/{name}/clusters',
       name: 'Repo Modules',
       description: 'All functional areas (Leiden clusters)',
       mimeType: 'text/yaml',
     },
     {
-      uriTemplate: 'gitnexus://repo/{name}/processes',
+      uriTemplate: 'yummygraph://repo/{name}/processes',
       name: 'Repo Processes',
       description: 'All execution flows',
       mimeType: 'text/yaml',
     },
     {
-      uriTemplate: 'gitnexus://repo/{name}/schema',
+      uriTemplate: 'yummygraph://repo/{name}/schema',
       name: 'Graph Schema',
       description: 'Node/edge schema for Cypher queries',
       mimeType: 'text/yaml',
     },
     {
-      uriTemplate: 'gitnexus://repo/{name}/cluster/{clusterName}',
+      uriTemplate: 'yummygraph://repo/{name}/cluster/{clusterName}',
       name: 'Module Detail',
       description: 'Deep dive into a specific functional area',
       mimeType: 'text/yaml',
     },
     {
-      uriTemplate: 'gitnexus://repo/{name}/process/{processName}',
+      uriTemplate: 'yummygraph://repo/{name}/process/{processName}',
       name: 'Process Trace',
       description: 'Step-by-step execution trace',
       mimeType: 'text/yaml',
     },
     {
-      uriTemplate: 'gitnexus://group/{name}/contracts',
+      uriTemplate: 'yummygraph://group/{name}/contracts',
       name: 'Group Contract Registry',
       description:
         'Cross-repo contract registry for a repository group. Optional query: type, repo, unmatchedOnly (true|false).',
       mimeType: 'text/yaml',
     },
     {
-      uriTemplate: 'gitnexus://group/{name}/status',
+      uriTemplate: 'yummygraph://group/{name}/status',
       name: 'Group Index Status',
       description: 'Per-repo index and contract-registry staleness for a repository group',
       mimeType: 'text/yaml',
@@ -100,15 +100,15 @@ export function getResourceTemplates(): ResourceTemplate[] {
   ];
 }
 
-/** Query parameters for `gitnexus://group/{name}/contracts` */
+/** Query parameters for `yummygraph://group/{name}/contracts` */
 export type GroupContractsResourceFilter = {
   type?: string;
   repo?: string;
   unmatchedOnly?: boolean;
 };
 
-/** Normalized parse result for GitNexus MCP resource URIs */
-export type ParsedGitnexusResource =
+/** Normalized parse result for YummyGraph MCP resource URIs */
+export type ParsedYummygraphResource =
   | { kind: 'repos' }
   | { kind: 'setup' }
   | {
@@ -134,12 +134,12 @@ function parseUnmatchedOnlyParam(raw: string | null): boolean | undefined {
 }
 
 /**
- * Parse a GitNexus resource URI (repos, setup, per-repo, or per-group templates).
+ * Parse a YummyGraph resource URI (repos, setup, per-repo, or per-group templates).
  * Used by `readResource` and tests (round-trip / dispatch coverage).
  */
-export function parseResourceUri(uri: string): ParsedGitnexusResource {
-  if (uri === 'gitnexus://repos') return { kind: 'repos' };
-  if (uri === 'gitnexus://setup') return { kind: 'setup' };
+export function parseResourceUri(uri: string): ParsedYummygraphResource {
+  if (uri === 'yummygraph://repos') return { kind: 'repos' };
+  if (uri === 'yummygraph://setup') return { kind: 'setup' };
 
   let u: URL;
   try {
@@ -148,7 +148,7 @@ export function parseResourceUri(uri: string): ParsedGitnexusResource {
     throw new Error(`Unknown resource URI: ${uri}`);
   }
 
-  if (u.protocol !== 'gitnexus:') {
+  if (u.protocol !== 'yummygraph:') {
     throw new Error(`Unknown resource URI: ${uri}`);
   }
 
@@ -159,7 +159,7 @@ export function parseResourceUri(uri: string): ParsedGitnexusResource {
       .filter(Boolean);
     if (segments.length < 2) {
       throw new Error(
-        `Invalid group resource URI (expected gitnexus://group/{name}/contracts or .../status): ${uri}`,
+        `Invalid group resource URI (expected yummygraph://group/{name}/contracts or .../status): ${uri}`,
       );
     }
     const tail = segments[segments.length - 1]!;
@@ -273,7 +273,7 @@ async function getReposResource(backend: LocalBackend): Promise<string> {
   const repos = await backend.listRepos();
 
   if (repos.length === 0) {
-    return 'repos: []\n# No repositories indexed. Run: gitnexus analyze';
+    return 'repos: []\n# No repositories indexed. Run: yummygraph analyze';
   }
 
   const lines: string[] = ['repos:'];
@@ -308,7 +308,7 @@ async function getContextResource(backend: LocalBackend, repoName?: string): Pro
   const context = backend.getContext(repoId) || backend.getContext();
 
   if (!context) {
-    return 'error: No codebase loaded. Run: gitnexus analyze';
+    return 'error: No codebase loaded. Run: yummygraph analyze';
   }
 
   // Check staleness
@@ -340,18 +340,18 @@ async function getContextResource(backend: LocalBackend, repoName?: string): Pro
   lines.push('  - cypher: Raw graph queries');
   lines.push('  - list_repos: Discover all indexed repositories');
   lines.push('');
-  lines.push('re_index: Run `npx gitnexus analyze` in terminal if data is stale');
+  lines.push('re_index: Run `npx yummygraph analyze` in terminal if data is stale');
   lines.push('');
   lines.push('resources_available:');
-  lines.push('  - gitnexus://repos: All indexed repositories');
-  lines.push(`  - gitnexus://repo/${context.projectName}/clusters: All functional areas`);
-  lines.push(`  - gitnexus://repo/${context.projectName}/processes: All execution flows`);
-  lines.push(`  - gitnexus://repo/${context.projectName}/cluster/{name}: Module details`);
-  lines.push(`  - gitnexus://repo/${context.projectName}/process/{name}: Process trace`);
+  lines.push('  - yummygraph://repos: All indexed repositories');
+  lines.push(`  - yummygraph://repo/${context.projectName}/clusters: All functional areas`);
+  lines.push(`  - yummygraph://repo/${context.projectName}/processes: All execution flows`);
+  lines.push(`  - yummygraph://repo/${context.projectName}/cluster/{name}: Module details`);
+  lines.push(`  - yummygraph://repo/${context.projectName}/process/{name}: Process trace`);
   lines.push(
-    '  - gitnexus://group/{name}/contracts: Group contract registry (optional ?type=&repo=&unmatchedOnly=)',
+    '  - yummygraph://group/{name}/contracts: Group contract registry (optional ?type=&repo=&unmatchedOnly=)',
   );
-  lines.push('  - gitnexus://group/{name}/status: Group index / contract staleness');
+  lines.push('  - yummygraph://group/{name}/status: Group index / contract staleness');
 
   return lines.join('\n');
 }
@@ -364,7 +364,7 @@ async function getClustersResource(backend: LocalBackend, repoName?: string): Pr
     const result = await backend.queryClusters(repoName, 100);
 
     if (!result.clusters || result.clusters.length === 0) {
-      return 'modules: []\n# No functional areas detected. Run: gitnexus analyze';
+      return 'modules: []\n# No functional areas detected. Run: yummygraph analyze';
     }
 
     const displayLimit = 20;
@@ -400,7 +400,7 @@ async function getProcessesResource(backend: LocalBackend, repoName?: string): P
     const result = await backend.queryProcesses(repoName, 50);
 
     if (!result.processes || result.processes.length === 0) {
-      return 'processes: []\n# No processes detected. Run: gitnexus analyze';
+      return 'processes: []\n# No processes detected. Run: yummygraph analyze';
     }
 
     const displayLimit = 20;
@@ -430,7 +430,7 @@ async function getProcessesResource(backend: LocalBackend, repoName?: string): P
  * Schema resource — graph structure for Cypher queries
  */
 function getSchemaResource(): string {
-  return `# GitNexus Graph Schema
+  return `# YummyGraph Graph Schema
 
 nodes:
   - File: Source code files
@@ -575,13 +575,13 @@ async function getProcessDetailResource(
 
 /**
  * Setup resource — generates AGENTS.md content for all indexed repos.
- * Useful for `gitnexus setup` onboarding or dynamic content injection.
+ * Useful for `yummygraph setup` onboarding or dynamic content injection.
  */
 async function getSetupResource(backend: LocalBackend): Promise<string> {
   const repos = await backend.listRepos();
 
   if (repos.length === 0) {
-    return '# GitNexus\n\nNo repositories indexed. Run: `npx gitnexus analyze` in a repository.';
+    return '# YummyGraph\n\nNo repositories indexed. Run: `npx yummygraph analyze` in a repository.';
   }
 
   const sections: string[] = [];
@@ -589,9 +589,9 @@ async function getSetupResource(backend: LocalBackend): Promise<string> {
   for (const repo of repos) {
     const stats = repo.stats || {};
     const lines = [
-      `# GitNexus MCP — ${repo.name}`,
+      `# YummyGraph MCP — ${repo.name}`,
       '',
-      `This project is indexed by GitNexus as **${repo.name}** (${stats.nodes || 0} symbols, ${stats.edges || 0} relationships, ${stats.processes || 0} execution flows).`,
+      `This project is indexed by YummyGraph as **${repo.name}** (${stats.nodes || 0} symbols, ${stats.edges || 0} relationships, ${stats.processes || 0} execution flows).`,
       '',
       '## Tools',
       '',
@@ -607,10 +607,10 @@ async function getSetupResource(backend: LocalBackend): Promise<string> {
       '',
       '## Resources',
       '',
-      `- \`gitnexus://repo/${repo.name}/context\` — Stats, staleness check`,
-      `- \`gitnexus://repo/${repo.name}/clusters\` — All functional areas`,
-      `- \`gitnexus://repo/${repo.name}/processes\` — All execution flows`,
-      `- \`gitnexus://repo/${repo.name}/schema\` — Graph schema for Cypher`,
+      `- \`yummygraph://repo/${repo.name}/context\` — Stats, staleness check`,
+      `- \`yummygraph://repo/${repo.name}/clusters\` — All functional areas`,
+      `- \`yummygraph://repo/${repo.name}/processes\` — All execution flows`,
+      `- \`yummygraph://repo/${repo.name}/schema\` — Graph schema for Cypher`,
     ];
     sections.push(lines.join('\n'));
   }

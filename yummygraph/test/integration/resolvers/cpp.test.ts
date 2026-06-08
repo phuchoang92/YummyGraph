@@ -1941,7 +1941,7 @@ describe('C++ ambiguous integer-width overloads', () => {
     const processCalls = calls.filter((c) => c.source === 'run' && c.target === 'process');
     // Exact .toBe(0): any non-zero count is a regression. count=1 = arbitrary
     // pick (the bug U2 fixes); count=2+ would require an ambiguous-edge model
-    // GitNexus does not have. The resolver must suppress entirely.
+    // YummyGraph does not have. The resolver must suppress entirely.
     expect(processCalls.length).toBe(0);
   });
 
@@ -2230,7 +2230,7 @@ describe('C++ anonymous namespace state-isolation guard', () => {
 // ---------------------------------------------------------------------------
 // U4: `using namespace` with conflicting names from two namespaces
 // The resolver MUST emit zero CALLS edges — emitting one is arbitrary
-// pick; emitting two requires an ambiguous-target edge model GitNexus
+// pick; emitting two requires an ambiguous-target edge model YummyGraph
 // does not have.
 // Depends on U1 (without scope-aware filtering, `a::foo` and `b::foo`
 // would already be in the importer's wildcard binding set as simple
@@ -2345,7 +2345,7 @@ describe('C++ default-argument overload ambiguity', () => {
     const calls = getRelationships(result, 'CALLS');
     const fCalls = calls.filter((c) => c.source === 'run' && c.target === 'f');
     // Exact .toBe(0): count=1 means arbitrary pick (the bug); count=2+ would
-    // require an ambiguous-target edge model GitNexus does not have. The
+    // require an ambiguous-target edge model YummyGraph does not have. The
     // resolver must suppress entirely. Standard C++ rejects the call as
     // ambiguous (GCC/Clang both diagnose).
     expect(fCalls.length).toBe(0);
@@ -2969,7 +2969,7 @@ describe('C++ ADL — int/long-collision overloads suppress via OVERLOAD_AMBIGUO
     // ['', 'int']), and isOverloadAmbiguousAfterNormalization detects
     // the collision in merged ordinary+ADL narrowing, so fallback suppresses.
     // count=1 is the bug (arbitrary first-pick); count=2 would require
-    // an ambiguous-target edge model GitNexus does not have.
+    // an ambiguous-target edge model YummyGraph does not have.
     expect(processCalls.length).toBe(0);
   });
 });
@@ -3124,7 +3124,7 @@ describe('C++ ADL — block-scope function declaration suppresses ADL', () => {
 // ---------------------------------------------------------------------------
 // ADL V2 - strict function-type associated entities.
 //
-// Function-reference arguments follow strict ISO C++ ADL: GitNexus walks the
+// Function-reference arguments follow strict ISO C++ ADL: YummyGraph walks the
 // referenced overload set's parameter and return types instead of contributing
 // the referenced function's enclosing namespace.
 // For `void worker()`, the associated set is empty; for `void worker(api::Token)`
@@ -3213,7 +3213,7 @@ describe('C++ ADL — namespace-qualified variable arg does NOT contribute names
     const processCalls = calls.filter((c) => c.source === 'run' && c.target === 'process');
     // data::value is a namespace-qualified integer variable. tree-sitter-cpp
     // produces a qualified_identifier AST node regardless of whether `value`
-    // denotes a function, variable, enum, or static member. The GitNexus guard
+    // denotes a function, variable, enum, or static member. The YummyGraph guard
     // in collectFunctionTypeAssociatedNamespaces verifies that a Function/Method
     // named `value` exists in the `data` namespace before walking any function
     // type. Since `data::value` is an int variable, no function type is walked,

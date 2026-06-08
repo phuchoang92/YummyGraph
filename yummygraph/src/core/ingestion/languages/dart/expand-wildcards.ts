@@ -10,7 +10,7 @@
  * cross-file `var u = getUser(); u.save()` never resolves `u`'s type.
  */
 
-import type { ParsedFile, ScopeId } from 'gitnexus-shared';
+import type { ParsedFile, ScopeId } from 'yummygraph-shared';
 
 export function expandDartWildcardNames(
   targetModuleScope: ScopeId,

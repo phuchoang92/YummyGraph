@@ -10,7 +10,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import type { SymbolDefinition } from 'gitnexus-shared';
+import type { SymbolDefinition } from 'yummygraph-shared';
 import { narrowOverloadCandidates } from '../../../src/core/ingestion/scope-resolution/passes/overload-narrowing.js';
 
 const mkDef = (overrides: Partial<SymbolDefinition> & { nodeId: string }): SymbolDefinition => ({

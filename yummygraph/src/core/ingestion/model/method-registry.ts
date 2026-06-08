@@ -7,7 +7,7 @@
  * (array values) and arity-based filtering.
  */
 
-import type { SymbolDefinition } from 'gitnexus-shared';
+import type { SymbolDefinition } from 'yummygraph-shared';
 
 // ---------------------------------------------------------------------------
 // Public read-only interface

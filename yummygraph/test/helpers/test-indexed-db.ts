@@ -84,7 +84,7 @@ export function withTestLbugDB(
   let ftsSkipWarned = false;
 
   const setup = async () => {
-    const tmpHandle = await createTempDir('gitnexus-lbug-');
+    const tmpHandle = await createTempDir('yummygraph-lbug-');
     const dbPath = path.join(tmpHandle.dbPath, 'lbug');
     const repoId = `test-${prefix}-${Date.now()}-${repoCounter++}`;
 

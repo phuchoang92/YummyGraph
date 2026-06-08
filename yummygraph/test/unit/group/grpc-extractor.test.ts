@@ -26,7 +26,7 @@ describe('GrpcExtractor', () => {
   let extractor: GrpcExtractor;
 
   beforeEach(async () => {
-    tmpDir = await fsp.mkdtemp(path.join(os.tmpdir(), 'gitnexus-grpc-'));
+    tmpDir = await fsp.mkdtemp(path.join(os.tmpdir(), 'yummygraph-grpc-'));
     extractor = new GrpcExtractor();
   });
 
@@ -44,7 +44,7 @@ describe('GrpcExtractor', () => {
     id: 'test-repo',
     path: 'test/app',
     repoPath,
-    storagePath: path.join(repoPath, '.gitnexus'),
+    storagePath: path.join(repoPath, '.yummygraph'),
   });
 
   describe('proto file parsing', () => {
@@ -1214,18 +1214,18 @@ export class AuthGateway {
     });
   });
 
-  // ─── #1185: gRPC extractor must honour .gitnexusignore ──────────────
+  // ─── #1185: gRPC extractor must honour .yummygraphignore ──────────────
   //
   // Both the `.proto` glob (in `buildProtoContext`) and the source-scan
   // glob (in `extract`) used a hardcoded ignore array that bypassed
   // `IgnoreService`. Both globs now consume the shared filter (mirrors
-  // `filesystem-walker.ts`) so any `.gitnexusignore` pattern is
+  // `filesystem-walker.ts`) so any `.yummygraphignore` pattern is
   // honoured. The single test below exercises BOTH paths in the same
   // run: a `.proto` under `mentor_env/` (proto-context build) AND a
   // Python `_pb2_grpc.<Name>Stub` consumer under `mentor_env/`
   // (source-scan path) — neither produces a contract.
-  describe('respects .gitnexusignore (#1185)', () => {
-    it('proto + source globs both skip files matched by .gitnexusignore', async () => {
+  describe('respects .yummygraphignore (#1185)', () => {
+    it('proto + source globs both skip files matched by .yummygraphignore', async () => {
       // Control: a regular .proto in a non-ignored dir.
       writeFile(
         'proto/auth.proto',
@@ -1248,7 +1248,7 @@ service LeakedService {
       // exercises the second glob in `extract()` (source-scan path).
       // Mirrors the canonical pattern from
       // `test_extract_python_stub_returns_consumer` above; without the
-      // `.gitnexusignore` filter this WOULD emit a `grpc::*/LeakedService`
+      // `.yummygraphignore` filter this WOULD emit a `grpc::*/LeakedService`
       // consumer contract.
       writeFile(
         'mentor_env/lib/leaked_consumer.py',
@@ -1258,7 +1258,7 @@ from proto import leaked_pb2_grpc
 channel = grpc.insecure_channel('localhost:50051')
 stub = leaked_pb2_grpc.LeakedServiceStub(channel)`,
       );
-      writeFile('.gitnexusignore', 'mentor_env/\n');
+      writeFile('.yummygraphignore', 'mentor_env/\n');
 
       const contracts = await extractor.extract(null, tmpDir, makeRepo(tmpDir));
       // Control proto provider is still emitted.
@@ -1491,7 +1491,7 @@ describe('GrpcExtractor.extract ambiguous proto resolution', () => {
   let extractor: GrpcExtractor;
 
   beforeEach(async () => {
-    tmpDir = await fsp.mkdtemp(path.join(os.tmpdir(), 'gitnexus-grpc-ambig-'));
+    tmpDir = await fsp.mkdtemp(path.join(os.tmpdir(), 'yummygraph-grpc-ambig-'));
     extractor = new GrpcExtractor();
   });
   afterEach(async () => {

@@ -7,7 +7,7 @@
  *   - `'unknown'`      — metadata absent / incomplete.
  */
 
-import type { Callsite, SymbolDefinition } from 'gitnexus-shared';
+import type { Callsite, SymbolDefinition } from 'yummygraph-shared';
 
 export function javaArityCompatibility(
   def: SymbolDefinition,

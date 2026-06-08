@@ -24,8 +24,8 @@ let dbPath: string;
 beforeAll(async () => {
   // Create a temp directory with CJK characters in the name.
   // This reproduces the user's scenario: repo at C:\Project\中文\code
-  tmpBase = path.join(os.tmpdir(), `gitnexus-lbug-非ASCII路径-${Date.now()}-${process.pid}`);
-  storagePath = path.join(tmpBase, '.gitnexus');
+  tmpBase = path.join(os.tmpdir(), `yummygraph-lbug-非ASCII路径-${Date.now()}-${process.pid}`);
+  storagePath = path.join(tmpBase, '.yummygraph');
   dbPath = path.join(storagePath, 'lbug');
   await fs.mkdir(dbPath, { recursive: true });
 });

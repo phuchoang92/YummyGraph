@@ -32,7 +32,7 @@
  * reference-site scope chain (mirror `findExportedDefByName`).
  */
 
-import type { ParsedFile } from 'gitnexus-shared';
+import type { ParsedFile } from 'yummygraph-shared';
 import type { ScopeResolutionIndexes } from '../../model/scope-resolution-indexes.js';
 
 export function collectNamespaceTargets(

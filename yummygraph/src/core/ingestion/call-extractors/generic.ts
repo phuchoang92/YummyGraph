@@ -1,4 +1,4 @@
-// gitnexus/src/core/ingestion/call-extractors/generic.ts
+// yummygraph/src/core/ingestion/call-extractors/generic.ts
 
 /**
  * Generic table-driven call extractor factory.

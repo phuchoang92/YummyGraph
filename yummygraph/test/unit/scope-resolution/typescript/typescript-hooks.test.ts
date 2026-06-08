@@ -38,7 +38,7 @@ import type {
   ScopeTree,
   SymbolDefinition,
   TypeRef,
-} from 'gitnexus-shared';
+} from 'yummygraph-shared';
 
 // ─── Fake scope helpers ───────────────────────────────────────────────────
 

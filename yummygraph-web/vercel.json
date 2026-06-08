@@ -1,3 +1,3 @@
 {
-  "installCommand": "cd ../gitnexus-shared && npm install && npm run build && cd ../gitnexus-web && npm ci --include=dev"
+  "installCommand": "cd ../yummygraph-shared && npm install && npm run build && cd ../yummygraph-web && npm ci --include=dev"
 }

@@ -48,7 +48,7 @@
  * IMPORTS from the pre-pipeline DB) covers that case instead.
  */
 
-import type { GraphNode, GraphRelationship } from 'gitnexus-shared';
+import type { GraphNode, GraphRelationship } from 'yummygraph-shared';
 import { createKnowledgeGraph } from '../graph/graph.js';
 import type { KnowledgeGraph } from '../graph/types.js';
 

@@ -5,7 +5,7 @@ import type {
   ScopeId,
   ScopeTree,
   TypeRef,
-} from 'gitnexus-shared';
+} from 'yummygraph-shared';
 
 export function rustBindingScopeFor(
   decl: CaptureMatch,

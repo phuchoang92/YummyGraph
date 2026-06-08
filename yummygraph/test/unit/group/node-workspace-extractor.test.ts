@@ -8,7 +8,7 @@ describe('NodeWorkspaceExtractor', () => {
   let tmpDir: string;
 
   beforeEach(async () => {
-    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'gitnexus-node-ws-'));
+    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'yummygraph-node-ws-'));
   });
 
   afterEach(async () => {

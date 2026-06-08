@@ -11,7 +11,7 @@
  * already attached) so these functions are straight-line tag readers.
  */
 
-import type { CaptureMatch, ParsedImport, ParsedTypeBinding, TypeRef } from 'gitnexus-shared';
+import type { CaptureMatch, ParsedImport, ParsedTypeBinding, TypeRef } from 'yummygraph-shared';
 
 // ─── interpretImport ──────────────────────────────────────────────────────
 

@@ -12,7 +12,7 @@ import {
   type ScopeId,
   type SymbolDefinition,
   type TypeRef,
-} from 'gitnexus-shared';
+} from 'yummygraph-shared';
 import { resolveReferenceSites } from '../../../src/core/ingestion/resolve-references.js';
 import type { ScopeResolutionIndexes } from '../../../src/core/ingestion/model/scope-resolution-indexes.js';
 

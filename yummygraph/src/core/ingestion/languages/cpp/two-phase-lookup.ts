@@ -4,7 +4,7 @@
  * Inside a class template body, names from a dependent base class are NOT
  * found by ordinary unqualified lookup. The standard requires the
  * `this->name` or `Base<T>::name` forms to make the lookup dependent.
- * GitNexus's global free-call fallback otherwise binds such names to the
+ * YummyGraph's global free-call fallback otherwise binds such names to the
  * dependent base's members, producing CALLS edges the compiler would
  * reject.
  *
@@ -31,7 +31,7 @@
  * (see `file-local-linkage.ts`).
  */
 
-import type { ParsedFile, ScopeId, SymbolDefinition } from 'gitnexus-shared';
+import type { ParsedFile, ScopeId, SymbolDefinition } from 'yummygraph-shared';
 import type { ScopeResolutionIndexes } from '../../model/scope-resolution-indexes.js';
 import { findEnclosingClassDef } from '../../scope-resolution/scope/walkers.js';
 

@@ -13,7 +13,7 @@ const launchArgs = [
 ];
 
 if (insecureE2E) {
-  // Allow cross-origin requests to gitnexus serve on a different port when explicitly enabled.
+  // Allow cross-origin requests to yummygraph serve on a different port when explicitly enabled.
   launchArgs.unshift('--disable-web-security', '--disable-site-isolation-trials');
 }
 

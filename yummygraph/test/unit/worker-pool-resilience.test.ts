@@ -149,7 +149,7 @@ let workerUrl: URL;
 beforeEach(() => {
   nextActions.length = 0;
   workerInstances = [];
-  tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-worker-pool-resilience-'));
+  tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-worker-pool-resilience-'));
   const workerPath = path.join(tempDir, 'fake-worker.js');
   fs.writeFileSync(workerPath, '// fake');
   workerUrl = pathToFileURL(workerPath) as URL;
@@ -572,8 +572,8 @@ describe('worker pool option resolution', () => {
     expect(opts.maxCumulativeTimeoutMs).toBe(5000);
   });
 
-  it('reads GITNEXUS_WORKER_MAX_RESPAWNS_PER_SLOT env override', () => {
-    vi.stubEnv('GITNEXUS_WORKER_MAX_RESPAWNS_PER_SLOT', '2');
+  it('reads YUMMYGRAPH_WORKER_MAX_RESPAWNS_PER_SLOT env override', () => {
+    vi.stubEnv('YUMMYGRAPH_WORKER_MAX_RESPAWNS_PER_SLOT', '2');
     try {
       expect(resolveWorkerPoolOptions({}, 1).maxRespawnsPerSlot).toBe(2);
     } finally {
@@ -581,8 +581,8 @@ describe('worker pool option resolution', () => {
     }
   });
 
-  it('reads GITNEXUS_WORKER_CONSECUTIVE_FAILURE_THRESHOLD env override', () => {
-    vi.stubEnv('GITNEXUS_WORKER_CONSECUTIVE_FAILURE_THRESHOLD', '12');
+  it('reads YUMMYGRAPH_WORKER_CONSECUTIVE_FAILURE_THRESHOLD env override', () => {
+    vi.stubEnv('YUMMYGRAPH_WORKER_CONSECUTIVE_FAILURE_THRESHOLD', '12');
     try {
       expect(resolveWorkerPoolOptions({}, 1).consecutiveFailureThreshold).toBe(12);
     } finally {
@@ -590,8 +590,8 @@ describe('worker pool option resolution', () => {
     }
   });
 
-  it('reads GITNEXUS_WORKER_MAX_CUMULATIVE_TIMEOUT_MS env override', () => {
-    vi.stubEnv('GITNEXUS_WORKER_MAX_CUMULATIVE_TIMEOUT_MS', '60000');
+  it('reads YUMMYGRAPH_WORKER_MAX_CUMULATIVE_TIMEOUT_MS env override', () => {
+    vi.stubEnv('YUMMYGRAPH_WORKER_MAX_CUMULATIVE_TIMEOUT_MS', '60000');
     try {
       expect(resolveWorkerPoolOptions({}, 1).maxCumulativeTimeoutMs).toBe(60000);
     } finally {
@@ -601,8 +601,8 @@ describe('worker pool option resolution', () => {
 });
 
 describe('resolveAutoPoolSize', () => {
-  it('honors GITNEXUS_WORKER_POOL_SIZE env override (positive integer)', () => {
-    vi.stubEnv('GITNEXUS_WORKER_POOL_SIZE', '12');
+  it('honors YUMMYGRAPH_WORKER_POOL_SIZE env override (positive integer)', () => {
+    vi.stubEnv('YUMMYGRAPH_WORKER_POOL_SIZE', '12');
     try {
       expect(resolveAutoPoolSize()).toBe(12);
     } finally {
@@ -610,8 +610,8 @@ describe('resolveAutoPoolSize', () => {
     }
   });
 
-  it('honors GITNEXUS_WORKER_POOL_SIZE=0 (sequential-fallback signal)', () => {
-    vi.stubEnv('GITNEXUS_WORKER_POOL_SIZE', '0');
+  it('honors YUMMYGRAPH_WORKER_POOL_SIZE=0 (sequential-fallback signal)', () => {
+    vi.stubEnv('YUMMYGRAPH_WORKER_POOL_SIZE', '0');
     try {
       expect(resolveAutoPoolSize()).toBe(0);
     } finally {
@@ -619,8 +619,8 @@ describe('resolveAutoPoolSize', () => {
     }
   });
 
-  it('honors GITNEXUS_WORKER_POOL_SIZE override above the auto cap', () => {
-    vi.stubEnv('GITNEXUS_WORKER_POOL_SIZE', '32');
+  it('honors YUMMYGRAPH_WORKER_POOL_SIZE override above the auto cap', () => {
+    vi.stubEnv('YUMMYGRAPH_WORKER_POOL_SIZE', '32');
     try {
       expect(resolveAutoPoolSize()).toBe(32);
     } finally {
@@ -629,7 +629,7 @@ describe('resolveAutoPoolSize', () => {
   });
 
   it('ignores invalid env values and falls back to the auto formula', () => {
-    vi.stubEnv('GITNEXUS_WORKER_POOL_SIZE', 'abc');
+    vi.stubEnv('YUMMYGRAPH_WORKER_POOL_SIZE', 'abc');
     try {
       const expected = Math.min(16, Math.max(1, os.cpus().length - 1));
       expect(resolveAutoPoolSize()).toBe(expected);
@@ -656,25 +656,25 @@ describe('workerPoolDisabledByEnv (#1741 — env=0 → sequential signal)', () =
     vi.unstubAllEnvs();
   });
 
-  it('is true only for a literal GITNEXUS_WORKER_POOL_SIZE=0', () => {
-    vi.stubEnv('GITNEXUS_WORKER_POOL_SIZE', '0');
+  it('is true only for a literal YUMMYGRAPH_WORKER_POOL_SIZE=0', () => {
+    vi.stubEnv('YUMMYGRAPH_WORKER_POOL_SIZE', '0');
     expect(workerPoolDisabledByEnv()).toBe(true);
   });
 
   it('is false for a positive env size (the pool is used)', () => {
-    vi.stubEnv('GITNEXUS_WORKER_POOL_SIZE', '4');
+    vi.stubEnv('YUMMYGRAPH_WORKER_POOL_SIZE', '4');
     expect(workerPoolDisabledByEnv()).toBe(false);
   });
 
   it('treats empty/whitespace as unset (not a disable signal — auto formula applies)', () => {
-    vi.stubEnv('GITNEXUS_WORKER_POOL_SIZE', '');
+    vi.stubEnv('YUMMYGRAPH_WORKER_POOL_SIZE', '');
     expect(workerPoolDisabledByEnv()).toBe(false);
-    vi.stubEnv('GITNEXUS_WORKER_POOL_SIZE', '   ');
+    vi.stubEnv('YUMMYGRAPH_WORKER_POOL_SIZE', '   ');
     expect(workerPoolDisabledByEnv()).toBe(false);
   });
 
   it('is false for an invalid value', () => {
-    vi.stubEnv('GITNEXUS_WORKER_POOL_SIZE', 'abc');
+    vi.stubEnv('YUMMYGRAPH_WORKER_POOL_SIZE', 'abc');
     expect(workerPoolDisabledByEnv()).toBe(false);
   });
 });

@@ -1,5 +1,5 @@
 /**
- * `gitnexus publish` — opt-in ping to the understand-quickly registry.
+ * `yummygraph publish` — opt-in ping to the understand-quickly registry.
  *
  * Fires a single `repository_dispatch` event at
  * `looptech-ai/understand-quickly` so the registry knows to refresh its
@@ -28,7 +28,7 @@ import {
   buildUqDispatchPayload,
   isValidOwnerRepo,
   parseOwnerRepoFromRemote,
-} from 'gitnexus-shared';
+} from 'yummygraph-shared';
 import { getGitRoot, getRemoteOriginUrl, getCurrentCommit } from '../storage/git.js';
 import { hasIndex } from '../storage/repo-manager.js';
 import { cliInfo, cliError } from './cli-message.js';
@@ -59,7 +59,7 @@ export const publishCommand = async (
   // The README, CLI --help, and PR body all promise "exit 0 without
   // UNDERSTAND_QUICKLY_TOKEN". Doing the index/repo-root checks before
   // the token gate would make those promises false for users who haven't
-  // run `gitnexus analyze` yet but want to verify the command is wired.
+  // run `yummygraph analyze` yet but want to verify the command is wired.
   const token = process.env[UNDERSTAND_QUICKLY_TOKEN_ENV];
   if (!token) {
     cliInfo(
@@ -91,14 +91,14 @@ export const publishCommand = async (
     repoPath = gitRoot;
   }
 
-  // ── 2. Confirm a GitNexus index exists ───────────────────────────────
+  // ── 2. Confirm a YummyGraph index exists ───────────────────────────────
   // Publishing without an index is almost always a mistake — the
   // registry's nightly sync would fetch a stale or missing graph file
   // and mark the entry `missing`. Refuse loudly with a fix-it hint.
   if (!(await hasIndex(repoPath))) {
     cliError(
-      `[understand-quickly] no GitNexus index found at ${repoPath}/.gitnexus.\n` +
-        'Run `gitnexus analyze` first, then re-run `gitnexus publish`.',
+      `[understand-quickly] no YummyGraph index found at ${repoPath}/.yummygraph.\n` +
+        'Run `yummygraph analyze` first, then re-run `yummygraph publish`.',
     );
     process.exitCode = 1;
     return;
@@ -128,7 +128,7 @@ export const publishCommand = async (
         Authorization: `Bearer ${token}`,
         'X-GitHub-Api-Version': '2022-11-28',
         'Content-Type': 'application/json',
-        'User-Agent': 'gitnexus-cli',
+        'User-Agent': 'yummygraph-cli',
       },
       body: JSON.stringify(payload),
       signal: AbortSignal.timeout(DISPATCH_TIMEOUT_MS),
@@ -137,7 +137,7 @@ export const publishCommand = async (
     // `AbortSignal.timeout()` throws a `DOMException` with `name ===
     // 'TimeoutError'` on Node 18.14+ (and on browsers/Bun). It is NOT
     // a plain `AbortError`. Match the pattern used in
-    // gitnexus/src/core/embeddings/http-client.ts so the user sees the
+    // yummygraph/src/core/embeddings/http-client.ts so the user sees the
     // targeted "timed out" message instead of a generic "operation
     // was aborted".
     const isTimeout = err instanceof DOMException && err.name === 'TimeoutError';

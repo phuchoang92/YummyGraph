@@ -1,13 +1,13 @@
 /**
- * Consolidated HTTP client for the GitNexus backend server.
+ * Consolidated HTTP client for the YummyGraph backend server.
  *
  * Replaces backend.ts, server-connection.ts, and worker HTTP helpers
  * with a single typed module. All graph queries, search, embeddings,
  * and file operations go through this client.
  */
 
-import type { GraphNode, GraphRelationship } from 'gitnexus-shared';
-import { CircuitOpenError, ResilientFetchExhaustedError, resilientFetch } from 'gitnexus-shared';
+import type { GraphNode, GraphRelationship } from 'yummygraph-shared';
+import { CircuitOpenError, ResilientFetchExhaustedError, resilientFetch } from 'yummygraph-shared';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -211,7 +211,7 @@ let _backendUrl = 'http://localhost:4747';
  *
  * Throws if the URL uses a non-HTTP scheme (e.g. javascript:, data:, file://).
  * All other well-formed http/https URLs are accepted — the client intentionally
- * supports connecting to remote GitNexus servers, not just localhost.
+ * supports connecting to remote YummyGraph servers, not just localhost.
  */
 export function validateBackendUrl(url: string): void {
   let parsed: URL;
@@ -328,7 +328,7 @@ const fetchWithTimeout = async (
   } catch (error: unknown) {
     if (error instanceof CircuitOpenError) {
       throw new BackendError(
-        `GitNexus backend at ${_backendUrl} is unhealthy; retry in ${Math.ceil(error.retryAfterMs / 1000)}s`,
+        `YummyGraph backend at ${_backendUrl} is unhealthy; retry in ${Math.ceil(error.retryAfterMs / 1000)}s`,
         0,
         'network',
       );
@@ -349,7 +349,7 @@ const fetchWithTimeout = async (
     }
     if (error instanceof TypeError) {
       throw new BackendError(
-        `Network error reaching GitNexus backend at ${_backendUrl}: ${error.message}`,
+        `Network error reaching YummyGraph backend at ${_backendUrl}: ${error.message}`,
         0,
         'network',
       );
@@ -512,7 +512,7 @@ export const fetchRepos = async (): Promise<BackendRepo[]> => {
  * this enables the backend's hold-queue and uses a 5-minute timeout to match.
  * Normal calls (e.g. repo switching between already-indexed repos) use the default 10s timeout.
  *
- * Must stay in sync with HOLD_QUEUE_TIMEOUT_SECS in gitnexus/src/server/api.ts.
+ * Must stay in sync with HOLD_QUEUE_TIMEOUT_SECS in yummygraph/src/server/api.ts.
  */
 const HOLD_QUEUE_TIMEOUT_MS = 300_000; // 5 minutes — matches backend HOLD_QUEUE_TIMEOUT_SECS
 

@@ -1,8 +1,8 @@
-// gitnexus/src/core/ingestion/field-types.ts
+// yummygraph/src/core/ingestion/field-types.ts
 
 import type { TypeEnvironment } from './type-env.js';
 import type { SymbolTableReader } from './model/index.js';
-import { SupportedLanguages } from 'gitnexus-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 
 /**
  * Visibility levels used across all supported languages.

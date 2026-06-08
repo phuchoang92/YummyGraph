@@ -1,4 +1,4 @@
-// gitnexus/src/core/ingestion/variable-extractors/generic.ts
+// yummygraph/src/core/ingestion/variable-extractors/generic.ts
 
 /**
  * Generic table-driven variable extractor factory.

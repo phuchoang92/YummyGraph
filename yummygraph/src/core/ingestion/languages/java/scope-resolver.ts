@@ -6,8 +6,8 @@
  * call-resolution path.
  */
 
-import type { ParsedFile, TypeRef } from 'gitnexus-shared';
-import { SupportedLanguages } from 'gitnexus-shared';
+import type { ParsedFile, TypeRef } from 'yummygraph-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 import type { KnowledgeGraph } from '../../../graph/types.js';
 import { buildMro, defaultLinearize } from '../../scope-resolution/passes/mro.js';
 import { resolveDefGraphId } from '../../scope-resolution/graph-bridge/ids.js';

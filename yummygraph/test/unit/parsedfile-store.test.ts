@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { mkdtemp, rm, readdir, readFile } from 'fs/promises';
 import { tmpdir } from 'os';
 import path from 'path';
-import type { ParsedFile } from 'gitnexus-shared';
+import type { ParsedFile } from 'yummygraph-shared';
 import {
   clearParsedFileStore,
   persistParsedFileChunk,

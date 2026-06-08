@@ -8,13 +8,13 @@ import {
   resolveDefaultBranch,
   validateBranchName,
   sanitizeDetectedBranch,
-  GitNexusRcError,
-  GITNEXUS_RC_FILENAME,
+  YummyGraphRcError,
+  YUMMYGRAPH_RC_FILENAME,
   DEFAULT_BRANCH_FALLBACK,
 } from '../../src/cli/analyze-config.js';
 import type { AnalyzeOptions } from '../../src/cli/analyze.js';
 
-describe('analyze-config (.gitnexusrc support, #243)', () => {
+describe('analyze-config (.yummygraphrc support, #243)', () => {
   let dir: string;
 
   beforeEach(async () => {
@@ -26,21 +26,21 @@ describe('analyze-config (.gitnexusrc support, #243)', () => {
   });
 
   const writeRc = (contents: string) =>
-    fs.writeFile(path.join(dir, GITNEXUS_RC_FILENAME), contents);
+    fs.writeFile(path.join(dir, YUMMYGRAPH_RC_FILENAME), contents);
 
   // ── loadAnalyzeConfig ──────────────────────────────────────────────
 
-  it('returns undefined when no .gitnexusrc exists (the normal case)', () => {
+  it('returns undefined when no .yummygraphrc exists (the normal case)', () => {
     expect(loadAnalyzeConfig(dir)).toBeUndefined();
   });
 
   it('throws an actionable error on invalid JSON, naming the file', async () => {
     await writeRc('{ not valid json ');
-    expect(() => loadAnalyzeConfig(dir)).toThrow(GitNexusRcError);
+    expect(() => loadAnalyzeConfig(dir)).toThrow(YummyGraphRcError);
     try {
       loadAnalyzeConfig(dir);
     } catch (err) {
-      expect((err as Error).message).toContain(GITNEXUS_RC_FILENAME);
+      expect((err as Error).message).toContain(YUMMYGRAPH_RC_FILENAME);
       expect((err as Error).message).toMatch(/not valid JSON/i);
     }
   });
@@ -191,7 +191,7 @@ describe('analyze-config (.gitnexusrc support, #243)', () => {
   });
 
   it('resolveDefaultBranch: invalid CLI branch throws (user error)', () => {
-    expect(() => resolveDefaultBranch({ cliBranch: 'bad branch' })).toThrow(GitNexusRcError);
+    expect(() => resolveDefaultBranch({ cliBranch: 'bad branch' })).toThrow(YummyGraphRcError);
     expect(() => resolveDefaultBranch({ cliBranch: 'bad branch' })).toThrow(/--default-branch/);
   });
 
@@ -239,7 +239,7 @@ describe('analyze-config (.gitnexusrc support, #243)', () => {
 
   it('validateBranchName rejects a backtick (breaks generated Markdown) (#1996)', () => {
     expect(() => validateBranchName('main`evil', 'src')).toThrow(/backtick/);
-    expect(() => validateBranchName('a`b', 'src')).toThrow(GitNexusRcError);
+    expect(() => validateBranchName('a`b', 'src')).toThrow(YummyGraphRcError);
     // sanitizeDetectedBranch swallows it → falls back via the resolver chain.
     expect(sanitizeDetectedBranch('main`evil')).toBeUndefined();
   });

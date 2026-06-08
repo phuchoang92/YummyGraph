@@ -1,5 +1,5 @@
 /**
- * Unit Tests: server validation helpers (gitnexus/src/server/validation.ts)
+ * Unit Tests: server validation helpers (yummygraph/src/server/validation.ts)
  *
  * Covers U1 of the security remediation plan:
  *   - assertString closes js/type-confusion-through-parameter-tampering by

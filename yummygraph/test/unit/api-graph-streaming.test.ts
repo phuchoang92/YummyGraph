@@ -159,8 +159,8 @@ describe('streamGraphNdjson', () => {
         if (query.includes('MATCH (n:`Tool`)')) {
           expect(query).not.toContain('startLine');
           await onRow({
-            id: 'Tool:gitnexus_query',
-            name: 'gitnexus_query',
+            id: 'Tool:yummygraph_query',
+            name: 'yummygraph_query',
             filePath: 'src/mcp/resources.ts',
             description: 'Query the code graph',
           });
@@ -208,10 +208,10 @@ describe('streamGraphNdjson', () => {
     expect(records).toContainEqual({
       type: 'node',
       data: {
-        id: 'Tool:gitnexus_query',
+        id: 'Tool:yummygraph_query',
         label: 'Tool',
         properties: {
-          name: 'gitnexus_query',
+          name: 'yummygraph_query',
           filePath: 'src/mcp/resources.ts',
           startLine: undefined,
           endLine: undefined,

@@ -2174,7 +2174,7 @@ describe('Kotlin companion vs instance member dispatch (#1756)', () => {
   // read) edge would silently pass the CALLS-only check while still
   // misrepresenting the dispatch to users / consumers of the graph.
   // Both `USES` and `ACCESSES` are valid `RelationshipType` values in
-  // `gitnexus-shared/src/graph/types.ts`.
+  // `yummygraph-shared/src/graph/types.ts`.
   it('crossover() emits NO USES edges to create (edge-type completeness)', () => {
     const usesEdges = getRelationships(result, 'USES').filter(
       (c) => c.source === 'crossover' && c.target === 'create',

@@ -20,7 +20,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import type { SymbolDefinition } from 'gitnexus-shared';
+import type { SymbolDefinition } from 'yummygraph-shared';
 import {
   buildGlobalCallableIndex,
   pickUniqueGlobalCallable,

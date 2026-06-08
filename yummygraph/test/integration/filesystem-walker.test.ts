@@ -187,7 +187,7 @@ describe('filesystem-walker', () => {
     });
   });
 
-  describe('.gitnexusignore support', () => {
+  describe('.yummygraphignore support', () => {
     let nexusignoreDir: string;
 
     beforeAll(async () => {
@@ -202,15 +202,15 @@ describe('filesystem-walker', () => {
       );
       await fs.writeFile(path.join(nexusignoreDir, 'local', 'grafana', 'module.js'), 'var x = 1;');
 
-      // Only .gitnexusignore, no .gitignore
-      await fs.writeFile(path.join(nexusignoreDir, '.gitnexusignore'), 'local/\n');
+      // Only .yummygraphignore, no .gitignore
+      await fs.writeFile(path.join(nexusignoreDir, '.yummygraphignore'), 'local/\n');
     });
 
     afterAll(async () => {
       await fs.rm(nexusignoreDir, { recursive: true, force: true });
     });
 
-    it('excludes directories listed in .gitnexusignore', async () => {
+    it('excludes directories listed in .yummygraphignore', async () => {
       const files = await walkRepositoryPaths(nexusignoreDir);
       const paths = files.map((f) => f.path.replace(/\\/g, '/'));
 
@@ -219,7 +219,7 @@ describe('filesystem-walker', () => {
     });
   });
 
-  describe('combined .gitignore + .gitnexusignore', () => {
+  describe('combined .gitignore + .yummygraphignore', () => {
     let combinedDir: string;
 
     beforeAll(async () => {
@@ -234,7 +234,7 @@ describe('filesystem-walker', () => {
       await fs.writeFile(path.join(combinedDir, 'local', 'plugins', 'module.js'), 'var x = 1;');
 
       await fs.writeFile(path.join(combinedDir, '.gitignore'), 'data/\n');
-      await fs.writeFile(path.join(combinedDir, '.gitnexusignore'), 'local/\n');
+      await fs.writeFile(path.join(combinedDir, '.yummygraphignore'), 'local/\n');
     });
 
     afterAll(async () => {
@@ -251,7 +251,7 @@ describe('filesystem-walker', () => {
     });
   });
 
-  describe('GITNEXUS_NO_GITIGNORE env var', () => {
+  describe('YUMMYGRAPH_NO_GITIGNORE env var', () => {
     let envDir: string;
 
     beforeAll(async () => {
@@ -276,18 +276,18 @@ describe('filesystem-walker', () => {
       expect(paths.every((p) => !p.includes('data/'))).toBe(true);
     });
 
-    it('includes gitignored directory when GITNEXUS_NO_GITIGNORE is set', async () => {
-      const original = process.env.GITNEXUS_NO_GITIGNORE;
-      process.env.GITNEXUS_NO_GITIGNORE = '1';
+    it('includes gitignored directory when YUMMYGRAPH_NO_GITIGNORE is set', async () => {
+      const original = process.env.YUMMYGRAPH_NO_GITIGNORE;
+      process.env.YUMMYGRAPH_NO_GITIGNORE = '1';
       try {
         const files = await walkRepositoryPaths(envDir);
         const paths = files.map((f) => f.path.replace(/\\/g, '/'));
         expect(paths.some((p) => p.includes('data/dump.json'))).toBe(true);
       } finally {
         if (original === undefined) {
-          delete process.env.GITNEXUS_NO_GITIGNORE;
+          delete process.env.YUMMYGRAPH_NO_GITIGNORE;
         } else {
-          process.env.GITNEXUS_NO_GITIGNORE = original;
+          process.env.YUMMYGRAPH_NO_GITIGNORE = original;
         }
       }
     });
@@ -328,7 +328,7 @@ describe('filesystem-walker', () => {
     let sizeDir: string;
     const BIG_FILE = 'src/big.ts';
     const BIG_FILE_BYTES = 600 * 1024;
-    const ORIGINAL_ENV = process.env.GITNEXUS_MAX_FILE_SIZE;
+    const ORIGINAL_ENV = process.env.YUMMYGRAPH_MAX_FILE_SIZE;
     let cap: ReturnType<typeof _captureLogger>;
 
     beforeAll(async () => {
@@ -343,16 +343,16 @@ describe('filesystem-walker', () => {
     });
 
     beforeEach(() => {
-      delete process.env.GITNEXUS_MAX_FILE_SIZE;
+      delete process.env.YUMMYGRAPH_MAX_FILE_SIZE;
       _resetMaxFileSizeWarnings();
       cap = _captureLogger();
     });
 
     afterEach(() => {
       if (ORIGINAL_ENV === undefined) {
-        delete process.env.GITNEXUS_MAX_FILE_SIZE;
+        delete process.env.YUMMYGRAPH_MAX_FILE_SIZE;
       } else {
-        process.env.GITNEXUS_MAX_FILE_SIZE = ORIGINAL_ENV;
+        process.env.YUMMYGRAPH_MAX_FILE_SIZE = ORIGINAL_ENV;
       }
       cap.restore();
     });
@@ -364,15 +364,15 @@ describe('filesystem-walker', () => {
       expect(paths).not.toContain(BIG_FILE);
     });
 
-    it('includes the 600KB file when GITNEXUS_MAX_FILE_SIZE=1024', async () => {
-      process.env.GITNEXUS_MAX_FILE_SIZE = '1024';
+    it('includes the 600KB file when YUMMYGRAPH_MAX_FILE_SIZE=1024', async () => {
+      process.env.YUMMYGRAPH_MAX_FILE_SIZE = '1024';
       const files = await walkRepositoryPaths(sizeDir);
       const paths = files.map((f) => f.path.replace(/\\/g, '/'));
       expect(paths).toContain(BIG_FILE);
     });
 
-    it('falls back to default and warns once on invalid GITNEXUS_MAX_FILE_SIZE', async () => {
-      process.env.GITNEXUS_MAX_FILE_SIZE = 'abc';
+    it('falls back to default and warns once on invalid YUMMYGRAPH_MAX_FILE_SIZE', async () => {
+      process.env.YUMMYGRAPH_MAX_FILE_SIZE = 'abc';
       const files = await walkRepositoryPaths(sizeDir);
       const paths = files.map((f) => f.path.replace(/\\/g, '/'));
       expect(paths).not.toContain(BIG_FILE);
@@ -383,7 +383,7 @@ describe('filesystem-walker', () => {
     });
 
     it('omits the "generated/vendored" suffix when threshold is overridden', async () => {
-      process.env.GITNEXUS_MAX_FILE_SIZE = '1';
+      process.env.YUMMYGRAPH_MAX_FILE_SIZE = '1';
       await walkRepositoryPaths(sizeDir);
       const skipWarnings = cap.records().filter((r) => String(r.msg ?? '').includes('Skipped '));
       expect(skipWarnings.length).toBeGreaterThan(0);
@@ -400,50 +400,50 @@ describe('filesystem-walker', () => {
     });
 
     // Regression: issue #1659. The skipped-paths list and the
-    // GITNEXUS_MAX_FILE_SIZE hint must appear by default, otherwise users
+    // YUMMYGRAPH_MAX_FILE_SIZE hint must appear by default, otherwise users
     // see "Skipped N large files" with no actionable detail and misdiagnose
     // missing IMPORTS/CALLS edges as a resolver bug.
-    it('lists the skipped path by default (not gated behind GITNEXUS_VERBOSE)', async () => {
+    it('lists the skipped path by default (not gated behind YUMMYGRAPH_VERBOSE)', async () => {
       await walkRepositoryPaths(sizeDir);
       const pathWarnings = cap.records().filter((r) => String(r.msg ?? '').includes(BIG_FILE));
       expect(pathWarnings.length).toBeGreaterThan(0);
     });
 
-    it('emits a GITNEXUS_MAX_FILE_SIZE hint when running with the default cap', async () => {
+    it('emits a YUMMYGRAPH_MAX_FILE_SIZE hint when running with the default cap', async () => {
       await walkRepositoryPaths(sizeDir);
       const hint = cap
         .records()
-        .filter((r) => String(r.msg ?? '').includes('GITNEXUS_MAX_FILE_SIZE=<KB>'));
+        .filter((r) => String(r.msg ?? '').includes('YUMMYGRAPH_MAX_FILE_SIZE=<KB>'));
       expect(hint.length).toBe(1);
     });
 
-    it('omits the GITNEXUS_MAX_FILE_SIZE hint when an override is active', async () => {
-      process.env.GITNEXUS_MAX_FILE_SIZE = '1';
+    it('omits the YUMMYGRAPH_MAX_FILE_SIZE hint when an override is active', async () => {
+      process.env.YUMMYGRAPH_MAX_FILE_SIZE = '1';
       await walkRepositoryPaths(sizeDir);
       const hint = cap
         .records()
-        .filter((r) => String(r.msg ?? '').includes('GITNEXUS_MAX_FILE_SIZE=<KB>'));
+        .filter((r) => String(r.msg ?? '').includes('YUMMYGRAPH_MAX_FILE_SIZE=<KB>'));
       expect(hint.length).toBe(0);
     });
 
-    // Edge case from the #1661 adversarial review: setting GITNEXUS_MAX_FILE_SIZE
+    // Edge case from the #1661 adversarial review: setting YUMMYGRAPH_MAX_FILE_SIZE
     // to the same value as the default (512KB) used to still print the hint
     // because the byte comparison resolved to equal. The hint should care
     // about whether the operator set the env var, not what value they chose.
-    it('omits the GITNEXUS_MAX_FILE_SIZE hint when the override equals the default value', async () => {
-      process.env.GITNEXUS_MAX_FILE_SIZE = '512';
+    it('omits the YUMMYGRAPH_MAX_FILE_SIZE hint when the override equals the default value', async () => {
+      process.env.YUMMYGRAPH_MAX_FILE_SIZE = '512';
       await walkRepositoryPaths(sizeDir);
       const hint = cap
         .records()
-        .filter((r) => String(r.msg ?? '').includes('GITNEXUS_MAX_FILE_SIZE=<KB>'));
+        .filter((r) => String(r.msg ?? '').includes('YUMMYGRAPH_MAX_FILE_SIZE=<KB>'));
       expect(hint.length).toBe(0);
     });
 
     it('routes large-file notices through console.warn while analyze progress is active', async () => {
-      const originalProgressActive = process.env.GITNEXUS_ANALYZE_PROGRESS_ACTIVE;
+      const originalProgressActive = process.env.YUMMYGRAPH_ANALYZE_PROGRESS_ACTIVE;
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
       try {
-        process.env.GITNEXUS_ANALYZE_PROGRESS_ACTIVE = '1';
+        process.env.YUMMYGRAPH_ANALYZE_PROGRESS_ACTIVE = '1';
         await walkRepositoryPaths(sizeDir);
         const messages = warnSpy.mock.calls.map(([msg]) => String(msg));
         expect(messages.some((m) => m.includes('Skipped 1 large files'))).toBe(true);
@@ -454,9 +454,9 @@ describe('filesystem-walker', () => {
       } finally {
         warnSpy.mockRestore();
         if (originalProgressActive === undefined) {
-          delete process.env.GITNEXUS_ANALYZE_PROGRESS_ACTIVE;
+          delete process.env.YUMMYGRAPH_ANALYZE_PROGRESS_ACTIVE;
         } else {
-          process.env.GITNEXUS_ANALYZE_PROGRESS_ACTIVE = originalProgressActive;
+          process.env.YUMMYGRAPH_ANALYZE_PROGRESS_ACTIVE = originalProgressActive;
         }
       }
     });
@@ -464,8 +464,8 @@ describe('filesystem-walker', () => {
 
   describe('large file skip preview cap (#1659)', () => {
     let manyDir: string;
-    const ORIGINAL_ENV = process.env.GITNEXUS_MAX_FILE_SIZE;
-    const ORIGINAL_VERBOSE = process.env.GITNEXUS_VERBOSE;
+    const ORIGINAL_ENV = process.env.YUMMYGRAPH_MAX_FILE_SIZE;
+    const ORIGINAL_VERBOSE = process.env.YUMMYGRAPH_VERBOSE;
     let cap: ReturnType<typeof _captureLogger>;
 
     beforeAll(async () => {
@@ -482,33 +482,33 @@ describe('filesystem-walker', () => {
     });
 
     beforeEach(() => {
-      delete process.env.GITNEXUS_MAX_FILE_SIZE;
-      delete process.env.GITNEXUS_VERBOSE;
+      delete process.env.YUMMYGRAPH_MAX_FILE_SIZE;
+      delete process.env.YUMMYGRAPH_VERBOSE;
       _resetMaxFileSizeWarnings();
       cap = _captureLogger();
     });
 
     afterEach(() => {
       if (ORIGINAL_ENV === undefined) {
-        delete process.env.GITNEXUS_MAX_FILE_SIZE;
+        delete process.env.YUMMYGRAPH_MAX_FILE_SIZE;
       } else {
-        process.env.GITNEXUS_MAX_FILE_SIZE = ORIGINAL_ENV;
+        process.env.YUMMYGRAPH_MAX_FILE_SIZE = ORIGINAL_ENV;
       }
       if (ORIGINAL_VERBOSE === undefined) {
-        delete process.env.GITNEXUS_VERBOSE;
+        delete process.env.YUMMYGRAPH_VERBOSE;
       } else {
-        process.env.GITNEXUS_VERBOSE = ORIGINAL_VERBOSE;
+        process.env.YUMMYGRAPH_VERBOSE = ORIGINAL_VERBOSE;
       }
       cap.restore();
     });
 
-    it('truncates the path list to 5 and mentions GITNEXUS_VERBOSE when over the cap', async () => {
+    it('truncates the path list to 5 and mentions YUMMYGRAPH_VERBOSE when over the cap', async () => {
       await walkRepositoryPaths(manyDir);
       const pathLines = cap.records().filter((r) => /^\s*-\s/.test(String(r.msg ?? '')));
       expect(pathLines.length).toBe(5);
       const more = cap
         .records()
-        .filter((r) => String(r.msg ?? '').includes('and 3 more (set GITNEXUS_VERBOSE=1'));
+        .filter((r) => String(r.msg ?? '').includes('and 3 more (set YUMMYGRAPH_VERBOSE=1'));
       expect(more.length).toBe(1);
     });
 
@@ -545,15 +545,15 @@ describe('filesystem-walker', () => {
         expect(pathLines.length).toBe(5);
         const more = cap
           .records()
-          .filter((r) => String(r.msg ?? '').includes('and 1 more (set GITNEXUS_VERBOSE=1'));
+          .filter((r) => String(r.msg ?? '').includes('and 1 more (set YUMMYGRAPH_VERBOSE=1'));
         expect(more.length).toBe(1);
       } finally {
         await fs.rm(sixDir, { recursive: true, force: true });
       }
     });
 
-    it('lists every skipped path when GITNEXUS_VERBOSE=1', async () => {
-      process.env.GITNEXUS_VERBOSE = '1';
+    it('lists every skipped path when YUMMYGRAPH_VERBOSE=1', async () => {
+      process.env.YUMMYGRAPH_VERBOSE = '1';
       await walkRepositoryPaths(manyDir);
       const pathLines = cap.records().filter((r) => /^\s*-\s/.test(String(r.msg ?? '')));
       expect(pathLines.length).toBe(8);
@@ -567,7 +567,7 @@ describe('filesystem-walker', () => {
     // slicing, so the listed paths come out in sorted order, which is the
     // stable contract operators can rely on.
     it('lists skipped paths in sorted order (deterministic preview)', async () => {
-      process.env.GITNEXUS_VERBOSE = '1';
+      process.env.YUMMYGRAPH_VERBOSE = '1';
       await walkRepositoryPaths(manyDir);
       const pathLines = cap
         .records()

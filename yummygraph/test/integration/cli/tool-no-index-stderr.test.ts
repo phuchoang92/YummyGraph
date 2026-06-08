@@ -2,14 +2,14 @@
  * Regression test for the buffered-pino + hard-exit diagnostic-loss bug
  * (Codex adversarial review on PR #1336, plan 002).
  *
- * Symptom before the fix: `gitnexus tool query <foo>` with no indexed
+ * Symptom before the fix: `yummygraph tool query <foo>` with no indexed
  * repos exits non-zero with EMPTY stderr — the `logger.error()` call was
  * routed through pino's `sync: false` SonicBoom buffer, and the
  * subsequent synchronous `process.exit(1)` killed the process before the
  * buffer could drain. Operators saw a silent failure.
  *
  * The fix routes user-facing CLI diagnostics through `cliError` (in
- * `gitnexus/src/cli/cli-message.ts`), which writes plain text directly
+ * `yummygraph/src/cli/cli-message.ts`), which writes plain text directly
  * to `process.stderr` AND tees a structured pino record. Direct stderr
  * writes don't go through the buffer, so they survive `process.exit`.
  *
@@ -38,21 +38,21 @@ interface ChildResult {
 }
 
 /**
- * Spawn the built `gitnexus` CLI with arguments, wait for exit, and
- * return captured streams + exit code. Pin GITNEXUS_HOME to a fresh
+ * Spawn the built `yummygraph` CLI with arguments, wait for exit, and
+ * return captured streams + exit code. Pin YUMMYGRAPH_HOME to a fresh
  * empty temp dir so the LocalBackend init reliably finds zero indexed
  * repos. Force NODE_OPTIONS empty to prevent host-environment overrides
  * from changing buffer / heap behavior (plan 001 U3 added the buffered
  * destination, which is what this test guards against).
  */
 function runCli(args: string[]): Promise<ChildResult> {
-  const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-cli-no-index-'));
+  const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-cli-no-index-'));
   return new Promise<ChildResult>((resolve, reject) => {
     const proc = spawn(process.execPath, [DIST_CLI, ...args], {
       cwd: REPO_ROOT,
       env: {
         ...process.env,
-        GITNEXUS_HOME: tmpHome,
+        YUMMYGRAPH_HOME: tmpHome,
         NODE_OPTIONS: '',
         // Force NDJSON path: pino-pretty only activates when stderr is a
         // TTY and !CI && !VITEST. spawn() pipes stderr, so it's not a
@@ -109,14 +109,14 @@ describe('CLI tool query — diagnostic survives hard exit (plan 002)', () => {
     // visible regardless of how `process.exit(1)` interacts with the
     // buffered pino destination.
     expect(result.stderr).toContain('No indexed repositories found');
-    expect(result.stderr).toContain('gitnexus analyze');
+    expect(result.stderr).toContain('yummygraph analyze');
 
     // Exit code stays 1 — we're only changing the message channel, not
     // the failure semantics.
     expect(result.exitCode).toBe(1);
 
     // Stdout should not carry the diagnostic. CLI tool data is reserved
-    // for stdout (e.g., `gitnexus query | jq`); diagnostics are stderr.
+    // for stdout (e.g., `yummygraph query | jq`); diagnostics are stderr.
     expect(result.stdout).not.toContain('No indexed repositories found');
   }, 30_000);
 });

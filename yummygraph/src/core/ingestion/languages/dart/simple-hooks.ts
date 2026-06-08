@@ -22,7 +22,7 @@ import type {
   ScopeTree,
   TypeRef,
   CaptureMatch,
-} from 'gitnexus-shared';
+} from 'yummygraph-shared';
 
 export function dartBindingScopeFor(
   decl: CaptureMatch,

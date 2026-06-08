@@ -44,7 +44,7 @@
  *   required_parameter, public_field_definition, private_property_identifier,
  *   new_expression (constructor field), call_expression with (import) fn.
  *
- * Grammar version: tree-sitter-typescript pinned in gitnexus/package.json.
+ * Grammar version: tree-sitter-typescript pinned in yummygraph/package.json.
  *
  * Exposes lazy `Parser` and `Query` singletons so callers don't pay tree-
  * sitter init cost per file.
@@ -246,8 +246,8 @@ const TYPESCRIPT_SCOPE_QUERY = `
 ;; body lost caller attribution: \`resolveCallerGraphId\` walked up past
 ;; the empty arrow scope to the module's File fallback. Sourcerer-fe alone
 ;; has ~296 such declarations (57 forwardRef + 21 memo + 161 useCallback
-;; + 57 useMemo) — all invisible to \`gitnexus_context\` /
-;; \`gitnexus_impact\` for outgoing edges before this fix.
+;; + 57 useMemo) — all invisible to \`yummygraph_context\` /
+;; \`yummygraph_impact\` for outgoing edges before this fix.
 ;;
 ;; Anchor discipline: same as the \`lexical_declaration\` / \`pair\` blocks
 ;; above — on the INNER \`arrow_function\` / \`function_expression\`, NOT
@@ -1003,8 +1003,8 @@ const TYPESCRIPT_SCOPE_QUERY = `
  *
  * Why JSX as a CALLS edge: \`<Foo />\` is syntactic sugar for \`Foo(props)\`
  * and the React component is invoked by the renderer, so for blast-radius
- * (\`gitnexus_impact("Badge", direction: "upstream")\`) and call-graph
- * (\`gitnexus_context("Foo")\`) purposes JSX usage IS a call. Routing
+ * (\`yummygraph_impact("Badge", direction: "upstream")\`) and call-graph
+ * (\`yummygraph_context("Foo")\`) purposes JSX usage IS a call. Routing
  * through \`@reference.call.free\` / \`@reference.call.member\` makes the
  * downstream caller-walk + edge-emission paths handle JSX uniformly with
  * ordinary call expressions — no new edge type, no schema changes.

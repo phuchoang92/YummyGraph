@@ -22,7 +22,7 @@
  * by a negative `arity` value per the shared Callsite contract).
  */
 
-import type { Callsite, SymbolDefinition } from 'gitnexus-shared';
+import type { Callsite, SymbolDefinition } from 'yummygraph-shared';
 
 export function phpArityCompatibility(
   def: SymbolDefinition,

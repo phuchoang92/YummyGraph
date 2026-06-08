@@ -114,7 +114,7 @@ import { getCanonicalRepoRoot } from '../../src/storage/git.js';
 
 describe('resolveWorktreeCwd — auto-detection helper', () => {
   it('returns repoPath unchanged when launchCwd is the same git root', () => {
-    const repoDir = mkdtempSync(path.join(os.tmpdir(), 'gitnexus-rwc-same-'));
+    const repoDir = mkdtempSync(path.join(os.tmpdir(), 'yummygraph-rwc-same-'));
     try {
       execSync('git init -q', { cwd: repoDir, stdio: 'ignore' });
       // Compare via realpathSync.native: mkdtempSync may return a symlink path
@@ -128,8 +128,8 @@ describe('resolveWorktreeCwd — auto-detection helper', () => {
   });
 
   it('returns repoPath unchanged when launchCwd is a non-git directory', () => {
-    const repoDir = mkdtempSync(path.join(os.tmpdir(), 'gitnexus-rwc-repo-'));
-    const plainDir = mkdtempSync(path.join(os.tmpdir(), 'gitnexus-rwc-plain-'));
+    const repoDir = mkdtempSync(path.join(os.tmpdir(), 'yummygraph-rwc-repo-'));
+    const plainDir = mkdtempSync(path.join(os.tmpdir(), 'yummygraph-rwc-plain-'));
     try {
       execSync('git init -q', { cwd: repoDir, stdio: 'ignore' });
       // plainDir has no git repo — no git root found → fall through to repoPath
@@ -142,7 +142,7 @@ describe('resolveWorktreeCwd — auto-detection helper', () => {
   });
 
   it('returns worktreeDir when launchCwd is a linked worktree of the same repo', () => {
-    const repoDir = mkdtempSync(path.join(os.tmpdir(), 'gitnexus-rwc-wt-'));
+    const repoDir = mkdtempSync(path.join(os.tmpdir(), 'yummygraph-rwc-wt-'));
     try {
       execSync('git init -q', { cwd: repoDir, stdio: 'ignore' });
       execSync('git config user.email "test@example.com"', { cwd: repoDir, stdio: 'ignore' });
@@ -176,8 +176,8 @@ describe('resolveWorktreeCwd — auto-detection helper', () => {
   });
 
   it('returns repoPath when launchCwd belongs to a different (unrelated) repo', () => {
-    const repoA = mkdtempSync(path.join(os.tmpdir(), 'gitnexus-rwc-a-'));
-    const repoB = mkdtempSync(path.join(os.tmpdir(), 'gitnexus-rwc-b-'));
+    const repoA = mkdtempSync(path.join(os.tmpdir(), 'yummygraph-rwc-a-'));
+    const repoB = mkdtempSync(path.join(os.tmpdir(), 'yummygraph-rwc-b-'));
     try {
       execSync('git init -q', { cwd: repoA, stdio: 'ignore' });
       execSync('git init -q', { cwd: repoB, stdio: 'ignore' });
@@ -199,7 +199,7 @@ describe('resolveWorktreeCwd — auto-detection helper', () => {
     // checkout) and repoPath (worktree) share the same canonical root and
     // wrongly override repoPath with the main-checkout path, causing git diff
     // to run from the wrong directory and return 0 changes.
-    const repoDir = mkdtempSync(path.join(os.tmpdir(), 'gitnexus-rwc-idx-wt-'));
+    const repoDir = mkdtempSync(path.join(os.tmpdir(), 'yummygraph-rwc-idx-wt-'));
     try {
       execSync('git init -q', { cwd: repoDir, stdio: 'ignore' });
       execSync('git config user.email "test@example.com"', { cwd: repoDir, stdio: 'ignore' });
@@ -234,7 +234,7 @@ describe('resolveWorktreeCwd — auto-detection helper', () => {
     // Covers: repoPath = wt-A (indexed), launchCwd = wt-B (server launched from another worktree).
     // The guard fires on repoPath being a linked worktree regardless of what launchCwd is,
     // so wt-A must be returned unchanged — not wt-B, not the main checkout.
-    const repoDir = mkdtempSync(path.join(os.tmpdir(), 'gitnexus-rwc-two-wt-'));
+    const repoDir = mkdtempSync(path.join(os.tmpdir(), 'yummygraph-rwc-two-wt-'));
     try {
       execSync('git init -q', { cwd: repoDir, stdio: 'ignore' });
       execSync('git config user.email "test@example.com"', { cwd: repoDir, stdio: 'ignore' });
@@ -280,7 +280,7 @@ describe('detect_changes worktree support — guard logic', () => {
   });
 
   it('getCanonicalRepoRoot returns null for a non-git directory', () => {
-    const tmpDir = mkdtempSync(path.join(os.tmpdir(), 'gitnexus-nonrepo-'));
+    const tmpDir = mkdtempSync(path.join(os.tmpdir(), 'yummygraph-nonrepo-'));
     try {
       expect(getCanonicalRepoRoot(tmpDir)).toBeNull();
     } finally {
@@ -291,7 +291,7 @@ describe('detect_changes worktree support — guard logic', () => {
   it('getCanonicalRepoRoot equates a worktree path with the canonical root', () => {
     // This directly exercises the comparison the guard performs:
     // both paths must yield the same canonical root for the guard to pass.
-    const repoDir = mkdtempSync(path.join(os.tmpdir(), 'gitnexus-guard-'));
+    const repoDir = mkdtempSync(path.join(os.tmpdir(), 'yummygraph-guard-'));
     try {
       execSync('git init -q', { cwd: repoDir, stdio: 'ignore' });
       execSync('git config user.email "test@example.com"', { cwd: repoDir, stdio: 'ignore' });
@@ -324,8 +324,8 @@ describe('detect_changes worktree support — guard logic', () => {
 
   it('getCanonicalRepoRoot returns different roots for two unrelated repos', () => {
     // The guard's rejection condition: roots must NOT match for unrelated repos.
-    const repoA = mkdtempSync(path.join(os.tmpdir(), 'gitnexus-repoA-'));
-    const repoB = mkdtempSync(path.join(os.tmpdir(), 'gitnexus-repoB-'));
+    const repoA = mkdtempSync(path.join(os.tmpdir(), 'yummygraph-repoA-'));
+    const repoB = mkdtempSync(path.join(os.tmpdir(), 'yummygraph-repoB-'));
     try {
       execSync('git init -q', { cwd: repoA, stdio: 'ignore' });
       execSync('git init -q', { cwd: repoB, stdio: 'ignore' });
@@ -350,7 +350,7 @@ describe('detect_changes worktree support — guard logic', () => {
 
 describe('detect_changes worktree support — end-to-end with real worktree', () => {
   it('git diff from canonical root misses unstaged changes in a linked worktree, but worktree cwd finds them', () => {
-    const repoDir = mkdtempSync(path.join(os.tmpdir(), 'gitnexus-wt-detect-'));
+    const repoDir = mkdtempSync(path.join(os.tmpdir(), 'yummygraph-wt-detect-'));
     try {
       execSync('git init -q', { cwd: repoDir, stdio: 'ignore' });
       execSync('git config user.email "test@example.com"', { cwd: repoDir, stdio: 'ignore' });
@@ -399,7 +399,7 @@ describe('detect_changes worktree support — end-to-end with real worktree', ()
   });
 
   it('git diff --staged from worktree cwd sees staged changes in that worktree', () => {
-    const repoDir = mkdtempSync(path.join(os.tmpdir(), 'gitnexus-wt-staged-'));
+    const repoDir = mkdtempSync(path.join(os.tmpdir(), 'yummygraph-wt-staged-'));
     try {
       execSync('git init -q', { cwd: repoDir, stdio: 'ignore' });
       execSync('git config user.email "test@example.com"', { cwd: repoDir, stdio: 'ignore' });

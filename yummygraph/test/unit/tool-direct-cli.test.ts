@@ -18,7 +18,7 @@ vi.mock('node:fs', () => ({
 describe('direct CLI tool commands', () => {
   beforeEach(() => {
     vi.unstubAllEnvs();
-    vi.stubEnv('GITNEXUS_LANG', 'en');
+    vi.stubEnv('YUMMYGRAPH_LANG', 'en');
     vi.resetModules();
     initMock.mockReset();
     callToolMock.mockReset();
@@ -40,13 +40,13 @@ describe('direct CLI tool commands', () => {
     await detectChangesCommand({
       scope: 'compare',
       baseRef: 'main',
-      repo: 'gitnexus',
+      repo: 'yummygraph',
     });
 
     expect(callToolMock).toHaveBeenCalledWith('detect_changes', {
       scope: 'compare',
       base_ref: 'main',
-      repo: 'gitnexus',
+      repo: 'yummygraph',
     });
     expect(writeSyncMock).toHaveBeenCalledWith(1, expect.stringContaining('Risk level: low'));
   });
@@ -111,7 +111,7 @@ describe('direct CLI tool commands', () => {
   });
 
   it('localizes detect_changes formatter labels for Simplified Chinese', async () => {
-    vi.stubEnv('GITNEXUS_LANG', 'zh-CN');
+    vi.stubEnv('YUMMYGRAPH_LANG', 'zh-CN');
     callToolMock.mockResolvedValue({
       summary: { changed_files: 2, changed_count: 3, affected_count: 1, risk_level: 'MEDIUM' },
       changed_symbols: [{ type: 'Function', name: 'foo', filePath: 'src/a.ts' }],

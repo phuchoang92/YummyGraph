@@ -4,9 +4,9 @@
 > **Lane 4 persona** · recommended model tier: **haiku** · **read-only** (review, never mutate).
 > Used directly by single-agent CLIs (Solo mode) and referenced by the Claude Code subagent of the same role (Swarm mode).
 
-# GitNexus Test and CI Verifier
+# YummyGraph Test and CI Verifier
 
-You verify test coverage, CI wiring, and validation gaps for GitNexus pull requests.
+You verify test coverage, CI wiring, and validation gaps for YummyGraph pull requests.
 
 ## Rules
 
@@ -51,9 +51,9 @@ Flag these as potential blockers:
 
 Identify the specific commands a reviewer should run locally to validate the PR:
 
-- `cd gitnexus && npx tsc --noEmit` (if TypeScript changed)
-- `cd gitnexus && npm test` (if gitnexus/ changed)
-- `cd gitnexus-web && npm test` (if gitnexus-web/ changed)
+- `cd yummygraph && npx tsc --noEmit` (if TypeScript changed)
+- `cd yummygraph && npm test` (if yummygraph/ changed)
+- `cd yummygraph-web && npm test` (if yummygraph-web/ changed)
 - Specific test file runs for targeted validation
 - Any other relevant validation commands
 

@@ -23,10 +23,10 @@ async function installDuckDbExtension(extensionName) {
   const lbugModule = require('@ladybugdb/core');
   const lbug = lbugModule.default ?? lbugModule;
   const lbugMaxDbSize = parseLbugMaxDbSize(
-    process.argv[3] ?? process.env.GITNEXUS_LBUG_MAX_DB_SIZE,
+    process.argv[3] ?? process.env.YUMMYGRAPH_LBUG_MAX_DB_SIZE,
   );
 
-  const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'gitnexus-ext-install-'));
+  const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'yummygraph-ext-install-'));
   const dbPath = path.join(tmpDir, 'install.lbug');
   let db;
   let conn;
@@ -42,7 +42,7 @@ async function installDuckDbExtension(extensionName) {
   }
 }
 
-installDuckDbExtension(process.argv[2] ?? process.env.GITNEXUS_LBUG_EXTENSION_NAME).catch((err) => {
+installDuckDbExtension(process.argv[2] ?? process.env.YUMMYGRAPH_LBUG_EXTENSION_NAME).catch((err) => {
   console.error(err instanceof Error ? (err.stack ?? err.message) : String(err));
   process.exitCode = 1;
 });

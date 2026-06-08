@@ -9,12 +9,12 @@ import { toNativeSafePath, cleanupNativePathJunctions } from '../../src/core/lbu
 
 describe('toNativeSafePath', () => {
   it('returns ASCII paths unchanged on any platform', () => {
-    const p = 'C:\\Users\\test\\project\\.gitnexus\\lbug';
+    const p = 'C:\\Users\\test\\project\\.yummygraph\\lbug';
     expect(toNativeSafePath(p)).toBe(p);
   });
 
   it('returns forward-slash ASCII paths unchanged', () => {
-    const p = '/home/user/project/.gitnexus/lbug';
+    const p = '/home/user/project/.yummygraph/lbug';
     expect(toNativeSafePath(p)).toBe(p);
   });
 
@@ -24,14 +24,14 @@ describe('toNativeSafePath', () => {
 
   if (process.platform !== 'win32') {
     it('returns non-ASCII paths unchanged on non-Windows', () => {
-      const p = '/home/用户/project/.gitnexus/lbug';
+      const p = '/home/用户/project/.yummygraph/lbug';
       expect(toNativeSafePath(p)).toBe(p);
     });
   }
 
   if (process.platform === 'win32') {
     it('converts a path with non-ASCII parent directory to an ASCII-safe form', () => {
-      // Real-world scenario: repo at C:\Project\中文\code, leaf is ASCII (.gitnexus/lbug).
+      // Real-world scenario: repo at C:\Project\中文\code, leaf is ASCII (.yummygraph/lbug).
       // Create a CJK parent dir with an ASCII leaf to match.
       const os = require('os');
       const fs = require('fs');

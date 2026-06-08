@@ -44,7 +44,7 @@
  *   `@type-binding.type`  (the enclosing type's name)
  */
 
-import type { Capture, CaptureMatch } from 'gitnexus-shared';
+import type { Capture, CaptureMatch } from 'yummygraph-shared';
 import { nodeToCapture, syntheticCapture, type SyntaxNode } from '../../utils/ast-helpers.js';
 
 /** Node types that define a TypeScript "type with instance members". */

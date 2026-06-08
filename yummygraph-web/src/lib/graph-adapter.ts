@@ -1,5 +1,5 @@
 import Graph, { MultiGraph } from 'graphology';
-import type { NodeLabel } from 'gitnexus-shared';
+import type { NodeLabel } from 'yummygraph-shared';
 import type { KnowledgeGraph } from '../core/graph/types';
 import { EDGE_INFO, NODE_COLORS, NODE_SIZES, getCommunityColor } from './constants';
 import { calculateTreeLayout } from './tree-layout';

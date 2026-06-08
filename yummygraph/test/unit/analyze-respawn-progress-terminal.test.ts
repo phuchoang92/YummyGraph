@@ -43,7 +43,7 @@ vi.mock('../../src/core/lbug/lbug-adapter.js', () => ({
 }));
 
 vi.mock('../../src/storage/repo-manager.js', () => ({
-  getStoragePaths: vi.fn(() => ({ storagePath: '.gitnexus', lbugPath: '.gitnexus/lbug' })),
+  getStoragePaths: vi.fn(() => ({ storagePath: '.yummygraph', lbugPath: '.yummygraph/lbug' })),
   getGlobalRegistryPath: vi.fn(() => 'registry.json'),
   RegistryNameCollisionError: class RegistryNameCollisionError extends Error {},
   AnalysisNotFinalizedError: class AnalysisNotFinalizedError extends Error {},
@@ -70,7 +70,7 @@ const setStreamIsTTY = (stream: NodeJS.WriteStream, value: boolean): (() => void
 
 describe('analyzeCommand respawn progress terminal bridge', () => {
   const ORIGINAL_NODE_OPTIONS = process.env.NODE_OPTIONS;
-  const ORIGINAL_RESPAWN_PROGRESS = process.env.GITNEXUS_RESPAWN_PROGRESS_TTY;
+  const ORIGINAL_RESPAWN_PROGRESS = process.env.YUMMYGRAPH_RESPAWN_PROGRESS_TTY;
   const ORIGINAL_COLUMNS = process.env.COLUMNS;
   let restoreStderrIsTTY: (() => void) | undefined;
   let stdoutWriteSpy: ReturnType<typeof vi.spyOn>;
@@ -88,7 +88,7 @@ describe('analyzeCommand respawn progress terminal bridge', () => {
     });
     process.exitCode = undefined;
     process.env.NODE_OPTIONS = '--max-old-space-size=8192';
-    process.env.GITNEXUS_RESPAWN_PROGRESS_TTY = '1';
+    process.env.YUMMYGRAPH_RESPAWN_PROGRESS_TTY = '1';
     restoreStderrIsTTY = setStreamIsTTY(process.stderr, false);
     stdoutWriteSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
     stderrWriteSpy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
@@ -101,8 +101,8 @@ describe('analyzeCommand respawn progress terminal bridge', () => {
     restoreStderrIsTTY = undefined;
     if (ORIGINAL_NODE_OPTIONS === undefined) delete process.env.NODE_OPTIONS;
     else process.env.NODE_OPTIONS = ORIGINAL_NODE_OPTIONS;
-    if (ORIGINAL_RESPAWN_PROGRESS === undefined) delete process.env.GITNEXUS_RESPAWN_PROGRESS_TTY;
-    else process.env.GITNEXUS_RESPAWN_PROGRESS_TTY = ORIGINAL_RESPAWN_PROGRESS;
+    if (ORIGINAL_RESPAWN_PROGRESS === undefined) delete process.env.YUMMYGRAPH_RESPAWN_PROGRESS_TTY;
+    else process.env.YUMMYGRAPH_RESPAWN_PROGRESS_TTY = ORIGINAL_RESPAWN_PROGRESS;
     if (ORIGINAL_COLUMNS === undefined) delete process.env.COLUMNS;
     else process.env.COLUMNS = ORIGINAL_COLUMNS;
   });

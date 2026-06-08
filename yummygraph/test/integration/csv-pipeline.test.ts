@@ -224,7 +224,7 @@ describe('streamAllCSVsToDisk', () => {
 });
 
 /**
- * Deterministic output — `GITNEXUS_SORT_GRAPH_OUTPUT` makes the CSV a pure function of the
+ * Deterministic output — `YUMMYGRAPH_SORT_GRAPH_OUTPUT` makes the CSV a pure function of the
  * graph's node/edge SET (id-sorted) instead of of insertion order. This is the
  * structural enabler for the out-of-core / windowed resolve: with it on,
  * a windowed emit that produces the same edge set in a different order yields
@@ -258,8 +258,8 @@ describe('streamAllCSVsToDisk — deterministic output ordering', () => {
     sorted: boolean,
     sub: string,
   ): Promise<{ folderIds: string[]; relRows: string[] }> => {
-    if (sorted) process.env.GITNEXUS_SORT_GRAPH_OUTPUT = '1';
-    else delete process.env.GITNEXUS_SORT_GRAPH_OUTPUT;
+    if (sorted) process.env.YUMMYGRAPH_SORT_GRAPH_OUTPUT = '1';
+    else delete process.env.YUMMYGRAPH_SORT_GRAPH_OUTPUT;
     try {
       const result = await streamAllCSVsToDisk(
         buildTestGraph(nodes, rels),
@@ -273,7 +273,7 @@ describe('streamAllCSVsToDisk — deterministic output ordering', () => {
       const relRows = dataRows(await fs.readFile(result.relCsvPath, 'utf-8'));
       return { folderIds, relRows };
     } finally {
-      delete process.env.GITNEXUS_SORT_GRAPH_OUTPUT;
+      delete process.env.YUMMYGRAPH_SORT_GRAPH_OUTPUT;
     }
   };
 

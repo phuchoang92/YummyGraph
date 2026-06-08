@@ -12,7 +12,7 @@
  * fires the natural rename failure that motivated PR #1772.
  *
  * No test-only hooks, no env-var fault toggles in production code: we use
- * the same `GITNEXUS_WAL_CHECKPOINT_THRESHOLD=1` knob that real users have
+ * the same `YUMMYGRAPH_WAL_CHECKPOINT_THRESHOLD=1` knob that real users have
  * available to force checkpointing on every write, then arrange a real
  * filesystem state that makes the rename impossible.
  *
@@ -22,7 +22,7 @@
  *      `--wal-checkpoint-threshold 67108864` (the
  *      `RECOMMENDED_WAL_CHECKPOINT_THRESHOLD` constant in `analyze.ts`).
  *   3. The recovery message references the
- *      `GITNEXUS_WAL_CHECKPOINT_THRESHOLD` env var as a parallel route.
+ *      `YUMMYGRAPH_WAL_CHECKPOINT_THRESHOLD` env var as a parallel route.
  *
  * Empirically confirmed portable on Windows; the same mechanism is
  * expected to work on POSIX (`rename(2)` fails with `EISDIR`/`ENOTEMPTY`
@@ -49,12 +49,12 @@ const tsxPkgDir = path.dirname(_require.resolve('tsx/package.json'));
 const tsxImportUrl = pathToFileURL(path.join(tsxPkgDir, 'dist', 'loader.mjs')).href;
 
 let tmpParent: string;
-let suiteGitnexusHome: string;
+let suiteYummygraphHome: string;
 let repoPath: string;
 
 beforeAll(() => {
   tmpParent = fs.mkdtempSync(path.join(os.tmpdir(), 'gn-wal-checkpoint-e2e-'));
-  suiteGitnexusHome = fs.mkdtempSync(path.join(os.tmpdir(), 'gn-wal-checkpoint-home-'));
+  suiteYummygraphHome = fs.mkdtempSync(path.join(os.tmpdir(), 'gn-wal-checkpoint-home-'));
   repoPath = path.join(tmpParent, 'mini-repo');
   fs.cpSync(FIXTURE_SRC, repoPath, { recursive: true });
 
@@ -75,7 +75,7 @@ beforeAll(() => {
 
 afterAll(() => {
   if (tmpParent) cleanupTempDirSync(tmpParent);
-  if (suiteGitnexusHome) cleanupTempDirSync(suiteGitnexusHome);
+  if (suiteYummygraphHome) cleanupTempDirSync(suiteYummygraphHome);
 });
 
 describe('analyze WAL auto-checkpoint rename failure (real lbug, no mocks)', () => {
@@ -85,8 +85,8 @@ describe('analyze WAL auto-checkpoint rename failure (real lbug, no mocks)', () 
     // non-empty directory, and the adapter's orphan-sidecar cleanup uses
     // `fs.unlink` (which fails on directories) — so the blocker persists
     // through `doInitLbug` and trips the very first auto-checkpoint that
-    // a `GITNEXUS_WAL_CHECKPOINT_THRESHOLD=1` setting forces.
-    const storageDir = path.join(repoPath, '.gitnexus');
+    // a `YUMMYGRAPH_WAL_CHECKPOINT_THRESHOLD=1` setting forces.
+    const storageDir = path.join(repoPath, '.yummygraph');
     fs.mkdirSync(storageDir, { recursive: true });
     const blockerDir = path.join(storageDir, 'lbug.wal.checkpoint');
     fs.mkdirSync(blockerDir, { recursive: true });
@@ -104,12 +104,12 @@ describe('analyze WAL auto-checkpoint rename failure (real lbug, no mocks)', () 
         stdio: ['pipe', 'pipe', 'pipe'],
         env: {
           ...process.env,
-          GITNEXUS_HOME: suiteGitnexusHome,
+          YUMMYGRAPH_HOME: suiteYummygraphHome,
           // Skip ensureHeap re-exec (which drops the tsx loader).
           NODE_OPTIONS: `${process.env.NODE_OPTIONS || ''} --max-old-space-size=8192`.trim(),
           // Tiny threshold forces auto-checkpoint on every write so the
           // first write into the WAL trips the planted rename blocker.
-          GITNEXUS_WAL_CHECKPOINT_THRESHOLD: '1',
+          YUMMYGRAPH_WAL_CHECKPOINT_THRESHOLD: '1',
           CI: '1',
         },
       },
@@ -125,9 +125,9 @@ describe('analyze WAL auto-checkpoint rename failure (real lbug, no mocks)', () 
     // 64 MiB threshold (67_108_864 bytes). Both come from the
     // RECOMMENDED_WAL_CHECKPOINT_THRESHOLD constant in analyze.ts; keep
     // those values in sync with this assertion if the constant changes.
-    expect(combined).toContain('gitnexus analyze --wal-checkpoint-threshold');
+    expect(combined).toContain('yummygraph analyze --wal-checkpoint-threshold');
     expect(combined).toContain('67108864');
     // The env-var route should be advertised alongside the flag.
-    expect(combined).toContain('GITNEXUS_WAL_CHECKPOINT_THRESHOLD');
+    expect(combined).toContain('YUMMYGRAPH_WAL_CHECKPOINT_THRESHOLD');
   }, 180_000);
 });

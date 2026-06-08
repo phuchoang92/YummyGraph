@@ -1,4 +1,4 @@
-import type { CaptureMatch, ParsedImport, ParsedTypeBinding, TypeRef } from 'gitnexus-shared';
+import type { CaptureMatch, ParsedImport, ParsedTypeBinding, TypeRef } from 'yummygraph-shared';
 
 /**
  * Interpret a C #include capture into a ParsedImport.

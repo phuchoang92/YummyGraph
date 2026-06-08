@@ -1,7 +1,7 @@
 /**
  * Rust scope-capture O(n^2) regression tripwire (PR #1918 follow-up).
  *
- * NOT gated behind GITNEXUS_BENCH and needs no compiled worker — it runs in
+ * NOT gated behind YUMMYGRAPH_BENCH and needs no compiled worker — it runs in
  * normal CI and is the actual guard against an O(n^2) re-regression of
  * `emitRustScopeCaptures`. It calls the hotpath directly on a ~400-entity
  * generated source. The O(n) path (threading the tree-sitter query's captured

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { calculateTreeLayout } from './tree-layout';
 import type { KnowledgeGraph } from '../core/graph/types';
-import type { GraphNode } from 'gitnexus-shared';
+import type { GraphNode } from 'yummygraph-shared';
 
 function makeNode(id: string, label: string, name: string): GraphNode {
   return {

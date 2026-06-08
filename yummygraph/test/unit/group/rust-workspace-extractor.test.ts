@@ -9,7 +9,7 @@ describe('RustWorkspaceExtractor', () => {
   let tmpDir: string;
 
   beforeEach(async () => {
-    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'gitnexus-rust-ws-'));
+    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'yummygraph-rust-ws-'));
   });
 
   afterEach(async () => {
@@ -277,14 +277,14 @@ describe('RustWorkspaceExtractor', () => {
     expect(contracts).toEqual(['alpha::Config', 'beta::Config']);
   });
 
-  it('respects .gitnexusignore patterns', async () => {
+  it('respects .yummygraphignore patterns', async () => {
     await writeFile(
       'lib/Cargo.toml',
       `[package]\nname = "mylib"\nversion = "0.1.0"\n\n[dependencies]\n`,
     );
     await writeFile('lib/src/lib.rs', 'pub struct Real {}\n');
     await writeFile('lib/generated/gen.rs', 'pub struct Fake {}\n');
-    await writeFile('lib/.gitnexusignore', 'generated/\n');
+    await writeFile('lib/.yummygraphignore', 'generated/\n');
 
     await writeFile(
       'app/Cargo.toml',
@@ -292,7 +292,7 @@ describe('RustWorkspaceExtractor', () => {
     );
     await writeFile('app/src/main.rs', 'use mylib::Real;\n');
     await writeFile('app/generated/gen.rs', 'use mylib::Fake;\n');
-    await writeFile('app/.gitnexusignore', 'generated/\n');
+    await writeFile('app/.yummygraphignore', 'generated/\n');
 
     const repos = { lib: 'mylib', app: 'myapp' };
     const repoPaths = new Map([

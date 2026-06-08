@@ -1,4 +1,4 @@
-import type { PipelineProgress } from 'gitnexus-shared';
+import type { PipelineProgress } from 'yummygraph-shared';
 import { useTranslation } from 'react-i18next';
 import { translateProgressMessage } from '../i18n/progress';
 

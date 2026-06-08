@@ -30,7 +30,7 @@ const DIRECT_PARSE_LIMIT_CHARS = 16 * 1024;
  * file is hard-skipped here rather than tripping the slower pool-level
  * retry/respawn machinery. 15 s leaves comfortable headroom.
  *
- * Override via `GITNEXUS_PARSE_TIMEOUT_MS`; `0` disables the budget entirely
+ * Override via `YUMMYGRAPH_PARSE_TIMEOUT_MS`; `0` disables the budget entirely
  * (unlimited parse time — restore the historical behaviour for debugging).
  */
 const DEFAULT_PARSE_TIMEOUT_MS = 15_000;
@@ -42,7 +42,7 @@ const DEFAULT_PARSE_TIMEOUT_MS = 15_000;
  * silently disabling the safety net.
  */
 function resolveParseTimeoutMs(): number {
-  const raw = process.env.GITNEXUS_PARSE_TIMEOUT_MS;
+  const raw = process.env.YUMMYGRAPH_PARSE_TIMEOUT_MS;
   if (raw === undefined || raw === '') return DEFAULT_PARSE_TIMEOUT_MS;
   const parsed = Number(raw);
   if (!Number.isFinite(parsed) || parsed < 0) return DEFAULT_PARSE_TIMEOUT_MS;
@@ -118,7 +118,7 @@ export class ParseTimeoutError extends Error {
     super(
       `tree-sitter parse exceeded its ${budgetMs}ms budget` +
         (label ? ` while parsing ${label}` : '') +
-        ' (set GITNEXUS_PARSE_TIMEOUT_MS=0 to disable, or raise the budget)',
+        ' (set YUMMYGRAPH_PARSE_TIMEOUT_MS=0 to disable, or raise the budget)',
     );
     this.name = 'ParseTimeoutError';
     this.budgetMs = budgetMs;
@@ -189,7 +189,7 @@ export function getParseDiagnostics(tree: Parser.Tree): {
  *     0.21.x string-to-buffer SIGSEGV. See {@link SAFE_PARSE_CHUNK_CHARS}.
  *
  *  2. **Runaway-parse timeout.** A per-parse budget (default 15 s, env
- *     `GITNEXUS_PARSE_TIMEOUT_MS`, `0` disables) is armed before parsing on
+ *     `YUMMYGRAPH_PARSE_TIMEOUT_MS`, `0` disables) is armed before parsing on
  *     both the direct and chunked paths. On timeout the runtime returns
  *     `null`; this function `reset()`s the parser, clears the budget, and
  *     throws {@link ParseTimeoutError}. The budget is always cleared in a

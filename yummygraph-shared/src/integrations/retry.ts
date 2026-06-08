@@ -5,7 +5,7 @@
  * Promise machinery — no Node-only imports. Safe to consume from CLI,
  * server, or browser callers.
  *
- * Pattern reference: gitnexus/src/core/embeddings/http-client.ts. This
+ * Pattern reference: yummygraph/src/core/embeddings/http-client.ts. This
  * helper is the upgraded form: classification is caller-supplied (so
  * 4xx-vs-5xx-vs-timeout decisions live with the protocol that knows
  * them), backoff is exponential with full jitter, and an optional

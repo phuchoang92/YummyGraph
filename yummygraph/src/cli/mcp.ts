@@ -24,7 +24,7 @@
  * touches `process.stdout` or loads a native binding at module init. If
  * either is true, switch it to a dynamic `await import(...)` inside
  * `mcpCommand` after the sentinel install. The regression test at
- * `gitnexus/test/integration/mcp/import-closure.test.ts` enforces this.
+ * `yummygraph/test/integration/mcp/import-closure.test.ts` enforces this.
  */
 
 import { installGlobalStdoutSentinel } from '../mcp/stdio-context.js';
@@ -37,7 +37,7 @@ export const mcpCommand = async () => {
   installGlobalStdoutSentinel();
 
   // uncaughtException/unhandledRejection handlers are owned by
-  // startMCPServer (gitnexus/src/mcp/server.ts) so the server's shutdown
+  // startMCPServer (yummygraph/src/mcp/server.ts) so the server's shutdown
   // path runs cleanly with full stack traces. Registering duplicates here
   // would only produce noisy double-logging on the same exception.
 
@@ -55,7 +55,7 @@ export const mcpCommand = async () => {
   ]);
 
   // Missing-optional-grammar warnings are intentionally NOT emitted here.
-  // `gitnexus analyze` already warns at index time, filtered by the repo's
+  // `yummygraph analyze` already warns at index time, filtered by the repo's
   // actual extensions, and a repo can only be served by MCP after analyze
   // has run. Repeating an unconditional warning at every MCP startup is
   // pure noise for users whose indexed repos don't use Dart/Proto.
@@ -71,12 +71,12 @@ export const mcpCommand = async () => {
     // Operator-actionable but the server still starts and serves; warn-level,
     // not error. Tools will discover newly-analyzed repos via lazy refresh.
     logger.warn(
-      'GitNexus: No indexed repos yet. Run `gitnexus analyze` in a git repo — the server will pick it up automatically.',
+      'YummyGraph: No indexed repos yet. Run `yummygraph analyze` in a git repo — the server will pick it up automatically.',
     );
   } else {
     logger.info(
       { repoCount: repos.length, repos: repos.map((r) => r.name) },
-      'GitNexus: MCP server starting',
+      'YummyGraph: MCP server starting',
     );
   }
 

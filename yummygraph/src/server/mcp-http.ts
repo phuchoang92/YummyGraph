@@ -1,7 +1,7 @@
 /**
  * MCP over HTTP
  *
- * Mounts the GitNexus MCP server on Express using StreamableHTTP transport.
+ * Mounts the YummyGraph MCP server on Express using StreamableHTTP transport.
  * Each connecting client gets its own stateful session; the LocalBackend
  * is shared across all sessions (thread-safe — lazy LadybugDB per repo).
  *

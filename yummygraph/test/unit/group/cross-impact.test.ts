@@ -15,7 +15,7 @@ import { writeBridgeMeta } from '../../../src/core/group/bridge-db.js';
 import { BRIDGE_SCHEMA_VERSION } from '../../../src/core/group/bridge-schema.js';
 
 function tmpGroup(): { tmpDir: string; groupDir: string; cleanup: () => void } {
-  const tmpDir = path.join(os.tmpdir(), `gitnexus-ci-${Date.now()}-${Math.random()}`);
+  const tmpDir = path.join(os.tmpdir(), `yummygraph-ci-${Date.now()}-${Math.random()}`);
   const groupDir = path.join(tmpDir, 'groups', 'g1');
   fs.mkdirSync(groupDir, { recursive: true });
   fs.writeFileSync(
@@ -108,7 +108,7 @@ describe('cross-impact', () => {
 
   it('test_runGroupImpact_local_timeout_returns_truncation', async () => {
     const { tmpDir, cleanup } = tmpGroup();
-    vi.stubEnv('GITNEXUS_HOME', tmpDir);
+    vi.stubEnv('YUMMYGRAPH_HOME', tmpDir);
     try {
       let impactCalls = 0;
       const port: GroupToolPort = {
@@ -116,7 +116,7 @@ describe('cross-impact', () => {
           id: 'be',
           name: 'reg-be',
           repoPath: '/r',
-          storagePath: '/r/.gitnexus',
+          storagePath: '/r/.yummygraph',
         })),
         impact: vi.fn(async () => {
           impactCalls++;
@@ -128,7 +128,7 @@ describe('cross-impact', () => {
         context: vi.fn(),
       };
       const r = await runGroupImpact(
-        { port, gitnexusDir: tmpDir },
+        { port, yummygraphDir: tmpDir },
         {
           name: 'g1',
           repo: 'app/backend',
@@ -157,14 +157,14 @@ describe('cross-impact', () => {
     // "no impact across the group" — a false negative on the failure path
     // of a blast-radius tool.
     const { tmpDir, cleanup } = tmpGroup();
-    vi.stubEnv('GITNEXUS_HOME', tmpDir);
+    vi.stubEnv('YUMMYGRAPH_HOME', tmpDir);
     try {
       const port: GroupToolPort = {
         resolveRepo: vi.fn(async () => ({
           id: 'be',
           name: 'reg-be',
           repoPath: '/r',
-          storagePath: '/r/.gitnexus',
+          storagePath: '/r/.yummygraph',
         })),
         impact: vi.fn(async () => ({ error: 'symbol not found: Sym' })),
         query: vi.fn(),
@@ -172,7 +172,7 @@ describe('cross-impact', () => {
         context: vi.fn(),
       };
       const r = await runGroupImpact(
-        { port, gitnexusDir: tmpDir },
+        { port, yummygraphDir: tmpDir },
         {
           name: 'g1',
           repo: 'app/backend',
@@ -200,24 +200,24 @@ describe('cross-impact', () => {
     // bubble to the caller as top-level errors too, not be swallowed into
     // an empty success payload.
     const { tmpDir, cleanup } = tmpGroup();
-    vi.stubEnv('GITNEXUS_HOME', tmpDir);
+    vi.stubEnv('YUMMYGRAPH_HOME', tmpDir);
     try {
       const port: GroupToolPort = {
         resolveRepo: vi.fn(async () => ({
           id: 'be',
           name: 'reg-be',
           repoPath: '/r',
-          storagePath: '/r/.gitnexus',
+          storagePath: '/r/.yummygraph',
         })),
         impact: vi.fn(async () => {
-          throw new Error('graph-load failure: .gitnexus missing');
+          throw new Error('graph-load failure: .yummygraph missing');
         }),
         query: vi.fn(),
         impactByUid: vi.fn(),
         context: vi.fn(),
       };
       const r = await runGroupImpact(
-        { port, gitnexusDir: tmpDir },
+        { port, yummygraphDir: tmpDir },
         {
           name: 'g1',
           repo: 'app/backend',
@@ -237,7 +237,7 @@ describe('cross-impact', () => {
 
   it('test_runGroupImpact_bridge_schema_mismatch_returns_error', async () => {
     const { tmpDir, groupDir, cleanup } = tmpGroup();
-    vi.stubEnv('GITNEXUS_HOME', tmpDir);
+    vi.stubEnv('YUMMYGRAPH_HOME', tmpDir);
     await writeBridgeMeta(groupDir, {
       version: BRIDGE_SCHEMA_VERSION + 9,
       generatedAt: new Date().toISOString(),
@@ -249,7 +249,7 @@ describe('cross-impact', () => {
           id: 'be',
           name: 'reg-be',
           repoPath: '/r',
-          storagePath: '/r/.gitnexus',
+          storagePath: '/r/.yummygraph',
         })),
         impact: vi.fn(async () => ({
           target: { id: 'u1', filePath: 'src/a.ts' },
@@ -262,7 +262,7 @@ describe('cross-impact', () => {
         context: vi.fn(),
       };
       const r = await runGroupImpact(
-        { port, gitnexusDir: tmpDir },
+        { port, yummygraphDir: tmpDir },
         {
           name: 'g1',
           repo: 'app/backend',

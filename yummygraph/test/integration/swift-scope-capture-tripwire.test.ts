@@ -9,7 +9,7 @@
  *
  * Complements bench/scope-capture/measure.mjs (which pins a fingerprint + a
  * 1.5× scaling budget for the `--check` CI job): this always-on test fails the
- * normal suite — no GITNEXUS_BENCH gate, no committed baseline — if the path
+ * normal suite — no YUMMYGRAPH_BENCH gate, no committed baseline — if the path
  * regresses to quadratic.
  *
  * Swift is an optional dependency; skips gracefully if the grammar isn't built.

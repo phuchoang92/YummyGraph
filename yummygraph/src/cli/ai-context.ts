@@ -1,7 +1,7 @@
 /**
  * AI Context Generator
  *
- * Creates AGENTS.md and CLAUDE.md with full inline GitNexus context.
+ * Creates AGENTS.md and CLAUDE.md with full inline YummyGraph context.
  * AGENTS.md is the standard read by Cursor, Windsurf, OpenCode, Codex, Cline, etc.
  * CLAUDE.md is for Claude Code which only reads that file.
  */
@@ -31,19 +31,19 @@ export interface AIContextOptions {
   skipSkills?: boolean;
   /**
    * Default branch used by the generated regression-compare example (#243).
-   * Resolved by the CLI (CLI flag > `.gitnexusrc` > auto-detect > "main"); a
+   * Resolved by the CLI (CLI flag > `.yummygraphrc` > auto-detect > "main"); a
    * plain caller that omits it gets "main", preserving prior behavior.
    */
   defaultBranch?: string;
 }
 
-const GITNEXUS_START_MARKER = '<!-- gitnexus:start -->';
-const GITNEXUS_END_MARKER = '<!-- gitnexus:end -->';
+const YUMMYGRAPH_START_MARKER = '<!-- yummygraph:start -->';
+const YUMMYGRAPH_END_MARKER = '<!-- yummygraph:end -->';
 
 /**
  * Find the index of a section marker that occupies its own line.
  * Unlike `indexOf`, this rejects inline prose references like
- * `` See the `<!-- gitnexus:start -->` block `` that appear
+ * `` See the `<!-- yummygraph:start -->` block `` that appear
  * mid-sentence (#1041). A marker counts as section-position only when:
  *   - preceded by newline or start-of-file, AND
  *   - followed by newline, `\r` (CRLF files), or end-of-file.
@@ -68,7 +68,7 @@ function findSectionMarkerIndex(content: string, marker: string, startFrom = 0):
 }
 
 /**
- * Generate the full GitNexus context content.
+ * Generate the full YummyGraph context content.
  *
  * Design principles (learned from real agent behavior and industry research):
  * - Inline critical workflows — skills are skipped 56% of the time (Vercel eval data)
@@ -79,14 +79,14 @@ function findSectionMarkerIndex(content: string, marker: string, startFrom = 0):
  * - Self-review checklist — forces model to verify its own work
  */
 async function findGroupsContainingRegistryName(registryName: string): Promise<string[]> {
-  const { listGroups, getDefaultGitnexusDir, getGroupDir } =
+  const { listGroups, getDefaultYummygraphDir, getGroupDir } =
     await import('../core/group/storage.js');
   const { loadGroupConfig } = await import('../core/group/config-parser.js');
   const names = await listGroups();
   const hits: string[] = [];
   for (const g of names) {
     try {
-      const config = await loadGroupConfig(getGroupDir(getDefaultGitnexusDir(), g));
+      const config = await loadGroupConfig(getGroupDir(getDefaultYummygraphDir(), g));
       if (Object.values(config.repos).some((r) => r === registryName)) hits.push(config.name);
     } catch {
       // skip invalid or unreadable groups
@@ -105,17 +105,17 @@ export function markdownSafeBranch(branch: string): string {
   return branch.replace(/`/g, '');
 }
 
-export function generateGitNexusContent(
+export function generateYummyGraphContent(
   projectName: string,
   stats: RepoStats,
   generatedSkills?: GeneratedSkillInfo[],
   groupNames?: string[],
   noStats?: boolean,
   skipSkills?: boolean,
-  // Project-relative path to the runner `gitnexus analyze` drops next to the
+  // Project-relative path to the runner `yummygraph analyze` drops next to the
   // index (#1945). Referenced by docs so a single CLI-neutral command resolves
-  // the available runner (global `gitnexus` → `pnpm dlx` → `npx`) at call time.
-  runnerPath: string = '.gitnexus/run.cjs',
+  // the available runner (global `yummygraph` → `pnpm dlx` → `npx`) at call time.
+  runnerPath: string = '.yummygraph/run.cjs',
   // Default branch for the regression-compare example (#243). Configurable so
   // projects on `develop`/`master`/etc. don't get `base_ref: "main"` rewritten
   // back over their fix on every analyze. The value is embedded inside a
@@ -142,12 +142,12 @@ export function generateGitNexusContent(
   // are independent of --skip-skills, so they remain when present.
   const standardSkillsRows = skipSkills
     ? ''
-    : `| Understand architecture / "How does X work?" | \`.claude/skills/gitnexus/gitnexus-exploring/SKILL.md\` |
-| Blast radius / "What breaks if I change X?" | \`.claude/skills/gitnexus/gitnexus-impact-analysis/SKILL.md\` |
-| Trace bugs / "Why is X failing?" | \`.claude/skills/gitnexus/gitnexus-debugging/SKILL.md\` |
-| Rename / extract / split / refactor | \`.claude/skills/gitnexus/gitnexus-refactoring/SKILL.md\` |
-| Tools, resources, schema reference | \`.claude/skills/gitnexus/gitnexus-guide/SKILL.md\` |
-| Index, status, clean, wiki CLI commands | \`.claude/skills/gitnexus/gitnexus-cli/SKILL.md\` |`;
+    : `| Understand architecture / "How does X work?" | \`.claude/skills/yummygraph/yummygraph-exploring/SKILL.md\` |
+| Blast radius / "What breaks if I change X?" | \`.claude/skills/yummygraph/yummygraph-impact-analysis/SKILL.md\` |
+| Trace bugs / "Why is X failing?" | \`.claude/skills/yummygraph/yummygraph-debugging/SKILL.md\` |
+| Rename / extract / split / refactor | \`.claude/skills/yummygraph/yummygraph-refactoring/SKILL.md\` |
+| Tools, resources, schema reference | \`.claude/skills/yummygraph/yummygraph-guide/SKILL.md\` |
+| Index, status, clean, wiki CLI commands | \`.claude/skills/yummygraph/yummygraph-cli/SKILL.md\` |`;
 
   const tableBody = [standardSkillsRows, generatedRows].filter(Boolean).join('\n');
   const skillsTable = tableBody
@@ -155,20 +155,20 @@ export function generateGitNexusContent(
 |------|---------------------|
 ${tableBody}`
     : '';
-  // Docs reference the project-local runner `gitnexus analyze` writes (#1945):
+  // Docs reference the project-local runner `yummygraph analyze` writes (#1945):
   // a single, CLI-neutral, machine-independent command (no per-machine churn,
   // #1706) that auto-selects the available runner at call time. Kept terse to
   // stay under the CLAUDE.md block token budget (#856); the cli skill carries the
   // full bootstrap + npm-11 fallback (`node.target is null` npx install crash).
   const runner = `node ${runnerPath}`;
   const bootstrapNote =
-    `No \`${runnerPath}\` yet? \`npx gitnexus analyze\` ` +
-    '(npm 11 crash → `npm i -g gitnexus`; #1939).';
+    `No \`${runnerPath}\` yet? \`npx yummygraph analyze\` ` +
+    '(npm 11 crash → `npm i -g yummygraph`; #1939).';
 
-  return `${GITNEXUS_START_MARKER}
-# GitNexus — Code Intelligence
+  return `${YUMMYGRAPH_START_MARKER}
+# YummyGraph — Code Intelligence
 
-This project is indexed by GitNexus as **${projectName}**${noStats ? '' : ` (${stats.nodes || 0} symbols, ${stats.edges || 0} relationships, ${stats.processes || 0} execution flows)`}. Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by YummyGraph as **${projectName}**${noStats ? '' : ` (${stats.nodes || 0} symbols, ${stats.edges || 0} relationships, ${stats.processes || 0} execution flows)`}. Use the YummyGraph MCP tools to understand code, assess impact, and navigate safely.
 
 > Index stale? Run \`${runner} analyze\` from the project root — it auto-selects an available runner. ${bootstrapNote}
 
@@ -191,16 +191,16 @@ This project is indexed by GitNexus as **${projectName}**${noStats ? '' : ` (${s
 
 | Resource | Use for |
 |----------|---------|
-| \`gitnexus://repo/${projectName}/context\` | Codebase overview, check index freshness |
-| \`gitnexus://repo/${projectName}/clusters\` | All functional areas |
-| \`gitnexus://repo/${projectName}/processes\` | All execution flows |
-| \`gitnexus://repo/${projectName}/process/{name}\` | Step-by-step execution trace |
+| \`yummygraph://repo/${projectName}/context\` | Codebase overview, check index freshness |
+| \`yummygraph://repo/${projectName}/clusters\` | All functional areas |
+| \`yummygraph://repo/${projectName}/processes\` | All execution flows |
+| \`yummygraph://repo/${projectName}/process/{name}\` | Step-by-step execution trace |
 
 ${
   groupNames && groupNames.length > 0
     ? `## Cross-Repo Groups
 
-This repository is listed under GitNexus **group(s): ${groupNames.join(', ')}** (see \`~/.gitnexus/groups/\`). For cross-repo analysis, use MCP tools \`impact\`, \`query\`, and \`context\` with \`repo\` set to \`@<groupName>\` or \`@<groupName>/<memberPath>\` (paths match keys in that group’s \`group.yaml\`). Use \`group_list\` / \`group_sync\` for membership and sync. From the project root: \`${runner} group list\`, \`${runner} group sync <name>\`, \`${runner} group impact <name> --target <symbol> --repo <group-path>\` (the \`${runnerPath}\` path is repo-root-relative).
+This repository is listed under YummyGraph **group(s): ${groupNames.join(', ')}** (see \`~/.yummygraph/groups/\`). For cross-repo analysis, use MCP tools \`impact\`, \`query\`, and \`context\` with \`repo\` set to \`@<groupName>\` or \`@<groupName>/<memberPath>\` (paths match keys in that group’s \`group.yaml\`). Use \`group_list\` / \`group_sync\` for membership and sync. From the project root: \`${runner} group list\`, \`${runner} group sync <name>\`, \`${runner} group impact <name> --target <symbol> --repo <group-path>\` (the \`${runnerPath}\` path is repo-root-relative).
 
 `
     : ''
@@ -212,7 +212,7 @@ ${skillsTable}
 
 `
       : ''
-  }${GITNEXUS_END_MARKER}`;
+  }${YUMMYGRAPH_END_MARKER}`;
 }
 
 /**
@@ -228,12 +228,12 @@ async function fileExists(filePath: string): Promise<boolean> {
 }
 
 /**
- * Create or update GitNexus section in a file
- * - If file doesn't exist: create with GitNexus content
- * - If file exists without GitNexus section: append
- * - If file exists with GitNexus section: replace that section
+ * Create or update YummyGraph section in a file
+ * - If file doesn't exist: create with YummyGraph content
+ * - If file exists without YummyGraph section: append
+ * - If file exists with YummyGraph section: replace that section
  */
-async function upsertGitNexusSection(
+async function upsertYummyGraphSection(
   filePath: string,
   content: string,
   projectName: string,
@@ -249,34 +249,34 @@ async function upsertGitNexusSection(
 
   const existingContent = await fs.readFile(filePath, 'utf-8');
 
-  // Check if GitNexus section already exists. Matching is restricted
+  // Check if YummyGraph section already exists. Matching is restricted
   // to markers that occupy their own line so that inline prose
-  // references (e.g. `` See the `<!-- gitnexus:start -->` block `` in
+  // references (e.g. `` See the `<!-- yummygraph:start -->` block `` in
   // the shipped CLAUDE.md) are NOT treated as section delimiters
   // (#1041). The end-marker scan starts after the start-marker so it
   // can never pick up an earlier end in the file.
-  const startIdx = findSectionMarkerIndex(existingContent, GITNEXUS_START_MARKER);
+  const startIdx = findSectionMarkerIndex(existingContent, YUMMYGRAPH_START_MARKER);
   const endIdx = findSectionMarkerIndex(
     existingContent,
-    GITNEXUS_END_MARKER,
+    YUMMYGRAPH_END_MARKER,
     startIdx === -1 ? 0 : startIdx,
   );
 
   if (startIdx !== -1 && endIdx !== -1 && endIdx > startIdx) {
     const existingSection = existingContent.substring(
       startIdx,
-      endIdx + GITNEXUS_END_MARKER.length,
+      endIdx + YUMMYGRAPH_END_MARKER.length,
     );
 
-    // If the existing section contains <!-- gitnexus:keep -->, preserve the user's
+    // If the existing section contains <!-- yummygraph:keep -->, preserve the user's
     // custom layout and only update the stats line (node/edge/flow counts).
     // This lets teams trim the verbose default template to a lean format without
-    // having it overwritten on every `gitnexus analyze`.
+    // having it overwritten on every `yummygraph analyze`.
     //
     // Note: the keep-marker check operates on `existingSection` (the substring
     // between valid section markers identified by findSectionMarkerIndex), so
-    // a keep marker in user prose OUTSIDE the GitNexus block has no effect.
-    if (existingSection.includes('<!-- gitnexus:keep -->')) {
+    // a keep marker in user prose OUTSIDE the YummyGraph block has no effect.
+    if (existingSection.includes('<!-- yummygraph:keep -->')) {
       // Build the new stats line from the caller-provided values directly.
       // We do NOT re-extract from `content` because:
       //   (a) first-bold extraction is fragile if the template evolves
@@ -300,12 +300,12 @@ async function upsertGitNexusSection(
       // The parenthetical is optional so a count-free line left by a prior
       // --no-stats run still matches — letting the name refresh, and letting
       // counts return if --no-stats is later dropped.
-      const statsPattern = /^(?:Indexed as|indexed by GitNexus as) \*\*[^*]+\*\*(?: \([^)]+\))?/m;
+      const statsPattern = /^(?:Indexed as|indexed by YummyGraph as) \*\*[^*]+\*\*(?: \([^)]+\))?/m;
 
       if (statsPattern.test(existingSection)) {
         const updatedSection = existingSection.replace(statsPattern, statsLine);
         const before = existingContent.substring(0, startIdx);
-        const after = existingContent.substring(endIdx + GITNEXUS_END_MARKER.length);
+        const after = existingContent.substring(endIdx + YUMMYGRAPH_END_MARKER.length);
         await fs.writeFile(filePath, (before + updatedSection + after).trim() + '\n', 'utf-8');
         return 'updated';
       }
@@ -317,7 +317,7 @@ async function upsertGitNexusSection(
 
     // No keep marker — replace existing section with full verbose content
     const before = existingContent.substring(0, startIdx);
-    const after = existingContent.substring(endIdx + GITNEXUS_END_MARKER.length);
+    const after = existingContent.substring(endIdx + YUMMYGRAPH_END_MARKER.length);
     const newContent = before + content + after;
     await fs.writeFile(filePath, newContent.trim() + '\n', 'utf-8');
     return 'updated';
@@ -330,44 +330,44 @@ async function upsertGitNexusSection(
 }
 
 /**
- * Install GitNexus skills to .claude/skills/gitnexus/
+ * Install YummyGraph skills to .claude/skills/yummygraph/
  * Works natively with Claude Code, Cursor, and GitHub Copilot
  */
 async function installSkills(repoPath: string): Promise<string[]> {
-  const skillsDir = path.join(repoPath, '.claude', 'skills', 'gitnexus');
+  const skillsDir = path.join(repoPath, '.claude', 'skills', 'yummygraph');
   const installedSkills: string[] = [];
 
   // Skill definitions bundled with the package
   const skills = [
     {
-      name: 'gitnexus-exploring',
+      name: 'yummygraph-exploring',
       description:
         'Use when the user asks how code works, wants to understand architecture, trace execution flows, or explore unfamiliar parts of the codebase. Examples: "How does X work?", "What calls this function?", "Show me the auth flow"',
     },
     {
-      name: 'gitnexus-debugging',
+      name: 'yummygraph-debugging',
       description:
         'Use when the user is debugging a bug, tracing an error, or asking why something fails. Examples: "Why is X failing?", "Where does this error come from?", "Trace this bug"',
     },
     {
-      name: 'gitnexus-impact-analysis',
+      name: 'yummygraph-impact-analysis',
       description:
         'Use when the user wants to know what will break if they change something, or needs safety analysis before editing code. Examples: "Is it safe to change X?", "What depends on this?", "What will break?"',
     },
     {
-      name: 'gitnexus-refactoring',
+      name: 'yummygraph-refactoring',
       description:
         'Use when the user wants to rename, extract, split, move, or restructure code safely. Examples: "Rename this function", "Extract this into a module", "Refactor this class", "Move this to a separate file"',
     },
     {
-      name: 'gitnexus-guide',
+      name: 'yummygraph-guide',
       description:
-        'Use when the user asks about GitNexus itself — available tools, how to query the knowledge graph, MCP resources, graph schema, or workflow reference. Examples: "What GitNexus tools are available?", "How do I use GitNexus?"',
+        'Use when the user asks about YummyGraph itself — available tools, how to query the knowledge graph, MCP resources, graph schema, or workflow reference. Examples: "What YummyGraph tools are available?", "How do I use YummyGraph?"',
     },
     {
-      name: 'gitnexus-cli',
+      name: 'yummygraph-cli',
       description:
-        'Use when the user needs to run GitNexus CLI commands like analyze/index a repo, check status, clean the index, generate a wiki, or list indexed repos. Examples: "Index this repo", "Reanalyze the codebase", "Generate a wiki"',
+        'Use when the user needs to run YummyGraph CLI commands like analyze/index a repo, check status, clean the index, generate a wiki, or list indexed repos. Examples: "Index this repo", "Reanalyze the codebase", "Generate a wiki"',
     },
   ];
 
@@ -396,7 +396,7 @@ description: ${skill.description}
 
 ${skill.description}
 
-Use GitNexus tools to accomplish this task.
+Use YummyGraph tools to accomplish this task.
 `;
       }
 
@@ -443,10 +443,10 @@ export async function generateAIContextFiles(
     await fs.mkdir(storagePath, { recursive: true });
     await fs.copyFile(runnerSrc, path.join(storagePath, 'run.cjs'));
   } catch (err) {
-    logger.warn(`Could not write GitNexus runner to ${runnerPath}: ${String(err)}`);
+    logger.warn(`Could not write YummyGraph runner to ${runnerPath}: ${String(err)}`);
   }
 
-  const content = generateGitNexusContent(
+  const content = generateYummyGraphContent(
     projectName,
     stats,
     generatedSkills,
@@ -461,7 +461,7 @@ export async function generateAIContextFiles(
   if (!options?.skipAgentsMd) {
     // Create AGENTS.md (standard for Cursor, Windsurf, OpenCode, Cline, etc.)
     const agentsPath = path.join(repoPath, 'AGENTS.md');
-    const agentsResult = await upsertGitNexusSection(
+    const agentsResult = await upsertYummyGraphSection(
       agentsPath,
       content,
       projectName,
@@ -472,7 +472,7 @@ export async function generateAIContextFiles(
 
     // Create CLAUDE.md (for Claude Code)
     const claudePath = path.join(repoPath, 'CLAUDE.md');
-    const claudeResult = await upsertGitNexusSection(
+    const claudeResult = await upsertYummyGraphSection(
       claudePath,
       content,
       projectName,
@@ -485,25 +485,25 @@ export async function generateAIContextFiles(
     createdFiles.push('CLAUDE.md (skipped via --skip-agents-md)');
   }
 
-  // Install skills to .claude/skills/gitnexus/ (unless --skip-skills)
+  // Install skills to .claude/skills/yummygraph/ (unless --skip-skills)
   if (!options?.skipSkills) {
     const installedSkills = await installSkills(repoPath);
     if (installedSkills.length > 0) {
-      createdFiles.push(`.claude/skills/gitnexus/ (${installedSkills.length} skills)`);
+      createdFiles.push(`.claude/skills/yummygraph/ (${installedSkills.length} skills)`);
     }
   } else {
-    createdFiles.push('.claude/skills/gitnexus/ (skipped via --skip-skills)');
+    createdFiles.push('.claude/skills/yummygraph/ (skipped via --skip-skills)');
   }
 
   return { files: createdFiles };
 }
 
 /**
- * Refresh only the `base_ref: "..."` value inside the GitNexus block of an
+ * Refresh only the `base_ref: "..."` value inside the YummyGraph block of an
  * already-generated AGENTS.md / CLAUDE.md, in place (#1996 tri-review P2).
  *
  * The `alreadyUpToDate` analyze fast path returns before the normal
- * {@link generateAIContextFiles} call, so a changed `.gitnexusrc` defaultBranch
+ * {@link generateAIContextFiles} call, so a changed `.yummygraphrc` defaultBranch
  * (or `--default-branch`) would otherwise not take effect until the next
  * re-index. This does a surgical line update that preserves the rest of the
  * block — including community-skill rows written by a prior `--skills` run —
@@ -530,11 +530,11 @@ export async function refreshBaseRefLine(
     } catch {
       continue;
     }
-    const startIdx = findSectionMarkerIndex(content, GITNEXUS_START_MARKER);
+    const startIdx = findSectionMarkerIndex(content, YUMMYGRAPH_START_MARKER);
     if (startIdx === -1) continue;
-    const endIdx = findSectionMarkerIndex(content, GITNEXUS_END_MARKER, startIdx);
+    const endIdx = findSectionMarkerIndex(content, YUMMYGRAPH_END_MARKER, startIdx);
     if (endIdx === -1 || endIdx <= startIdx) continue;
-    const blockEnd = endIdx + GITNEXUS_END_MARKER.length;
+    const blockEnd = endIdx + YUMMYGRAPH_END_MARKER.length;
     const block = content.substring(startIdx, blockEnd);
     // Only the generated regression example carries a base_ref line, and only
     // one per block; replace its quoted value while leaving the rest untouched.

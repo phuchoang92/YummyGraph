@@ -20,7 +20,7 @@
  */
 
 import { beforeEach, describe, expect, it } from 'vitest';
-import type { ParsedFile } from 'gitnexus-shared';
+import type { ParsedFile } from 'yummygraph-shared';
 import {
   applyCStaticLinkageSideChannel,
   collectCStaticLinkageSideChannel,

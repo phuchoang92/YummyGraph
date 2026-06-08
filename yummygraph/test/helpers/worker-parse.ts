@@ -2,7 +2,7 @@
  * Worker-backed parse helper for tests.
  *
  * Since the sequential (in-process) parser was removed, the worker pool is
- * GitNexus's only parse path. Tests that used to call `processParsing` with no
+ * YummyGraph's only parse path. Tests that used to call `processParsing` with no
  * pool (driving the in-process parser) now route in-memory fixture files
  * through a REAL worker pool here and assert on the resulting graph exactly as
  * before — the assertions are about graph content, not which path produced it.

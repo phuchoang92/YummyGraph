@@ -17,7 +17,7 @@ import type {
   Scope,
   ScopeKind,
   SymbolDefinition,
-} from 'gitnexus-shared';
+} from 'yummygraph-shared';
 import {
   extract,
   selectNodeBearingDef,

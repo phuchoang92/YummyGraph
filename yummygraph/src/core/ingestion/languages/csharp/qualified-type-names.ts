@@ -10,7 +10,7 @@
  * constructor resolver can break a same-tail collision (`new B.Foo()` with both
  * `A.Foo` and `B.Foo`) by matching the explicit qualifier against the sidecar.
  */
-import type { ParsedFile, ScopeId, SymbolDefinition } from 'gitnexus-shared';
+import type { ParsedFile, ScopeId, SymbolDefinition } from 'yummygraph-shared';
 import { isClassLike } from '../../scope-resolution/scope/walkers.js';
 
 function isTypeDef(def: SymbolDefinition): boolean {

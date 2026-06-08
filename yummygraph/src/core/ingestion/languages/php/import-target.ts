@@ -15,7 +15,7 @@
  * `linkStatus: 'unresolved'`.
  */
 
-import type { ParsedImport, WorkspaceIndex } from 'gitnexus-shared';
+import type { ParsedImport, WorkspaceIndex } from 'yummygraph-shared';
 import { resolvePhpImportInternal } from '../../import-resolvers/php.js';
 import type { ComposerConfig } from '../../language-config.js';
 import { readFileSync } from 'node:fs';

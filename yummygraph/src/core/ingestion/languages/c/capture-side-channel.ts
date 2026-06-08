@@ -34,7 +34,7 @@
  * foreign-shaped snapshot.
  */
 
-import type { ParsedFile } from 'gitnexus-shared';
+import type { ParsedFile } from 'yummygraph-shared';
 import { getStaticNamesForFile, markStaticName } from './static-linkage.js';
 
 /**

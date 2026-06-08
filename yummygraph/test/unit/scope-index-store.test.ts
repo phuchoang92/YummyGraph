@@ -10,8 +10,8 @@ import { describe, it, expect, afterAll } from 'vitest';
 import { mkdtempSync, rmSync, existsSync, readdirSync, writeFileSync, mkdirSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { buildScopeTree } from 'gitnexus-shared';
-import type { Scope, ScopeId, SymbolDefinition, BindingRef } from 'gitnexus-shared';
+import { buildScopeTree } from 'yummygraph-shared';
+import type { Scope, ScopeId, SymbolDefinition, BindingRef } from 'yummygraph-shared';
 import {
   persistScopeShards,
   DiskBackedScopeTree,

@@ -20,7 +20,7 @@ describe('HttpRouteExtractor', () => {
 
   beforeEach(() => {
     extractor = new HttpRouteExtractor();
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-http-extract-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-http-extract-'));
   });
 
   afterEach(() => {
@@ -31,7 +31,7 @@ describe('HttpRouteExtractor', () => {
     id: 'test-repo',
     path: 'test/backend',
     repoPath,
-    storagePath: path.join(repoPath, '.gitnexus'),
+    storagePath: path.join(repoPath, '.yummygraph'),
   });
 
   describe('plugin selection', () => {
@@ -3087,18 +3087,18 @@ router.get('/api/posts/{postId}', handler2);
     });
   });
 
-  // ─── #1185: contract extractors must honour .gitnexusignore ─────────
+  // ─── #1185: contract extractors must honour .yummygraphignore ─────────
   //
   // Pre-#1185 the source-scan path used a hardcoded
   // `[node_modules, .git, dist, build, vendor]` glob ignore array, so a
-  // user's `.gitnexusignore` pattern (e.g. a Python venv `mentor_env/`,
+  // user's `.yummygraphignore` pattern (e.g. a Python venv `mentor_env/`,
   // a generated stubs dir, a noisy fixture tree) was silently scanned
   // anyway. Since #1185 the source-scan path consumes the shared
   // `IgnoreService` (mirrors `filesystem-walker.ts`), so any pattern in
-  // `.gitnexusignore` (or `.gitignore`) prunes the glob.
-  describe('respects .gitnexusignore (#1185)', () => {
-    it('source-scan glob skips files matched by .gitnexusignore', async () => {
-      const dir = path.join(tmpDir, 'gitnexusignore-honoured');
+  // `.yummygraphignore` (or `.gitignore`) prunes the glob.
+  describe('respects .yummygraphignore (#1185)', () => {
+    it('source-scan glob skips files matched by .yummygraphignore', async () => {
+      const dir = path.join(tmpDir, 'yummygraphignore-honoured');
       fs.mkdirSync(path.join(dir, 'src/routes'), { recursive: true });
       fs.mkdirSync(path.join(dir, 'mentor_env/lib'), { recursive: true });
       // Control: a normal route file that SHOULD be discovered.
@@ -3120,7 +3120,7 @@ r.get('/api/leaked', (req, res) => res.json([]));
 export default r;
 `,
       );
-      fs.writeFileSync(path.join(dir, '.gitnexusignore'), 'mentor_env/\n');
+      fs.writeFileSync(path.join(dir, '.yummygraphignore'), 'mentor_env/\n');
 
       const contracts = await extractor.extract(null, dir, makeRepo(dir));
       const providers = contracts.filter((c) => c.role === 'provider');
@@ -3132,14 +3132,14 @@ export default r;
       expect(contracts.some((c) => c.symbolRef?.filePath?.startsWith('mentor_env/'))).toBe(false);
     });
 
-    // Pinned by the @claude review on PR #1247: above, only `.gitnexusignore`
+    // Pinned by the @claude review on PR #1247: above, only `.yummygraphignore`
     // is exercised. `createIgnoreFilter` reads `.gitignore` too via
     // `loadIgnoreRules`, but that integration is only proven at the
     // `IgnoreService` level — no extractor-level test for the
     // `.gitignore`-only code path. Adding one minimal extractor-level
     // assertion here closes the gap (one shared test is sufficient
     // because all three extractors consume the same filter object).
-    it('source-scan glob also skips files matched by `.gitignore` (no `.gitnexusignore`)', async () => {
+    it('source-scan glob also skips files matched by `.gitignore` (no `.yummygraphignore`)', async () => {
       const dir = path.join(tmpDir, 'gitignore-honoured');
       fs.mkdirSync(path.join(dir, 'src/routes'), { recursive: true });
       fs.mkdirSync(path.join(dir, 'mentor_env/lib'), { recursive: true });
@@ -3160,7 +3160,7 @@ r.get('/api/leaked', (req, res) => res.json([]));
 export default r;
 `,
       );
-      // Note: NO .gitnexusignore — only `.gitignore`. This proves the
+      // Note: NO .yummygraphignore — only `.gitignore`. This proves the
       // `.gitignore` code path inside `createIgnoreFilter` is wired to
       // the extractors' globs.
       fs.writeFileSync(path.join(dir, '.gitignore'), 'mentor_env/\n');

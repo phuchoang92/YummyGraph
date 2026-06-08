@@ -27,7 +27,7 @@ describe('orphan sidecar recovery — native integration', () => {
   itLbugReopen(
     'initLbug recovers when both .shadow and .wal.checkpoint orphan sidecars are present without a main DB file',
     async () => {
-      const tmp = await createTempDir('gitnexus-lbug-orphan-');
+      const tmp = await createTempDir('yummygraph-lbug-orphan-');
       const dbPath = path.join(tmp.dbPath, 'lbug');
       const shadowPath = `${dbPath}.shadow`;
       const walCheckpointPath = `${dbPath}.wal.checkpoint`;
@@ -65,7 +65,7 @@ describe('orphan sidecar recovery — native integration', () => {
   itLbugReopen(
     'initLbug recovers when only .shadow orphan sidecar is present (partial crash state)',
     async () => {
-      const tmp = await createTempDir('gitnexus-lbug-orphan-');
+      const tmp = await createTempDir('yummygraph-lbug-orphan-');
       const dbPath = path.join(tmp.dbPath, 'lbug');
       const shadowPath = `${dbPath}.shadow`;
       const walCheckpointPath = `${dbPath}.wal.checkpoint`;
@@ -92,7 +92,7 @@ describe('orphan sidecar recovery — native integration', () => {
   );
 
   itLbugReopen('initLbug succeeds on a clean path with no orphan sidecars (baseline)', async () => {
-    const tmp = await createTempDir('gitnexus-lbug-orphan-');
+    const tmp = await createTempDir('yummygraph-lbug-orphan-');
     const dbPath = path.join(tmp.dbPath, 'lbug');
 
     try {
@@ -111,7 +111,7 @@ describe('orphan sidecar recovery — native integration', () => {
   itLbugReopen(
     'initLbug does not attempt orphan cleanup when the main DB file exists',
     async () => {
-      const tmp = await createTempDir('gitnexus-lbug-orphan-');
+      const tmp = await createTempDir('yummygraph-lbug-orphan-');
       const dbPath = path.join(tmp.dbPath, 'lbug');
       // Place a marker file with a non-sidecar extension next to the DB path.
       // Our cleanup only targets `.shadow` and `.wal.checkpoint` and only when
@@ -157,7 +157,7 @@ describe('orphan sidecar recovery — native integration', () => {
 
 describe('init lock — single-process ownership contract', () => {
   itLbugReopen('acquireInitLock succeeds when parent directory does not exist yet', async () => {
-    const tmp = await createTempDir('gitnexus-lbug-orphan-');
+    const tmp = await createTempDir('yummygraph-lbug-orphan-');
     // Use a nested path whose parent directory does NOT exist
     const dbPath = path.join(tmp.dbPath, 'nonexistent-subdir', 'lbug');
     const lockPath = `${dbPath}.init.lock`;
@@ -184,7 +184,7 @@ describe('init lock — single-process ownership contract', () => {
   });
 
   itLbugReopen('acquireInitLock creates and releases lock file atomically', async () => {
-    const tmp = await createTempDir('gitnexus-lbug-orphan-');
+    const tmp = await createTempDir('yummygraph-lbug-orphan-');
     const dbPath = path.join(tmp.dbPath, 'lbug');
     const lockPath = `${dbPath}.init.lock`;
 
@@ -209,7 +209,7 @@ describe('init lock — single-process ownership contract', () => {
   });
 
   itLbugReopen('acquireInitLock blocks concurrent acquire from same process', async () => {
-    const tmp = await createTempDir('gitnexus-lbug-orphan-');
+    const tmp = await createTempDir('yummygraph-lbug-orphan-');
     const dbPath = path.join(tmp.dbPath, 'lbug');
 
     try {
@@ -228,7 +228,7 @@ describe('init lock — single-process ownership contract', () => {
   });
 
   itLbugReopen('acquireInitLock reclaims stale lock from dead process', async () => {
-    const tmp = await createTempDir('gitnexus-lbug-orphan-');
+    const tmp = await createTempDir('yummygraph-lbug-orphan-');
     const dbPath = path.join(tmp.dbPath, 'lbug');
     const lockPath = `${dbPath}.init.lock`;
 
@@ -257,7 +257,7 @@ describe('init lock — single-process ownership contract', () => {
   });
 
   itLbugReopen('release is idempotent — calling twice does not throw', async () => {
-    const tmp = await createTempDir('gitnexus-lbug-orphan-');
+    const tmp = await createTempDir('yummygraph-lbug-orphan-');
     const dbPath = path.join(tmp.dbPath, 'lbug');
 
     try {
@@ -275,7 +275,7 @@ describe('init lock — single-process ownership contract', () => {
   itLbugReopen(
     'initLbug cleans up lock file after successful init with orphan sidecars',
     async () => {
-      const tmp = await createTempDir('gitnexus-lbug-orphan-');
+      const tmp = await createTempDir('yummygraph-lbug-orphan-');
       const dbPath = path.join(tmp.dbPath, 'lbug');
       const lockPath = `${dbPath}.init.lock`;
 
@@ -302,7 +302,7 @@ describe('init lock — single-process ownership contract', () => {
   );
 
   itLbugReopen('initLbug cleans up lock file even when DB open fails', async () => {
-    const tmp = await createTempDir('gitnexus-lbug-orphan-');
+    const tmp = await createTempDir('yummygraph-lbug-orphan-');
     // Use an invalid path that will cause LadybugDB to fail
     const dbPath = path.join(tmp.dbPath, 'nonexistent-subdir', 'deep', 'lbug');
     const lockPath = `${dbPath}.init.lock`;

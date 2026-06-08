@@ -25,7 +25,7 @@
  * Pure given the input source text. No I/O, no globals consulted.
  */
 
-import type { Capture, CaptureMatch } from 'gitnexus-shared';
+import type { Capture, CaptureMatch } from 'yummygraph-shared';
 import {
   findNodeAtRange,
   nodeToCapture,
@@ -347,7 +347,7 @@ export function emitTsScopeCaptures(
     // element's range). The guard lives here, not inside findSelfOrAncestorOfTypes
     // (shared with the import-statement and function-scope ascents). This is
     // acceptable for React: components are virtually never overloaded in the
-    // current GitNexus graph model, so name-only dispatch matches the single
+    // current YummyGraph graph model, so name-only dispatch matches the single
     // component definition. A future props-arity-aware synthesizer would count
     // `jsx_attribute` children of the opening tag instead of `arguments`.
     const callAnchor = pickFirstCapture(grouped, CALL_TAGS);

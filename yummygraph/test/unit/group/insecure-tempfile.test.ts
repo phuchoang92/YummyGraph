@@ -114,7 +114,7 @@ describe('insecure tempfile — behavioural (#1318 U6)', () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-u6-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-u6-'));
   });
 
   afterEach(() => {
@@ -170,7 +170,7 @@ describe('insecure tempfile — writeBridgeMeta behavioural (#1318 U6)', () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-u6-meta-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-u6-meta-'));
   });
 
   afterEach(() => {

@@ -36,7 +36,7 @@ import urllib.parse
 import urllib.request
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
-GITNEXUS_DIR = REPO_ROOT / "gitnexus"
+YUMMYGRAPH_DIR = REPO_ROOT / "yummygraph"
 
 # ── Upgrade target ──────────────────────────────────────────────────────
 # The runtime version we want to upgrade TO. Update this when the goal
@@ -98,7 +98,7 @@ INTENTIONAL_PINS: dict[str, str] = {
 # ── Helpers ─────────────────────────────────────────────────────────────
 
 def _load_package_json() -> dict:
-    return json.loads((GITNEXUS_DIR / "package.json").read_text())
+    return json.loads((YUMMYGRAPH_DIR / "package.json").read_text())
 
 
 def read_current_runtime() -> str:
@@ -112,7 +112,7 @@ def read_current_runtime() -> str:
 
 
 def read_pinned_grammar_versions() -> dict[str, str]:
-    """Return the grammar version range pinned in gitnexus/package.json.
+    """Return the grammar version range pinned in yummygraph/package.json.
 
     Looks at both runtime and optional dependencies. Returns the raw range
     string (e.g. '0.21.4', '^0.23.0', 'file:./vendor/...') so the report can
@@ -269,7 +269,7 @@ def is_vendored_pin(spec: str | None) -> bool:
 def vendored_drift_summary(
     name: str, upstream_repo: str, upstream_branch: str, parser_path: str
 ) -> dict:
-    """Inspect a vendored grammar under gitnexus/vendor/<name>.
+    """Inspect a vendored grammar under yummygraph/vendor/<name>.
 
     Returns the vendored package.json's ``version`` and ``_vendoredBy``
     fields (which carry the human rationale for vendoring), the vendored
@@ -278,7 +278,7 @@ def vendored_drift_summary(
     script: the rationale belongs next to the vendored sources, not in
     a daily-running CI script.
     """
-    vendor_dir = GITNEXUS_DIR / "vendor" / name
+    vendor_dir = YUMMYGRAPH_DIR / "vendor" / name
     pkg: dict = {}
     pkg_path = vendor_dir / "package.json"
     if pkg_path.is_file():
@@ -402,9 +402,9 @@ def assert_current() -> int:
                 failures.append(msg)
             continue
 
-        installed_parser = GITNEXUS_DIR / "node_modules" / name / parser_path
+        installed_parser = YUMMYGRAPH_DIR / "node_modules" / name / parser_path
         if not installed_parser.is_file():
-            installed_parser = GITNEXUS_DIR / "node_modules" / name / "src" / "parser.c"
+            installed_parser = YUMMYGRAPH_DIR / "node_modules" / name / "src" / "parser.c"
         abi = extract_language_version(installed_parser)
         if abi is None:
             skipped.append(f"{name} (not installed / no parser.c — covered by load-smoke)")
@@ -541,7 +541,7 @@ def main() -> int:
         pinned_spec = pinned_versions.get(name, "—")
 
         # Vendored grammars don't have an "npm latest" we install from —
-        # we ship our own copy under gitnexus/vendor/<name>. Treat them
+        # we ship our own copy under yummygraph/vendor/<name>. Treat them
         # as a separate kind of artefact: their readiness for the runtime
         # upgrade depends on the vendored ABI being in the target range,
         # not on a peer-dep negotiation.
@@ -604,10 +604,10 @@ def main() -> int:
             current_compat = satisfies_target(peer_range, f"{current_runtime}.0")
 
         # Check installed ABI using the same parser_path from GRAMMARS.
-        installed_parser = GITNEXUS_DIR / "node_modules" / name / parser_path
+        installed_parser = YUMMYGRAPH_DIR / "node_modules" / name / parser_path
         if not installed_parser.is_file():
             # Fallback to default location.
-            installed_parser = GITNEXUS_DIR / "node_modules" / name / "src" / "parser.c"
+            installed_parser = YUMMYGRAPH_DIR / "node_modules" / name / "src" / "parser.c"
         installed_abi = extract_language_version(installed_parser)
         abi_display = str(installed_abi) if installed_abi else "?"
 
@@ -821,7 +821,7 @@ def main() -> int:
     if vendored_grammars:
         lines.append(md_h(f"Vendored parsers ({len(vendored_grammars)})", 2))
         lines.append(
-            "These grammars ship from `gitnexus/vendor/` rather than the npm "
+            "These grammars ship from `yummygraph/vendor/` rather than the npm "
             "registry. Their compatibility is governed by the **vendored "
             "ABI** (must lie in the target runtime's range), not by a peer-"
             "dep negotiation. The rationale for each vendored copy lives in "

@@ -22,14 +22,14 @@
  * skeleton (`scopeId -> {shard, childIds, parent}`), so only the working set of
  * scopes is resident, not all of them.
  *
- * Default-off: only constructed when `GITNEXUS_DISK_SCOPE_INDEX` is set. The
+ * Default-off: only constructed when `YUMMYGRAPH_DISK_SCOPE_INDEX` is set. The
  * resident `buildScopeTree` path is untouched otherwise.
  */
 
 import { mkdirSync, writeFileSync, readFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
-import type { Scope, ScopeId, ScopeTree, SymbolDefinition } from 'gitnexus-shared';
-import { buildScopeTree } from 'gitnexus-shared';
+import type { Scope, ScopeId, ScopeTree, SymbolDefinition } from 'yummygraph-shared';
+import { buildScopeTree } from 'yummygraph-shared';
 import { mapReplacer } from './parse-cache.js';
 import { makeInterningReviver } from './parsedfile-store.js';
 
@@ -147,7 +147,7 @@ export class DiskBackedScopeTree implements ScopeTree {
 
   get byId(): ReadonlyMap<ScopeId, Scope> {
     throw new Error(
-      'DiskBackedScopeTree.byId is unsupported (INGESTION_EMIT_SCOPES is incompatible with GITNEXUS_DISK_SCOPE_INDEX).',
+      'DiskBackedScopeTree.byId is unsupported (INGESTION_EMIT_SCOPES is incompatible with YUMMYGRAPH_DISK_SCOPE_INDEX).',
     );
   }
 

@@ -1,18 +1,18 @@
 /**
- * Project-local `.gitnexusrc` support for `gitnexus analyze` (#243).
+ * Project-local `.yummygraphrc` support for `yummygraph analyze` (#243).
  *
  * Lets a repository commit recurring `analyze` defaults — default branch for the
  * generated regression example, AI-context / skills opt-outs, embedding knobs —
  * so contributors don't re-pass the same flags on every run. Design rules:
  *
- *   - Config is repo-local (`.gitnexusrc` at the resolved repo root). It is NOT
- *     read from `.gitnexus/` because that directory is index storage and is
+ *   - Config is repo-local (`.yummygraphrc` at the resolved repo root). It is NOT
+ *     read from `.yummygraph/` because that directory is index storage and is
  *     commonly gitignored.
- *   - JSON only. No YAML, no `package.json` field, no global `~/.gitnexus` file
+ *   - JSON only. No YAML, no `package.json` field, no global `~/.yummygraph` file
  *     in this pass.
  *   - CLI flags always override config (see {@link mergeAnalyzeOptions}).
  *   - Fail closed: unknown keys, wrong value types, conflicting aliases, and
- *     invalid JSON all throw {@link GitNexusRcError} so a typo never silently
+ *     invalid JSON all throw {@link YummyGraphRcError} so a typo never silently
  *     no-ops. Errors are actionable and surface before any expensive analysis.
  *   - Config values never reach a shell. Strings are validated against control
  *     and hidden/bidirectional characters so they cannot inject markdown,
@@ -32,7 +32,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import type { AnalyzeOptions } from './analyze.js';
 
-export const GITNEXUS_RC_FILENAME = '.gitnexusrc';
+export const YUMMYGRAPH_RC_FILENAME = '.yummygraphrc';
 
 /** Final fallback when no branch is configured or detectable. */
 export const DEFAULT_BRANCH_FALLBACK = 'main';
@@ -41,14 +41,14 @@ export const DEFAULT_BRANCH_FALLBACK = 'main';
 const BRANCH_MAX_LENGTH = 255;
 
 /**
- * Thrown for any `.gitnexusrc` problem (missing-file is NOT an error — it
+ * Thrown for any `.yummygraphrc` problem (missing-file is NOT an error — it
  * returns `undefined`). The message is user-facing and names the file so the
  * CLI can print it verbatim before starting the progress bar.
  */
-export class GitNexusRcError extends Error {
+export class YummyGraphRcError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'GitNexusRcError';
+    this.name = 'YummyGraphRcError';
   }
 }
 
@@ -67,7 +67,7 @@ interface KeySpec {
 }
 
 /**
- * Allowed `.gitnexusrc` keys and how each maps onto `AnalyzeOptions`.
+ * Allowed `.yummygraphrc` keys and how each maps onto `AnalyzeOptions`.
  *
  * Aliases intentionally collapse onto a shared target:
  *   - `branch` is the legacy alias for `defaultBranch` (issue-comment shape).
@@ -125,7 +125,7 @@ const assertNoHiddenChars = (value: string, source: string): void => {
   for (const ch of value) {
     const cp = ch.codePointAt(0);
     if (cp !== undefined && isHiddenOrControl(cp)) {
-      throw new GitNexusRcError(
+      throw new YummyGraphRcError(
         `${source}: value contains control or hidden/bidirectional characters, which are not allowed.`,
       );
     }
@@ -133,42 +133,42 @@ const assertNoHiddenChars = (value: string, source: string): void => {
 };
 
 /**
- * Validate a user-supplied branch name (from CLI or `.gitnexusrc`). Returns the
- * trimmed name or throws {@link GitNexusRcError}. Conservative but accepts the
+ * Validate a user-supplied branch name (from CLI or `.yummygraphrc`). Returns the
+ * trimmed name or throws {@link YummyGraphRcError}. Conservative but accepts the
  * shapes real branches use (`feature/foo-bar`, `release/1.2`, `develop`).
  */
 export function validateBranchName(value: string, source: string): string {
   const trimmed = value.trim();
   if (!trimmed) {
-    throw new GitNexusRcError(`${source}: branch name must not be empty.`);
+    throw new YummyGraphRcError(`${source}: branch name must not be empty.`);
   }
   if (trimmed.length > BRANCH_MAX_LENGTH) {
-    throw new GitNexusRcError(`${source}: branch name is too long (max ${BRANCH_MAX_LENGTH}).`);
+    throw new YummyGraphRcError(`${source}: branch name is too long (max ${BRANCH_MAX_LENGTH}).`);
   }
   assertNoHiddenChars(trimmed, source);
   if (/\s/.test(trimmed)) {
-    throw new GitNexusRcError(`${source}: branch name must not contain whitespace.`);
+    throw new YummyGraphRcError(`${source}: branch name must not contain whitespace.`);
   }
   // git ref-name rules (subset): reject characters git itself forbids in refs.
   if (/[~^:?*[\\]/.test(trimmed)) {
-    throw new GitNexusRcError(
+    throw new YummyGraphRcError(
       `${source}: branch name contains characters not allowed in a git ref (~ ^ : ? * [ \\).`,
     );
   }
   if (trimmed.startsWith('-')) {
-    throw new GitNexusRcError(`${source}: branch name must not start with "-".`);
+    throw new YummyGraphRcError(`${source}: branch name must not start with "-".`);
   }
   if (trimmed.includes('..')) {
-    throw new GitNexusRcError(`${source}: branch name must not contain "..".`);
+    throw new YummyGraphRcError(`${source}: branch name must not contain "..".`);
   }
   // Git permits a backtick in a ref, but the branch is embedded inside a
   // Markdown inline-code span in the generated AGENTS.md/CLAUDE.md regression
   // example, where a backtick would close the span early and let the rest of
   // the template render as instruction text. Reject it at this single
-  // chokepoint so all three tiers (CLI flag, .gitnexusrc, auto-detect via
+  // chokepoint so all three tiers (CLI flag, .yummygraphrc, auto-detect via
   // sanitizeDetectedBranch) are covered (#1996 tri-review P1).
   if (trimmed.includes('`')) {
-    throw new GitNexusRcError(
+    throw new YummyGraphRcError(
       `${source}: branch name must not contain a backtick (it would break the generated Markdown).`,
     );
   }
@@ -190,41 +190,41 @@ export function sanitizeDetectedBranch(value: string | null | undefined): string
 }
 
 const normalizeValue = (kind: ValueKind, value: unknown, key: string): unknown => {
-  const source = `${GITNEXUS_RC_FILENAME} "${key}"`;
+  const source = `${YUMMYGRAPH_RC_FILENAME} "${key}"`;
   switch (kind) {
     case 'boolean':
       if (typeof value !== 'boolean') {
-        throw new GitNexusRcError(`${source} must be a boolean (true/false).`);
+        throw new YummyGraphRcError(`${source} must be a boolean (true/false).`);
       }
       return value;
     case 'boolean-negate':
       if (typeof value !== 'boolean') {
-        throw new GitNexusRcError(`${source} must be a boolean (true/false).`);
+        throw new YummyGraphRcError(`${source} must be a boolean (true/false).`);
       }
       return !value;
     case 'branch':
       if (typeof value !== 'string') {
-        throw new GitNexusRcError(`${source} must be a string branch name.`);
+        throw new YummyGraphRcError(`${source} must be a string branch name.`);
       }
       return validateBranchName(value, source);
     case 'string': {
       if (typeof value !== 'string') {
-        throw new GitNexusRcError(`${source} must be a string.`);
+        throw new YummyGraphRcError(`${source} must be a string.`);
       }
       const trimmed = value.trim();
       if (!trimmed) {
-        throw new GitNexusRcError(`${source} must not be empty.`);
+        throw new YummyGraphRcError(`${source} must not be empty.`);
       }
       assertNoHiddenChars(trimmed, source);
       // `name` flows into the generated AGENTS.md/CLAUDE.md as `**${name}**` and
-      // inside `gitnexus://repo/${name}/…` code spans, so a Markdown-significant
+      // inside `yummygraph://repo/${name}/…` code spans, so a Markdown-significant
       // character would break those spans or inject emphasis/links/HTML into
       // agent-instruction content (#1996 tri-review P1). `_` is intentionally
       // allowed (legitimate in repo names; intraword `_` is not emphasis).
       // embeddingDevice (the other `string`-kind option) only ever holds a
       // fixed device token, so this guard never rejects a valid value there.
       if (/[`*[\]<>]/.test(trimmed)) {
-        throw new GitNexusRcError(
+        throw new YummyGraphRcError(
           `${source} must not contain Markdown-significant characters (\` * [ ] < >).`,
         );
       }
@@ -237,18 +237,18 @@ const normalizeValue = (kind: ValueKind, value: unknown, key: string): unknown =
       // error messages stay in one place.
       if (typeof value === 'number') {
         if (!Number.isFinite(value)) {
-          throw new GitNexusRcError(`${source} must be a finite number.`);
+          throw new YummyGraphRcError(`${source} must be a finite number.`);
         }
         return String(value);
       }
       if (typeof value === 'string') {
         const trimmed = value.trim();
         if (!trimmed) {
-          throw new GitNexusRcError(`${source} must not be empty.`);
+          throw new YummyGraphRcError(`${source} must not be empty.`);
         }
         return trimmed;
       }
-      throw new GitNexusRcError(`${source} must be a number or numeric string.`);
+      throw new YummyGraphRcError(`${source} must be a number or numeric string.`);
     }
     case 'embeddings': {
       // Mirror `--embeddings [limit]`: boolean toggles, a non-negative integer
@@ -256,19 +256,19 @@ const normalizeValue = (kind: ValueKind, value: unknown, key: string): unknown =
       if (typeof value === 'boolean') return value;
       if (typeof value === 'number') {
         if (!Number.isInteger(value) || value < 0) {
-          throw new GitNexusRcError(
+          throw new YummyGraphRcError(
             `${source} must be true/false or a non-negative integer (node cap; 0 disables the cap).`,
           );
         }
         return String(value);
       }
-      throw new GitNexusRcError(
+      throw new YummyGraphRcError(
         `${source} must be a boolean or a non-negative integer (node cap; 0 disables the cap).`,
       );
     }
     default:
       // Exhaustive — kept for forward-compat if a new kind is added.
-      throw new GitNexusRcError(`${source}: unsupported config value kind.`);
+      throw new YummyGraphRcError(`${source}: unsupported config value kind.`);
   }
 };
 
@@ -291,15 +291,15 @@ const normalizeLevel = (
     // truthy) and would slip past `if (!spec)`, hitting the wrong error branch
     // instead of the documented "Unknown key" message (#1996 tri-review P3).
     if (!Object.hasOwn(KEY_SPECS, key)) {
-      throw new GitNexusRcError(
-        `Unknown key "${key}" in ${GITNEXUS_RC_FILENAME}. ${ALLOWED_KEYS_HINT}`,
+      throw new YummyGraphRcError(
+        `Unknown key "${key}" in ${YUMMYGRAPH_RC_FILENAME}. ${ALLOWED_KEYS_HINT}`,
       );
     }
     const spec = KEY_SPECS[key];
     const prev = setBy.get(spec.target);
     if (prev && prev !== key) {
-      throw new GitNexusRcError(
-        `${GITNEXUS_RC_FILENAME}: "${prev}" and "${key}" both configure the same option; set only one.`,
+      throw new YummyGraphRcError(
+        `${YUMMYGRAPH_RC_FILENAME}: "${prev}" and "${key}" both configure the same option; set only one.`,
       );
     }
     setBy.set(spec.target, key);
@@ -310,20 +310,20 @@ const normalizeLevel = (
 };
 
 /**
- * Locate, read, parse, validate, and normalize `.gitnexusrc` at `repoRoot`.
+ * Locate, read, parse, validate, and normalize `.yummygraphrc` at `repoRoot`.
  *
  * @returns the normalized config defaults, or `undefined` when no file exists
- *          (the normal case). Throws {@link GitNexusRcError} on any problem.
+ *          (the normal case). Throws {@link YummyGraphRcError} on any problem.
  */
 export function loadAnalyzeConfig(repoRoot: string): Partial<AnalyzeOptions> | undefined {
-  const filePath = path.join(repoRoot, GITNEXUS_RC_FILENAME);
+  const filePath = path.join(repoRoot, YUMMYGRAPH_RC_FILENAME);
 
   let raw: string;
   try {
     raw = fs.readFileSync(filePath, 'utf-8');
   } catch (err) {
     if ((err as NodeJS.ErrnoException)?.code === 'ENOENT') return undefined;
-    throw new GitNexusRcError(`Could not read ${GITNEXUS_RC_FILENAME}: ${(err as Error).message}`);
+    throw new YummyGraphRcError(`Could not read ${YUMMYGRAPH_RC_FILENAME}: ${(err as Error).message}`);
   }
 
   // Strip a leading UTF-8 BOM: Node's 'utf-8' decode keeps it, and JSON.parse
@@ -336,14 +336,14 @@ export function loadAnalyzeConfig(repoRoot: string): Partial<AnalyzeOptions> | u
   try {
     parsed = JSON.parse(raw);
   } catch (err) {
-    throw new GitNexusRcError(
-      `${GITNEXUS_RC_FILENAME} is not valid JSON: ${(err as Error).message}. ` +
+    throw new YummyGraphRcError(
+      `${YUMMYGRAPH_RC_FILENAME} is not valid JSON: ${(err as Error).message}. ` +
         `Expected a JSON object such as {"defaultBranch": "develop", "skipContextFiles": true}.`,
     );
   }
 
   if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
-    throw new GitNexusRcError(`${GITNEXUS_RC_FILENAME} must contain a JSON object.`);
+    throw new YummyGraphRcError(`${YUMMYGRAPH_RC_FILENAME} must contain a JSON object.`);
   }
 
   const obj = parsed as Record<string, unknown>;
@@ -353,7 +353,7 @@ export function loadAnalyzeConfig(repoRoot: string): Partial<AnalyzeOptions> | u
   if (Object.prototype.hasOwnProperty.call(obj, NESTED_KEY)) {
     const nestedRaw = obj[NESTED_KEY];
     if (nestedRaw === null || typeof nestedRaw !== 'object' || Array.isArray(nestedRaw)) {
-      throw new GitNexusRcError(`${GITNEXUS_RC_FILENAME} "${NESTED_KEY}" must be a JSON object.`);
+      throw new YummyGraphRcError(`${YUMMYGRAPH_RC_FILENAME} "${NESTED_KEY}" must be a JSON object.`);
     }
     nested = normalizeLevel(nestedRaw as Record<string, unknown>, { allowNestedKey: false });
   }
@@ -363,7 +363,7 @@ export function loadAnalyzeConfig(repoRoot: string): Partial<AnalyzeOptions> | u
 }
 
 /**
- * Merge CLI options over `.gitnexusrc` defaults. CLI wins whenever it provides a
+ * Merge CLI options over `.yummygraphrc` defaults. CLI wins whenever it provides a
  * value — including an explicit `false` (so an explicit CLI off-switch beats a
  * config `true`). Config fills only the genuinely-unset (`undefined`) options.
  *
@@ -402,7 +402,7 @@ export function mergeAnalyzeOptions(
  * Resolve the default branch threaded into generated context, applying the
  * precedence chain:
  *
- *   CLI `--default-branch` > `.gitnexusrc` `defaultBranch`/`branch`
+ *   CLI `--default-branch` > `.yummygraphrc` `defaultBranch`/`branch`
  *     > auto-detected `origin/HEAD` > {@link DEFAULT_BRANCH_FALLBACK} ("main").
  *
  * User-supplied values (CLI, config) are validated strictly and throw on bad
@@ -418,7 +418,7 @@ export function resolveDefaultBranch(input: {
     return validateBranchName(input.cliBranch, '--default-branch');
   }
   if (input.configBranch !== undefined) {
-    return validateBranchName(input.configBranch, `${GITNEXUS_RC_FILENAME} "defaultBranch"`);
+    return validateBranchName(input.configBranch, `${YUMMYGRAPH_RC_FILENAME} "defaultBranch"`);
   }
   const detected = sanitizeDetectedBranch(input.detectedBranch);
   if (detected) return detected;

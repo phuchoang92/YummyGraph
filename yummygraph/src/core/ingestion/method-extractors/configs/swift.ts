@@ -1,7 +1,7 @@
-// gitnexus/src/core/ingestion/method-extractors/configs/swift.ts
+// yummygraph/src/core/ingestion/method-extractors/configs/swift.ts
 // Verified against tree-sitter-swift 0.7.x
 
-import { SupportedLanguages } from 'gitnexus-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 import type {
   MethodExtractionConfig,
   ParameterInfo,

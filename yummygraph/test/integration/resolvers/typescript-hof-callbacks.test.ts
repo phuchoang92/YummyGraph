@@ -1,7 +1,7 @@
 /**
  * TypeScript: CALLS edges from inside higher-order-function callbacks.
  *
- * Repro for the bug filed in `gitnexus-bug-report.md`: in a real
+ * Repro for the bug filed in `yummygraph-bug-report.md`: in a real
  * TS+React monorepo, ~75% of `Function` nodes had no outgoing CALLS
  * edges. The dominant pattern was call expressions nested inside
  * callbacks passed as arguments to other functions:

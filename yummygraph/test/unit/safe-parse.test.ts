@@ -98,13 +98,13 @@ describe('parseSourceSafe', () => {
 });
 
 describe('parseSourceSafe — runaway-parse timeout (#1922)', () => {
-  const ORIGINAL_BUDGET = process.env.GITNEXUS_PARSE_TIMEOUT_MS;
+  const ORIGINAL_BUDGET = process.env.YUMMYGRAPH_PARSE_TIMEOUT_MS;
 
   afterEach(() => {
     if (ORIGINAL_BUDGET === undefined) {
-      delete process.env.GITNEXUS_PARSE_TIMEOUT_MS;
+      delete process.env.YUMMYGRAPH_PARSE_TIMEOUT_MS;
     } else {
-      process.env.GITNEXUS_PARSE_TIMEOUT_MS = ORIGINAL_BUDGET;
+      process.env.YUMMYGRAPH_PARSE_TIMEOUT_MS = ORIGINAL_BUDGET;
     }
   });
 
@@ -113,27 +113,27 @@ describe('parseSourceSafe — runaway-parse timeout (#1922)', () => {
   const pathological = (): string => buildSource(4 * 1024 * 1024);
 
   it('throws ParseTimeoutError when the parse exceeds its budget', () => {
-    process.env.GITNEXUS_PARSE_TIMEOUT_MS = '1';
+    process.env.YUMMYGRAPH_PARSE_TIMEOUT_MS = '1';
     const parser = makeParser();
     expect(() => parseSourceSafe(parser, pathological())).toThrow(ParseTimeoutError);
   });
 
   it('reset()s the parser on timeout so the SAME parser parses cleanly next', () => {
-    process.env.GITNEXUS_PARSE_TIMEOUT_MS = '1';
+    process.env.YUMMYGRAPH_PARSE_TIMEOUT_MS = '1';
     const parser = makeParser();
     expect(() => parseSourceSafe(parser, pathological())).toThrow(ParseTimeoutError);
 
     // Without reset() tree-sitter resumes the interrupted parse and would
     // either return null again or a corrupt tree. With a cleared budget +
     // reset(), a trivial follow-up parse on the SAME parser must succeed.
-    process.env.GITNEXUS_PARSE_TIMEOUT_MS = '0';
+    process.env.YUMMYGRAPH_PARSE_TIMEOUT_MS = '0';
     const tree = parseSourceSafe(parser, 'x = 1\n');
     expect(tree.rootNode.type).toBe('module');
     expect(tree.rootNode.hasError).toBe(false);
   });
 
   it('does not throw and returns a tree when the budget is disabled (0)', () => {
-    process.env.GITNEXUS_PARSE_TIMEOUT_MS = '0';
+    process.env.YUMMYGRAPH_PARSE_TIMEOUT_MS = '0';
     const tree = parseSourceSafe(makeParser(), 'x = 1\n');
     expect(tree.rootNode.type).toBe('module');
   });

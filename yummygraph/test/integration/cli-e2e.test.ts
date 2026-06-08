@@ -3,7 +3,7 @@
  *
  * Tests CLI commands via child process spawn:
  * - statusCommand: verify stdout for unindexed repo
- * - analyzeCommand: verify pipeline runs and creates .gitnexus/ output
+ * - analyzeCommand: verify pipeline runs and creates .yummygraph/ output
  *
  * Uses process.execPath (never 'node' string), no shell: true.
  * Accepts status === null (timeout) as valid on slow CI runners.
@@ -37,7 +37,7 @@ const FIXTURE_SRC = path.resolve(testDir, '..', 'fixtures', 'mini-repo');
 // still works), `afterAll` rms the parent tmpdir.
 let MINI_REPO: string;
 let tmpParent: string;
-let suiteGitnexusHome: string;
+let suiteYummygraphHome: string;
 
 // Absolute file:// URL to tsx loader — needed when spawning CLI with cwd
 // outside the project tree (bare 'tsx' specifier won't resolve there).
@@ -51,7 +51,7 @@ beforeAll(() => {
   // Copy the fixture into an isolated tmpdir named `mini-repo` so that the
   // `--repo mini-repo` CLI arg (which matches by basename) still works.
   tmpParent = fs.mkdtempSync(path.join(os.tmpdir(), 'gn-cli-e2e-'));
-  suiteGitnexusHome = fs.mkdtempSync(path.join(os.tmpdir(), 'gn-cli-e2e-home-'));
+  suiteYummygraphHome = fs.mkdtempSync(path.join(os.tmpdir(), 'gn-cli-e2e-home-'));
   MINI_REPO = path.join(tmpParent, 'mini-repo');
   fs.cpSync(FIXTURE_SRC, MINI_REPO, { recursive: true });
 
@@ -94,15 +94,15 @@ afterAll(() => {
   if (tmpParent) {
     cleanupTempDirSync(tmpParent);
   }
-  if (suiteGitnexusHome) {
-    cleanupTempDirSync(suiteGitnexusHome);
+  if (suiteYummygraphHome) {
+    cleanupTempDirSync(suiteYummygraphHome);
   }
 });
 
 function cliEnv(extraEnv: Record<string, string> = {}) {
   return {
     ...process.env,
-    GITNEXUS_HOME: suiteGitnexusHome,
+    YUMMYGRAPH_HOME: suiteYummygraphHome,
     // Pre-set --max-old-space-size so analyzeCommand's ensureHeap() sees it
     // and skips the re-exec. The re-exec drops the tsx loader (--import tsx
     // is not in process.argv), causing ERR_UNKNOWN_FILE_EXTENSION on .ts files.
@@ -137,8 +137,8 @@ function runCliRaw(extraArgs: string[], cwd: string, timeoutMs = 15000) {
 
 /**
  * Like runCliRaw but accepts extra env vars. Used by tests that need to
- * isolate the global registry via GITNEXUS_HOME so they don't touch the
- * developer / CI agent's real ~/.gitnexus/registry.json (#829).
+ * isolate the global registry via YUMMYGRAPH_HOME so they don't touch the
+ * developer / CI agent's real ~/.yummygraph/registry.json (#829).
  */
 function runCliWithEnv(
   extraArgs: string[],
@@ -346,12 +346,12 @@ describe('CLI end-to-end', () => {
       ].join('\n'),
     ).toBe(0);
 
-    // Successful analyze should create .gitnexus/ output directory
-    const gitnexusDir = path.join(MINI_REPO, '.gitnexus');
-    expect(fs.existsSync(gitnexusDir)).toBe(true);
-    expect(fs.statSync(gitnexusDir).isDirectory()).toBe(true);
+    // Successful analyze should create .yummygraph/ output directory
+    const yummygraphDir = path.join(MINI_REPO, '.yummygraph');
+    expect(fs.existsSync(yummygraphDir)).toBe(true);
+    expect(fs.statSync(yummygraphDir).isDirectory()).toBe(true);
     expect(fs.existsSync(path.join(MINI_REPO, '.gitignore'))).toBe(false);
-    expect(fs.readFileSync(path.join(gitnexusDir, '.gitignore'), 'utf-8')).toBe('*\n');
+    expect(fs.readFileSync(path.join(yummygraphDir, '.gitignore'), 'utf-8')).toBe('*\n');
   }, 60_000);
 
   // Regression guard for issue #1169 — analyze must produce BOTH a
@@ -370,7 +370,7 @@ describe('CLI end-to-end', () => {
     const repoParent = path.dirname(repo);
 
     try {
-      const result = runCliWithEnv(['analyze'], repo, { GITNEXUS_HOME: gnHome }, 60000);
+      const result = runCliWithEnv(['analyze'], repo, { YUMMYGRAPH_HOME: gnHome }, 60000);
 
       expect(
         result.status,
@@ -390,7 +390,7 @@ describe('CLI end-to-end', () => {
         ].join('\n'),
       ).toBe(0);
 
-      const metaPath = path.join(repo, '.gitnexus', 'meta.json');
+      const metaPath = path.join(repo, '.yummygraph', 'meta.json');
       expect(
         fs.existsSync(metaPath),
         `meta.json missing at ${metaPath} after analyze exited 0 — this is the #1169 silent-finalize symptom`,
@@ -427,7 +427,7 @@ describe('CLI end-to-end', () => {
     const repoParent = path.dirname(repo);
 
     try {
-      const first = runCliWithEnv(['analyze'], repo, { GITNEXUS_HOME: gnHome }, 60000);
+      const first = runCliWithEnv(['analyze'], repo, { YUMMYGRAPH_HOME: gnHome }, 60000);
       expect(
         first.status,
         [
@@ -437,7 +437,7 @@ describe('CLI end-to-end', () => {
         ].join('\n'),
       ).toBe(0);
 
-      const metaPath = path.join(repo, '.gitnexus', 'meta.json');
+      const metaPath = path.join(repo, '.yummygraph', 'meta.json');
       expect(fs.existsSync(metaPath)).toBe(true);
 
       // Simulate the half-finalized state from the review: meta.json is
@@ -445,7 +445,7 @@ describe('CLI end-to-end', () => {
       // because the global registry entry is missing.
       fs.writeFileSync(path.join(gnHome, 'registry.json'), '[]', 'utf-8');
 
-      const second = runCliWithEnv(['analyze'], repo, { GITNEXUS_HOME: gnHome }, 60000);
+      const second = runCliWithEnv(['analyze'], repo, { YUMMYGRAPH_HOME: gnHome }, 60000);
       expect(
         second.status,
         [
@@ -466,7 +466,7 @@ describe('CLI end-to-end', () => {
   // ─── analyze --name <alias> + --allow-duplicate-name (#829) ──────
   //
   // End-to-end regression guard for the name-collision feature:
-  //   1. `analyze --name X` persists the alias to ~/.gitnexus/registry.json
+  //   1. `analyze --name X` persists the alias to ~/.yummygraph/registry.json
   //   2. A second `analyze --name X` on a DIFFERENT path is rejected with
   //      a collision error (exit code 1, "already used" in output)
   //   3. `analyze --name X --allow-duplicate-name` bypasses the guard;
@@ -495,7 +495,7 @@ describe('CLI end-to-end', () => {
 
     it('--name alias stores; collision rejects; --allow-duplicate-name bypasses', () => {
       // Isolate the global registry so this test never touches the
-      // developer's real ~/.gitnexus.
+      // developer's real ~/.yummygraph.
       const gnHome = fs.mkdtempSync(path.join(os.tmpdir(), 'gn-home-'));
 
       // Two mini-repo copies whose basenames intentionally collide.
@@ -509,7 +509,7 @@ describe('CLI end-to-end', () => {
         const r1 = runCliWithEnv(
           ['analyze', '--name', 'shared'],
           repoA,
-          { GITNEXUS_HOME: gnHome },
+          { YUMMYGRAPH_HOME: gnHome },
           60000,
         );
         if (r1.status === null) return; // CI timeout tolerance
@@ -531,7 +531,7 @@ describe('CLI end-to-end', () => {
         const r2 = runCliWithEnv(
           ['analyze', '--name', 'shared'],
           repoB,
-          { GITNEXUS_HOME: gnHome },
+          { YUMMYGRAPH_HOME: gnHome },
           60000,
         );
         if (r2.status === null) return;
@@ -554,7 +554,7 @@ describe('CLI end-to-end', () => {
         const r3 = runCliWithEnv(
           ['analyze', '--name', 'shared', '--allow-duplicate-name'],
           repoB,
-          { GITNEXUS_HOME: gnHome },
+          { YUMMYGRAPH_HOME: gnHome },
           60000,
         );
         if (r3.status === null) return;
@@ -591,7 +591,7 @@ describe('CLI end-to-end', () => {
           const r4 = runCliWithEnv(
             ['analyze', '--name', 'shared', '--skills'],
             repoC,
-            { GITNEXUS_HOME: gnHome },
+            { YUMMYGRAPH_HOME: gnHome },
             60000,
           );
           if (r4.status === null) return;
@@ -615,11 +615,11 @@ describe('CLI end-to-end', () => {
     }, 360000); // 6-min outer budget (4 × ~60s analyze calls + fixture setup)
   });
 
-  // ─── gitnexus remove <target> (#664) ─────────────────────────────
+  // ─── yummygraph remove <target> (#664) ─────────────────────────────
   //
   // End-to-end regression guard for the remove command:
   //   1. `remove <alias>` without --force is a dry-run (exit 0, preserves state)
-  //   2. `remove <alias> --force` deletes the .gitnexus/ directory
+  //   2. `remove <alias> --force` deletes the .yummygraph/ directory
   //      AND unregisters from the global registry
   //   3. `remove <unknown>` is idempotent (exit 0 with a warning)
   //   4. `remove <ambiguous>` (two entries share the alias via
@@ -642,7 +642,7 @@ describe('CLI end-to-end', () => {
         const r1 = runCliWithEnv(
           ['analyze', '--name', 'alias-a'],
           repoA,
-          { GITNEXUS_HOME: gnHome },
+          { YUMMYGRAPH_HOME: gnHome },
           60000,
         );
         if (r1.status === null) return;
@@ -672,7 +672,7 @@ describe('CLI end-to-end', () => {
         // (e.g. a future refactor that accidentally drops one of the
         // three `console.log` lines, or swaps `entry.path` for
         // `entry.name` in the output).
-        const r2 = runCliWithEnv(['remove', 'alias-a'], parentA, { GITNEXUS_HOME: gnHome }, 15000);
+        const r2 = runCliWithEnv(['remove', 'alias-a'], parentA, { YUMMYGRAPH_HOME: gnHome }, 15000);
         if (r2.status === null) return;
         expect(r2.status).toBe(0);
         const r2Output = `${r2.stdout}${r2.stderr}`;
@@ -688,7 +688,7 @@ describe('CLI end-to-end', () => {
         const r3 = runCliWithEnv(
           ['remove', 'alias-a', '--force'],
           parentA,
-          { GITNEXUS_HOME: gnHome },
+          { YUMMYGRAPH_HOME: gnHome },
           15000,
         );
         if (r3.status === null) return;
@@ -714,7 +714,7 @@ describe('CLI end-to-end', () => {
 
         // Idempotent: removing the same alias AGAIN must exit 0 with a
         // warning (so `remove X && analyze Y` keeps working in scripts).
-        const r4 = runCliWithEnv(['remove', 'alias-a'], parentA, { GITNEXUS_HOME: gnHome }, 15000);
+        const r4 = runCliWithEnv(['remove', 'alias-a'], parentA, { YUMMYGRAPH_HOME: gnHome }, 15000);
         if (r4.status === null) return;
         expect(r4.status).toBe(0);
         expect(`${r4.stdout}${r4.stderr}`).toMatch(/Nothing to remove/i);
@@ -737,7 +737,7 @@ describe('CLI end-to-end', () => {
         const r1 = runCliWithEnv(
           ['analyze', '--name', 'shared'],
           repoA,
-          { GITNEXUS_HOME: gnHome },
+          { YUMMYGRAPH_HOME: gnHome },
           60000,
         );
         if (r1.status === null) return;
@@ -746,7 +746,7 @@ describe('CLI end-to-end', () => {
         const r2 = runCliWithEnv(
           ['analyze', '--name', 'shared', '--allow-duplicate-name'],
           repoB,
-          { GITNEXUS_HOME: gnHome },
+          { YUMMYGRAPH_HOME: gnHome },
           60000,
         );
         if (r2.status === null) return;
@@ -760,7 +760,7 @@ describe('CLI end-to-end', () => {
         const r3 = runCliWithEnv(
           ['remove', 'shared', '--force'],
           parentA,
-          { GITNEXUS_HOME: gnHome },
+          { YUMMYGRAPH_HOME: gnHome },
           15000,
         );
         if (r3.status === null) return;
@@ -804,7 +804,7 @@ describe('CLI end-to-end', () => {
         const r4 = runCliWithEnv(
           ['remove', repoAEntry.path, '--force'],
           parentA,
-          { GITNEXUS_HOME: gnHome },
+          { YUMMYGRAPH_HOME: gnHome },
           15000,
         );
         if (r4.status === null) return;
@@ -829,17 +829,17 @@ describe('CLI end-to-end', () => {
       }
     }, 240000); // 4-min outer budget (2 × ~60s analyze + 2 × fast remove)
 
-    it('refuses to proceed when a registry entry points storagePath outside <repo>/.gitnexus (#1003)', () => {
+    it('refuses to proceed when a registry entry points storagePath outside <repo>/.yummygraph (#1003)', () => {
       // Regression guard for the safety gap flagged by @magyargergo on
-      // PR #1003: `~/.gitnexus/registry.json` is a user-writable JSON
+      // PR #1003: `~/.yummygraph/registry.json` is a user-writable JSON
       // file, so a corrupted or hand-edited entry could point
       // storagePath at the repo root (catastrophic: rm the working
       // tree) or at any other arbitrary path. `remove --force` must
       // refuse to call fs.rm when storagePath isn't the canonical
-      // `<entry.path>/.gitnexus`. We verify:
+      // `<entry.path>/.yummygraph`. We verify:
       //   1. Exit code 1 with the actionable "registry entry corrupted"
       //      hint.
-      //   2. The .gitnexus/ storage dir is UNTOUCHED.
+      //   2. The .yummygraph/ storage dir is UNTOUCHED.
       //   3. The repo itself (entry.path) is UNTOUCHED.
       //   4. The registry entry is NOT removed (no partial mutation).
       const gnHome = fs.mkdtempSync(path.join(os.tmpdir(), 'gn-home-poison-'));
@@ -852,7 +852,7 @@ describe('CLI end-to-end', () => {
         const r1 = runCliWithEnv(
           ['analyze', '--name', 'poisoned-alias'],
           repo,
-          { GITNEXUS_HOME: gnHome },
+          { YUMMYGRAPH_HOME: gnHome },
           60000,
         );
         if (r1.status === null) return;
@@ -870,7 +870,7 @@ describe('CLI end-to-end', () => {
         fs.writeFileSync(registryPath, JSON.stringify(poisoned, null, 2));
 
         // Sanity: storage dir and working tree both still exist.
-        expect(fs.existsSync(path.join(repo, '.gitnexus'))).toBe(true);
+        expect(fs.existsSync(path.join(repo, '.yummygraph'))).toBe(true);
         expect(fs.existsSync(repo)).toBe(true);
         expect(fs.existsSync(path.join(repo, '.git'))).toBe(true);
 
@@ -878,7 +878,7 @@ describe('CLI end-to-end', () => {
         const r2 = runCliWithEnv(
           ['remove', 'poisoned-alias', '--force'],
           parent,
-          { GITNEXUS_HOME: gnHome },
+          { YUMMYGRAPH_HOME: gnHome },
           15000,
         );
         if (r2.status === null) return;
@@ -895,11 +895,11 @@ describe('CLI end-to-end', () => {
         expect(r2Output).toMatch(/Refusing to remove/i);
         expect(r2Output).toMatch(/registry\.json/i);
 
-        // Repo + .gitnexus dir + .git dir must all still exist — the
+        // Repo + .yummygraph dir + .git dir must all still exist — the
         // guard aborts BEFORE fs.rm. This is the whole point of the
         // test: the working tree is not allowed to disappear.
         expect(fs.existsSync(repo), 'repo working tree must survive').toBe(true);
-        expect(fs.existsSync(path.join(repo, '.gitnexus')), 'storage dir must survive').toBe(true);
+        expect(fs.existsSync(path.join(repo, '.yummygraph')), 'storage dir must survive').toBe(true);
         expect(fs.existsSync(path.join(repo, '.git')), '.git must survive').toBe(true);
 
         // Registry unchanged — no partial mutation.
@@ -921,12 +921,12 @@ describe('CLI end-to-end', () => {
   // (not aborted), so clean --all preserves its existing per-repo
   // error-tolerance semantics: one bad entry does not halt cleanup of
   // the rest. We verify:
-  //   1. The poisoned entry is NOT deleted (working tree + .gitnexus
+  //   1. The poisoned entry is NOT deleted (working tree + .yummygraph
   //      survive), and the CLI prints a "Refusing to clean" message.
   //   2. The poisoned entry is left in the registry (nothing was
   //      mutated for it).
   //   3. A co-existing well-formed entry IS still cleaned (both its
-  //      .gitnexus dir AND its registry entry are gone).
+  //      .yummygraph dir AND its registry entry are gone).
   describe('clean --all with a poisoned registry entry (#1003)', () => {
     it('skips poisoned entries, cleans valid ones, never deletes the working tree', () => {
       const gnHome = fs.mkdtempSync(path.join(os.tmpdir(), 'gn-home-clean-poison-'));
@@ -944,7 +944,7 @@ describe('CLI end-to-end', () => {
           const r = runCliWithEnv(
             ['analyze', '--name', alias],
             repo,
-            { GITNEXUS_HOME: gnHome },
+            { YUMMYGRAPH_HOME: gnHome },
             60000,
           );
           if (r.status === null) return;
@@ -964,18 +964,18 @@ describe('CLI end-to-end', () => {
         );
         fs.writeFileSync(registryPath, JSON.stringify(poisoned, null, 2));
 
-        // Sanity: both working trees and .gitnexus dirs still exist.
+        // Sanity: both working trees and .yummygraph dirs still exist.
         expect(fs.existsSync(repoBad)).toBe(true);
-        expect(fs.existsSync(path.join(repoBad, '.gitnexus'))).toBe(true);
+        expect(fs.existsSync(path.join(repoBad, '.yummygraph'))).toBe(true);
         expect(fs.existsSync(path.join(repoBad, '.git'))).toBe(true);
-        expect(fs.existsSync(path.join(repoGood, '.gitnexus'))).toBe(true);
+        expect(fs.existsSync(path.join(repoGood, '.yummygraph'))).toBe(true);
 
         // clean --all --force from a neutral cwd (parentBad), so the
         // command isn't "inside" either repo.
         const r = runCliWithEnv(
           ['clean', '--all', '--force'],
           parentBad,
-          { GITNEXUS_HOME: gnHome },
+          { YUMMYGRAPH_HOME: gnHome },
           30000,
         );
         if (r.status === null) return;
@@ -987,23 +987,23 @@ describe('CLI end-to-end', () => {
         expect(output).toMatch(/Refusing to clean/i);
         expect(output).toMatch(/bad-alias/);
 
-        // Poisoned repo: working tree + .gitnexus + .git all SURVIVE.
+        // Poisoned repo: working tree + .yummygraph + .git all SURVIVE.
         expect(fs.existsSync(repoBad), 'poisoned repo working tree must survive').toBe(true);
         expect(
-          fs.existsSync(path.join(repoBad, '.gitnexus')),
-          'poisoned repo .gitnexus must survive (guard refused to rm repo root)',
+          fs.existsSync(path.join(repoBad, '.yummygraph')),
+          'poisoned repo .yummygraph must survive (guard refused to rm repo root)',
         ).toBe(true);
         expect(fs.existsSync(path.join(repoBad, '.git')), '.git must survive').toBe(true);
 
-        // Good repo: its .gitnexus IS gone (cleanup succeeded despite
+        // Good repo: its .yummygraph IS gone (cleanup succeeded despite
         // the poisoned sibling entry — per-entry error tolerance is
         // preserved).
         expect(
-          fs.existsSync(path.join(repoGood, '.gitnexus')),
-          'good repo .gitnexus should be cleaned',
+          fs.existsSync(path.join(repoGood, '.yummygraph')),
+          'good repo .yummygraph should be cleaned',
         ).toBe(false);
         // But the good repo's working tree stays (clean never touches
-        // anything outside .gitnexus).
+        // anything outside .yummygraph).
         expect(fs.existsSync(repoGood), 'good repo working tree must survive').toBe(true);
 
         // Registry post-state: poisoned entry still present (skipped,
@@ -1043,7 +1043,7 @@ describe('CLI end-to-end', () => {
       // Commander writes --help output to stdout.
       expect(result.stdout).toMatch(/Usage:/i);
       // The program name and at least one known subcommand should appear.
-      expect(result.stdout).toMatch(/gitnexus/i);
+      expect(result.stdout).toMatch(/yummygraph/i);
       expect(result.stdout).toMatch(/analyze|status|serve/i);
     });
 
@@ -1077,8 +1077,8 @@ describe('CLI end-to-end', () => {
 
     it('status on non-indexed repo reports not indexed', () => {
       // Even though MINI_REPO is now in an isolated tmpdir, previous tests
-      // in this suite may have created MINI_REPO/.gitnexus via analyze,
-      // and findRepo() walks up so any `.gitnexus` along the path still
+      // in this suite may have created MINI_REPO/.yummygraph via analyze,
+      // and findRepo() walks up so any `.yummygraph` along the path still
       // counts. This test needs a GUARANTEED pristine repo to assert the
       // "not indexed" output, so it mints its own throwaway tmp git repo.
       const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cli-noindex-'));
@@ -1168,7 +1168,7 @@ describe('CLI end-to-end', () => {
       }
     });
 
-    it('wiki on non-indexed repo fails with "No GitNexus index"', () => {
+    it('wiki on non-indexed repo fails with "No YummyGraph index"', () => {
       const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'wiki-noindex-'));
       try {
         spawnSync('git', ['init'], { cwd: tmpDir, stdio: 'pipe' });
@@ -1184,7 +1184,7 @@ describe('CLI end-to-end', () => {
           },
         });
 
-        // Must spawn outside project tree so it doesn't find parent .gitnexus
+        // Must spawn outside project tree so it doesn't find parent .yummygraph
         const result = spawnSync(
           process.execPath,
           ['--import', tsxImportUrl, cliEntry, 'wiki', tmpDir],
@@ -1199,7 +1199,7 @@ describe('CLI end-to-end', () => {
         if (result.status === null) return;
 
         expect(result.status).toBe(1);
-        expect(result.stdout).toMatch(/No GitNexus index found/);
+        expect(result.stdout).toMatch(/No YummyGraph index found/);
       } finally {
         cleanupTempDirSync(tmpDir);
       }
@@ -1243,7 +1243,7 @@ describe('CLI end-to-end', () => {
 
   // ─── stdout fd 1 tests (#324) ───────────────────────────────────────
   // These tests verify that tool output goes to stdout (fd 1), not stderr.
-  // Requires analyze to have run first (the analyze test above populates .gitnexus/).
+  // Requires analyze to have run first (the analyze test above populates .yummygraph/).
 
   // All tool commands pass --repo to disambiguate when the global registry
   // has multiple indexed repos (e.g. the parent project is also indexed).
@@ -1385,7 +1385,7 @@ describe('CLI end-to-end', () => {
 
         child.stdout.on('data', (chunk: Buffer) => {
           stdoutBuffer += chunk.toString();
-          if (stdoutBuffer.includes('GITNEXUS_EVAL_SERVER_READY:127.0.0.1:')) {
+          if (stdoutBuffer.includes('YUMMYGRAPH_EVAL_SERVER_READY:127.0.0.1:')) {
             foundOnStdout = true;
             child.kill('SIGTERM');
           }
@@ -1393,7 +1393,7 @@ describe('CLI end-to-end', () => {
 
         child.stderr.on('data', (chunk: Buffer) => {
           const text = chunk.toString();
-          if (text.includes('GITNEXUS_EVAL_SERVER_READY:')) {
+          if (text.includes('YUMMYGRAPH_EVAL_SERVER_READY:')) {
             foundOnStderr = true;
             child.kill('SIGTERM');
           }
@@ -1435,8 +1435,8 @@ describe('CLI end-to-end', () => {
         {
           timeoutMsg: 'eval-server did not emit READY signal within 30s',
           onStdout({ stdoutBuffer, settle, resolve, reject }) {
-            if (!stdoutBuffer.includes('GITNEXUS_EVAL_SERVER_READY:')) return;
-            if (stdoutBuffer.includes('GITNEXUS_EVAL_SERVER_READY:127.0.0.1:')) {
+            if (!stdoutBuffer.includes('YUMMYGRAPH_EVAL_SERVER_READY:')) return;
+            if (stdoutBuffer.includes('YUMMYGRAPH_EVAL_SERVER_READY:127.0.0.1:')) {
               settle(resolve);
             } else {
               settle(() =>
@@ -1460,7 +1460,7 @@ describe('CLI end-to-end', () => {
           async onStdout({ stdoutBuffer, isSettled, settle, resolve, reject }) {
             const readyLine = stdoutBuffer
               .split('\n')
-              .find((l) => l.startsWith('GITNEXUS_EVAL_SERVER_READY:0.0.0.0:'));
+              .find((l) => l.startsWith('YUMMYGRAPH_EVAL_SERVER_READY:0.0.0.0:'));
             if (!readyLine || isSettled()) return;
 
             // Parse the actual OS-assigned port from the READY signal
@@ -1502,7 +1502,7 @@ describe('CLI end-to-end', () => {
           async onStdout({ stdoutBuffer, isSettled, settle, resolve, reject }) {
             const readyLine = stdoutBuffer
               .split('\n')
-              .find((l) => l.startsWith('GITNEXUS_EVAL_SERVER_READY:'));
+              .find((l) => l.startsWith('YUMMYGRAPH_EVAL_SERVER_READY:'));
             if (!readyLine || isSettled()) return;
 
             // The signal must contain a real bound IP, not the literal input string
@@ -1518,7 +1518,7 @@ describe('CLI end-to-end', () => {
             }
 
             // Parse host and port: everything after the prefix up to the last colon
-            const withoutPrefix = readyLine.slice('GITNEXUS_EVAL_SERVER_READY:'.length);
+            const withoutPrefix = readyLine.slice('YUMMYGRAPH_EVAL_SERVER_READY:'.length);
             const lastColon = withoutPrefix.lastIndexOf(':');
             const signalHost = withoutPrefix.slice(0, lastColon); // "127.0.0.1" or "[::1]"
             const boundPort = withoutPrefix.slice(lastColon + 1).trim();

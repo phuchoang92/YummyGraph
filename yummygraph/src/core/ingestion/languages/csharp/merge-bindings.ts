@@ -24,7 +24,7 @@
  * earlier binding.
  */
 
-import type { BindingRef } from 'gitnexus-shared';
+import type { BindingRef } from 'yummygraph-shared';
 
 const TIER_LOCAL = 0;
 const TIER_IMPORT = 1;

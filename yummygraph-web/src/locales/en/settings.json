@@ -5,7 +5,7 @@
   "backendUrl": "Backend URL",
   "connected": "Connected",
   "notConnected": "Not connected",
-  "runServeHint": "Run `gitnexus serve` to connect the web UI to a local backend.",
+  "runServeHint": "Run `yummygraph serve` to connect the web UI to a local backend.",
   "provider": "Provider",
   "apiKey": "API Key",
   "learnMore": "Learn more",

@@ -1,6 +1,6 @@
-// gitnexus/src/core/ingestion/class-extractors/configs/go.ts
+// yummygraph/src/core/ingestion/class-extractors/configs/go.ts
 
-import { SupportedLanguages } from 'gitnexus-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 import type { ClassExtractionConfig } from '../../class-types.js';
 
 export const goClassConfig: ClassExtractionConfig = {

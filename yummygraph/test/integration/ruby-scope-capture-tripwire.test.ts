@@ -1,7 +1,7 @@
 /**
  * Ruby scope-capture O(n^2) regression tripwire.
  *
- * NOT gated behind GITNEXUS_BENCH and needs no compiled worker — it runs in
+ * NOT gated behind YUMMYGRAPH_BENCH and needs no compiled worker — it runs in
  * normal CI and is the actual guard against an O(n^2) re-regression of
  * `emitRubyScopeCaptures`. It calls the hotpath directly on a ~400-entity
  * generated source. The O(n) path (PR #1918, threading the tree-sitter query's

@@ -6,7 +6,7 @@
  * scope extraction, heritage (include/extend/prepend), MRO construction,
  * and call resolution via the registry-primary scope-resolution path.
  *
- * Run: GITNEXUS_BENCH=1 npx vitest run test/integration/ruby-pipeline-benchmark.test.ts
+ * Run: YUMMYGRAPH_BENCH=1 npx vitest run test/integration/ruby-pipeline-benchmark.test.ts
  *
  * The benchmark uses workers (production path) by default. Set
  * a single-worker pool (the sequential parser was removed).
@@ -17,7 +17,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { runPipelineFromRepo } from '../../src/core/ingestion/pipeline.js';
 
-const BENCH_ENABLED = process.env.GITNEXUS_BENCH === '1';
+const BENCH_ENABLED = process.env.YUMMYGRAPH_BENCH === '1';
 
 interface BenchResult {
   fileCount: number;

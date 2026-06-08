@@ -53,7 +53,7 @@ import type {
   ScopeId,
   ScopeTree,
   TypeRef,
-} from 'gitnexus-shared';
+} from 'yummygraph-shared';
 
 export interface ScopeResolutionIndexes {
   readonly scopeTree: ScopeTree;

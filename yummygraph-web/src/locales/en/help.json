@@ -43,13 +43,13 @@
     "explained": "Status bar explained"
   },
   "tryAsking": "Try asking:",
-  "footer": "GitNexus — graph explorer",
+  "footer": "YummyGraph — graph explorer",
   "title": "Help & Reference",
-  "footerLong": "GitNexus — open source codebase graph explorer",
+  "footerLong": "YummyGraph — open source codebase graph explorer",
   "docsGithub": "Docs & GitHub ↗",
   "overview": {
     "gettingStarted": "Getting started",
-    "whatIsTitle": "What is GitNexus?",
+    "whatIsTitle": "What is YummyGraph?",
     "whatIsDescription": "An interactive graph explorer for your codebase. Every file, function, and import becomes a node you can explore, query, and navigate visually.",
     "currentRepoTitle": "Your current repo",
     "loadedCounts": "Loaded: {{nodeCount}} nodes · {{edgeCount}} edges",

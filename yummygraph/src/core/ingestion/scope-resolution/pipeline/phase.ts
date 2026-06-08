@@ -28,7 +28,7 @@ import type { PipelinePhase, PipelineContext, PhaseResult } from '../../pipeline
 import { getPhaseOutput } from '../../pipeline-phases/types.js';
 import type { StructureOutput } from '../../pipeline-phases/structure.js';
 import type { ParseOutput } from '../../pipeline-phases/parse.js';
-import { SupportedLanguages, getLanguageFromFilename } from 'gitnexus-shared';
+import { SupportedLanguages, getLanguageFromFilename } from 'yummygraph-shared';
 import { readFileContents } from '../../filesystem-walker.js';
 import { runScopeResolution, type ScopeResolutionSubPhase } from './run.js';
 import { buildGraphNodeLookup } from '../graph-bridge/node-lookup.js';
@@ -108,7 +108,7 @@ export const scopeResolutionPhase: PipelinePhase<ScopeResolutionOutput> = {
     // path, since workers can't return tree-sitter Trees across the
     // MessageChannel and scope-resolution would otherwise re-parse
     // every file from scratch on the main thread.
-    const preExtractedByPath = new Map<string, import('gitnexus-shared').ParsedFile>();
+    const preExtractedByPath = new Map<string, import('yummygraph-shared').ParsedFile>();
     for (const pf of workerParsedFiles) {
       preExtractedByPath.set(pf.filePath, pf);
     }
@@ -393,7 +393,7 @@ export const scopeResolutionPhase: PipelinePhase<ScopeResolutionOutput> = {
       // Release file contents and pre-extracted entries after each language
       // to reduce memory pressure. For large codebases (16K+ PHP files),
       // holding all source code simultaneously with scope trees causes OOM.
-      // See: https://github.com/abhigyanpatwari/GitNexus/issues/1741
+      // See: https://github.com/abhigyanpatwari/YummyGraph/issues/1741
       //
       // Use `filePaths` (not `primaryFilePaths`) so that any context files
       // added by `collectScopeContextPaths` (e.g. TS/JS files pulled in for
@@ -445,7 +445,7 @@ export const scopeResolutionPhase: PipelinePhase<ScopeResolutionOutput> = {
 
     // Scope-resolution is the sole consumer of the disk-backed ParsedFile
     // store; remove its shards now (can be many GB on a huge repo) so they
-    // don't linger in `.gitnexus`. Best-effort — never fail the phase on a
+    // don't linger in `.yummygraph`. Best-effort — never fail the phase on a
     // cleanup error.
     if (parsedFileStorePath) {
       try {

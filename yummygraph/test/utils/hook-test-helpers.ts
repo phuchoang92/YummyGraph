@@ -46,21 +46,21 @@ export function parseHookOutput(
 
 // ─── Stale-index hint PATH-detection helpers (#1938) ────────────────
 //
-// The hooks emit `gitnexus analyze` (no npx) when a launcher is on PATH. These
+// The hooks emit `yummygraph analyze` (no npx) when a launcher is on PATH. These
 // helpers let an e2e test fabricate that condition deterministically: scrub any
-// ambient `gitnexus` off PATH, then prepend a synthetic launcher — so the test
+// ambient `yummygraph` off PATH, then prepend a synthetic launcher — so the test
 // asserts the hook's real PATH auto-detection rather than env-var forcing.
 
-/** Names a global `gitnexus` may take on each platform (for scrub + fabricate). */
-function gitNexusLauncherNames(): string[] {
+/** Names a global `yummygraph` may take on each platform (for scrub + fabricate). */
+function yummyGraphLauncherNames(): string[] {
   return process.platform === 'win32'
-    ? ['gitnexus', 'gitnexus.cmd', 'gitnexus.bat', 'gitnexus.exe', 'gitnexus.ps1']
-    : ['gitnexus'];
+    ? ['yummygraph', 'yummygraph.cmd', 'yummygraph.bat', 'yummygraph.exe', 'yummygraph.ps1']
+    : ['yummygraph'];
 }
 
-/** True if `dir` holds a runnable `gitnexus` launcher (isFile + X_OK on POSIX). */
-function hasGitNexusLauncher(dir: string): boolean {
-  return gitNexusLauncherNames().some((name) => {
+/** True if `dir` holds a runnable `yummygraph` launcher (isFile + X_OK on POSIX). */
+function hasYummyGraphLauncher(dir: string): boolean {
+  return yummyGraphLauncherNames().some((name) => {
     const candidate = path.join(dir, name);
     try {
       if (!fs.statSync(candidate).isFile()) return false;
@@ -73,17 +73,17 @@ function hasGitNexusLauncher(dir: string): boolean {
 }
 
 /**
- * The current PATH with every dir that contains a `gitnexus` launcher removed, so
- * a test box that already has gitnexus installed cannot make the assertion pass
+ * The current PATH with every dir that contains a `yummygraph` launcher removed, so
+ * a test box that already has yummygraph installed cannot make the assertion pass
  * (or fail) for the wrong reason. Mirrors the hook's own detection — isFile() +
  * X_OK — rather than a bare existsSync.
  */
-export function pathWithoutGitNexus(
+export function pathWithoutYummyGraph(
   pathValue: string = process.env.PATH || process.env.Path || process.env.path || '',
 ): string {
   return pathValue
     .split(path.delimiter)
-    .filter((dir) => dir && !hasGitNexusLauncher(dir))
+    .filter((dir) => dir && !hasYummyGraphLauncher(dir))
     .join(path.delimiter);
 }
 
@@ -98,13 +98,13 @@ export function envWithPath(pathValue: string): NodeJS.ProcessEnv {
 }
 
 /**
- * Create a temp dir holding a runnable `gitnexus` launcher and return a PATH that
- * puts it first (with all other gitnexus launchers scrubbed). Caller must invoke
+ * Create a temp dir holding a runnable `yummygraph` launcher and return a PATH that
+ * puts it first (with all other yummygraph launchers scrubbed). Caller must invoke
  * cleanup() to remove the temp dir.
  */
-export function createGitNexusPathEntry(): { pathValue: string; cleanup: () => void } {
-  const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-path-'));
-  const launcher = path.join(binDir, process.platform === 'win32' ? 'gitnexus.cmd' : 'gitnexus');
+export function createYummyGraphPathEntry(): { pathValue: string; cleanup: () => void } {
+  const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-path-'));
+  const launcher = path.join(binDir, process.platform === 'win32' ? 'yummygraph.cmd' : 'yummygraph');
   fs.writeFileSync(
     launcher,
     process.platform === 'win32' ? '@echo off\r\nexit /b 0\r\n' : '#!/bin/sh\nexit 0\n',
@@ -112,7 +112,7 @@ export function createGitNexusPathEntry(): { pathValue: string; cleanup: () => v
   if (process.platform !== 'win32') fs.chmodSync(launcher, 0o755);
 
   return {
-    pathValue: [binDir, pathWithoutGitNexus()].filter(Boolean).join(path.delimiter),
+    pathValue: [binDir, pathWithoutYummyGraph()].filter(Boolean).join(path.delimiter),
     cleanup: () => fs.rmSync(binDir, { recursive: true, force: true }),
   };
 }

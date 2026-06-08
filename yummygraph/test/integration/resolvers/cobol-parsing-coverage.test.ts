@@ -159,11 +159,11 @@ describe('COBOL parsing coverage (F17-F23)', () => {
     let skipResult: PipelineResult;
 
     beforeAll(async () => {
-      process.env.GITNEXUS_MAX_COBOL_FILE_SIZE_BYTES = '100';
+      process.env.YUMMYGRAPH_MAX_COBOL_FILE_SIZE_BYTES = '100';
       skipResult = await runPipelineFromRepo(COVERAGE_FIXTURE, () => {}, {
         skipGraphPhases: true,
       });
-      delete process.env.GITNEXUS_MAX_COBOL_FILE_SIZE_BYTES;
+      delete process.env.YUMMYGRAPH_MAX_COBOL_FILE_SIZE_BYTES;
     }, 60000);
 
     it('file above threshold is skipped — zero Module nodes', () => {
@@ -175,11 +175,11 @@ describe('COBOL parsing coverage (F17-F23)', () => {
 
     it('file near threshold (below limit) processes normally', async () => {
       // Set threshold to 10MB — well above all fixture file sizes
-      process.env.GITNEXUS_MAX_COBOL_FILE_SIZE_BYTES = String(10 * 1024 * 1024);
+      process.env.YUMMYGRAPH_MAX_COBOL_FILE_SIZE_BYTES = String(10 * 1024 * 1024);
       const norResult = await runPipelineFromRepo(COVERAGE_FIXTURE, () => {}, {
         skipGraphPhases: true,
       });
-      delete process.env.GITNEXUS_MAX_COBOL_FILE_SIZE_BYTES;
+      delete process.env.YUMMYGRAPH_MAX_COBOL_FILE_SIZE_BYTES;
       const modules = getNodesByLabel(norResult, 'Module');
       expect(modules.length).toBeGreaterThan(0);
     });

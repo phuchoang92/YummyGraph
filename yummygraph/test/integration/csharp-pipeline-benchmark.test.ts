@@ -16,7 +16,7 @@
  *      materialises O(scopes × defs) BindingRefs into that one bucket.
  *      The concentrated test is the regression guard for that path.
  *
- * Run: GITNEXUS_BENCH=1 npx vitest run test/integration/csharp-pipeline-benchmark.test.ts
+ * Run: YUMMYGRAPH_BENCH=1 npx vitest run test/integration/csharp-pipeline-benchmark.test.ts
  */
 import { describe, it, expect } from 'vitest';
 import fs from 'node:fs';
@@ -24,7 +24,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { runPipelineFromRepo } from '../../src/core/ingestion/pipeline.js';
 
-const BENCH_ENABLED = process.env.GITNEXUS_BENCH === '1';
+const BENCH_ENABLED = process.env.YUMMYGRAPH_BENCH === '1';
 
 interface BenchResult {
   fileCount: number;

@@ -18,7 +18,7 @@
  * lazily when `allFilePaths` reference changes (once per workspace pass).
  */
 
-import { SupportedLanguages } from 'gitnexus-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 import { resolveTsTarget, type TsResolveContext } from '../typescript/import-target.js';
 import { buildSuffixIndex, type SuffixIndex } from '../../import-resolvers/utils.js';
 import type { TsconfigPaths } from '../../language-config.js';

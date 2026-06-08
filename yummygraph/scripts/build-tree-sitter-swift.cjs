@@ -5,7 +5,7 @@
  * The vendored package ships platform prebuilds; node-gyp-build selects the
  * correct binary at require time. This script calls node-gyp-build once
  * against the materialized package so a missing-prebuild failure surfaces
- * as an install-time warning (with the rest of the gitnexus install
+ * as an install-time warning (with the rest of the yummygraph install
  * succeeding) rather than as a runtime error the first time Swift parsing
  * is requested. The result is discarded — it does not copy, register, or
  * mutate anything; the runtime require() path in parser-loader does the
@@ -16,8 +16,8 @@
 const fs = require('fs');
 const path = require('path');
 
-if (process.env.GITNEXUS_SKIP_OPTIONAL_GRAMMARS === '1') {
-  console.warn('[tree-sitter-swift] Skipping prebuild probe (GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1).');
+if (process.env.YUMMYGRAPH_SKIP_OPTIONAL_GRAMMARS === '1') {
+  console.warn('[tree-sitter-swift] Skipping prebuild probe (YUMMYGRAPH_SKIP_OPTIONAL_GRAMMARS=1).');
   process.exit(0);
 }
 

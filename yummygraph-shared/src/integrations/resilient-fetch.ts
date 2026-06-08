@@ -3,7 +3,7 @@
  * GitHub-flavoured retry classification baked in (Retry-After parsing,
  * 401/403/404/422 treated as terminal client errors).
  *
- * Designed for the `gitnexus publish` GitHub `repository_dispatch`
+ * Designed for the `yummygraph publish` GitHub `repository_dispatch`
  * call, but the classification rules apply to any GitHub REST endpoint.
  * Runtime-agnostic — no Node-only imports.
  */

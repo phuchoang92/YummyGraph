@@ -24,7 +24,7 @@ describe('ThriftExtractor', () => {
   let extractor: ThriftExtractor;
 
   beforeEach(async () => {
-    tmpDir = await fsp.mkdtemp(path.join(os.tmpdir(), 'gitnexus-thrift-'));
+    tmpDir = await fsp.mkdtemp(path.join(os.tmpdir(), 'yummygraph-thrift-'));
     extractor = new ThriftExtractor();
   });
 
@@ -42,7 +42,7 @@ describe('ThriftExtractor', () => {
     id: 'test-repo',
     path: 'test/app',
     repoPath,
-    storagePath: path.join(repoPath, '.gitnexus'),
+    storagePath: path.join(repoPath, '.yummygraph'),
   });
 
   it('test_extract_thrift_single_method_returns_idl_provider', async () => {
@@ -627,7 +627,7 @@ describe('buildThriftContext', () => {
   let tmpDir: string;
 
   beforeEach(async () => {
-    tmpDir = await fsp.mkdtemp(path.join(os.tmpdir(), 'gitnexus-thrift-context-'));
+    tmpDir = await fsp.mkdtemp(path.join(os.tmpdir(), 'yummygraph-thrift-context-'));
   });
 
   afterEach(async () => {

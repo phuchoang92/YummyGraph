@@ -116,7 +116,7 @@ describe('analyzeCommand heap respawn', () => {
     expect(args).toContain('--max-semi-space-size=128');
     expect(opts.env.NODE_OPTIONS).toContain('--max-old-space-size=16384');
     expect(opts.env.NODE_OPTIONS).toContain('--max-semi-space-size=128');
-    expect(opts.env.GITNEXUS_RESPAWN_PROGRESS_TTY).toBe('1');
+    expect(opts.env.YUMMYGRAPH_RESPAWN_PROGRESS_TTY).toBe('1');
   });
 
   it('does not force ANSI progress when the parent output is not a TTY', async () => {
@@ -131,7 +131,7 @@ describe('analyzeCommand heap respawn', () => {
 
     expect(spawnMock).toHaveBeenCalledTimes(1);
     const [, , opts] = spawnMock.mock.calls[0];
-    expect(opts.env.GITNEXUS_RESPAWN_PROGRESS_TTY).toBeUndefined();
+    expect(opts.env.YUMMYGRAPH_RESPAWN_PROGRESS_TTY).toBeUndefined();
   });
 
   it('does not re-exec when NODE_OPTIONS already defines max-old-space-size', async () => {
@@ -139,7 +139,7 @@ describe('analyzeCommand heap respawn', () => {
     getHeapStatisticsMock.mockReturnValue({ heap_size_limit: 512 * 1024 * 1024 });
 
     const { analyzeCommand } = await import('../../src/cli/analyze.js');
-    await analyzeCommand('/__gitnexus_nonexistent__', {});
+    await analyzeCommand('/__yummygraph_nonexistent__', {});
 
     expect(spawnMock).not.toHaveBeenCalled();
   });

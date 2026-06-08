@@ -10,7 +10,7 @@
  * `emitScopeCaptures` which wraps the regex tagger. COPY statements are
  * interpreted as imports; there is no type system and no implicit receiver.
  */
-import { SupportedLanguages } from 'gitnexus-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 import { defineLanguage } from '../language-provider.js';
 import {
   emitCobolScopeCaptures,

@@ -19,7 +19,7 @@
  * translation is required for graph-edge correctness.
  */
 
-import type { CaptureMatch } from 'gitnexus-shared';
+import type { CaptureMatch } from 'yummygraph-shared';
 import { extractVueScript } from '../../vue-sfc-extractor.js';
 import { emitTsScopeCaptures } from '../typescript/captures.js';
 import { emitJsScopeCaptures } from '../javascript/captures.js';

@@ -5,18 +5,18 @@ import path from 'path';
 import { createRequire } from 'module';
 
 const _require = createRequire(import.meta.url);
-const gitnexusPkg = _require('../gitnexus/package.json');
+const yummygraphPkg = _require('../yummygraph/package.json');
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   define: {
-    __REQUIRED_NODE_VERSION__: JSON.stringify(gitnexusPkg.engines.node.replace(/[>=^~\s]/g, '')),
+    __REQUIRED_NODE_VERSION__: JSON.stringify(yummygraphPkg.engines.node.replace(/[>=^~\s]/g, '')),
   },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
       '@shared': path.resolve(__dirname, '../shared'),
-      'gitnexus-shared': path.resolve(__dirname, '../gitnexus-shared/src/index.ts'),
+      'yummygraph-shared': path.resolve(__dirname, '../yummygraph-shared/src/index.ts'),
       // Fix for Rollup failing to resolve this deep import from @langchain/anthropic
       '@anthropic-ai/sdk/lib/transform-json-schema': path.resolve(
         __dirname,

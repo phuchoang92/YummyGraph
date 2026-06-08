@@ -40,7 +40,7 @@
  * by scanning parent context (destructured vs. namespace) of `call_expression`
  * nodes whose callee is the identifier `require`.
  *
- * Grammar version: `tree-sitter-javascript` pinned in gitnexus/package.json.
+ * Grammar version: `tree-sitter-javascript` pinned in yummygraph/package.json.
  *
  * Exposes lazy `Parser` and `Query` singletons so callers don't pay
  * tree-sitter init cost per file.

@@ -1,9 +1,9 @@
-import type { GraphNode, GraphRelationship, NodeLabel } from 'gitnexus-shared';
+import type { GraphNode, GraphRelationship, NodeLabel } from 'yummygraph-shared';
 import type { KnowledgeGraph } from '../graph/types.js';
 import { parseTruthyEnv } from './utils/env.js';
 
 const LOCAL_VALUE_LABELS = new Set<NodeLabel>(['Const', 'Variable', 'Static']);
-const KEEP_LOCAL_VALUE_SYMBOLS_ENV = 'GITNEXUS_KEEP_LOCAL_VALUE_SYMBOLS';
+const KEEP_LOCAL_VALUE_SYMBOLS_ENV = 'YUMMYGRAPH_KEEP_LOCAL_VALUE_SYMBOLS';
 
 export interface LocalSymbolPruneStats {
   candidateNodes: number;

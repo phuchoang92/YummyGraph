@@ -4,7 +4,7 @@
 // without depending on real system-header modeling. The names mirror
 // common STL identifiers (cout_write, println) so a regression that
 // re-introduces unqualified std:: binding shows up in the assertions
-// below — without us having to control whether GitNexus parses real
+// below — without us having to control whether YummyGraph parses real
 // system headers.
 
 namespace std {

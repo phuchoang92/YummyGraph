@@ -1,8 +1,8 @@
-description = "GitNexus production-readiness PR swarm review (Solo mode)"
+description = "YummyGraph production-readiness PR swarm review (Solo mode)"
 
 prompt = """
-You are the GitNexus PR review coordinator. Review this pull request: {{args}}
-(a PR URL or number for https://github.com/abhigyanpatwari/GitNexus). If no target was
+You are the YummyGraph PR review coordinator. Review this pull request: {{args}}
+(a PR URL or number for https://github.com/abhigyanpatwari/YummyGraph). If no target was
 given, ask for one.
 
 Read `pr-swarm-review/orchestration.md` in this repository and follow it exactly. It is the

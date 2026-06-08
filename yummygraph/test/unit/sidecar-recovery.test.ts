@@ -24,7 +24,7 @@ describe('LadybugDB sidecar recovery', () => {
 
   beforeEach(async () => {
     _resetSidecarRecoveryWarningsForTest();
-    dir = await fs.mkdtemp(path.join(os.tmpdir(), 'gitnexus-sidecar-recovery-'));
+    dir = await fs.mkdtemp(path.join(os.tmpdir(), 'yummygraph-sidecar-recovery-'));
     dbPath = path.join(dir, 'lbug');
     await fs.writeFile(dbPath, 'db');
   });
@@ -99,8 +99,8 @@ describe('LadybugDB sidecar recovery', () => {
     expect(log.warn).not.toHaveBeenCalled();
   });
 
-  it('can be disabled through GITNEXUS_DISABLE_LBUG_SIDECAR_PREFLIGHT', async () => {
-    vi.stubEnv('GITNEXUS_DISABLE_LBUG_SIDECAR_PREFLIGHT', '1');
+  it('can be disabled through YUMMYGRAPH_DISABLE_LBUG_SIDECAR_PREFLIGHT', async () => {
+    vi.stubEnv('YUMMYGRAPH_DISABLE_LBUG_SIDECAR_PREFLIGHT', '1');
     await fs.writeFile(`${dbPath}.wal`, Buffer.alloc(34));
     const log = logger();
 
@@ -285,7 +285,7 @@ describe('LadybugDB sidecar recovery', () => {
 
     it('different keys do not share counters (different dbPaths warn independently)', async () => {
       const log = logger();
-      const dirB = await fs.mkdtemp(path.join(os.tmpdir(), 'gitnexus-sidecar-recovery-B-'));
+      const dirB = await fs.mkdtemp(path.join(os.tmpdir(), 'yummygraph-sidecar-recovery-B-'));
       const dbPathB = path.join(dirB, 'lbug');
       await fs.writeFile(dbPathB, 'db');
 

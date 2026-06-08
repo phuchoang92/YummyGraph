@@ -1,9 +1,9 @@
 ---
-name: gitnexus-refactoring
+name: yummygraph-refactoring
 description: Plan safe refactors using blast radius and dependency mapping
 ---
 
-# Refactoring with GitNexus
+# Refactoring with YummyGraph
 
 ## When to Use
 - "Rename this function safely"
@@ -21,7 +21,7 @@ description: Plan safe refactors using blast radius and dependency mapping
 4. Plan update order: interfaces → implementations → callers → tests
 ```
 
-> If "Index is stale" → run `node .gitnexus/run.cjs analyze` in terminal.
+> If "Index is stale" → run `node .yummygraph/run.cjs analyze` in terminal.
 
 ## Checklists
 

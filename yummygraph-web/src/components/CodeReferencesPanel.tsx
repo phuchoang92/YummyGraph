@@ -14,7 +14,7 @@ import {
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { useAppState } from '../hooks/useAppState';
-import { type GraphNode, getSyntaxLanguageFromFilename } from 'gitnexus-shared';
+import { type GraphNode, getSyntaxLanguageFromFilename } from 'yummygraph-shared';
 import { NODE_COLORS } from '../lib/constants';
 import { readFile, type ReadFileResult } from '../services/backend-client';
 import { useTranslation } from 'react-i18next';
@@ -82,7 +82,7 @@ export const CodeReferencesPanel = ({ onFocusNode }: CodeReferencesPanelProps) =
 
   const [panelWidth, setPanelWidth] = useState<number>(() => {
     try {
-      const saved = window.localStorage.getItem('gitnexus.codePanelWidth');
+      const saved = window.localStorage.getItem('yummygraph.codePanelWidth');
       const parsed = saved ? parseInt(saved, 10) : NaN;
       if (!Number.isFinite(parsed)) return 560; // increased default
       return Math.max(420, Math.min(parsed, 900));
@@ -93,7 +93,7 @@ export const CodeReferencesPanel = ({ onFocusNode }: CodeReferencesPanelProps) =
 
   useEffect(() => {
     try {
-      window.localStorage.setItem('gitnexus.codePanelWidth', String(panelWidth));
+      window.localStorage.setItem('yummygraph.codePanelWidth', String(panelWidth));
     } catch {
       // ignore
     }

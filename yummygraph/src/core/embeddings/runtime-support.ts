@@ -54,15 +54,15 @@ export const getLocalEmbeddingRuntimeBlocker = (
       'darwin/x64 native binding, so the local embedding model cannot load here.',
       'ONNX_WEB_BACKEND=wasm does not help: the failure happens while importing',
       'the native runtime, before any backend can be selected. Forcing',
-      'GITNEXUS_EMBEDDING_DEVICE=wasm (or cpu) does not help either, for the same reason.',
+      'YUMMYGRAPH_EMBEDDING_DEVICE=wasm (or cpu) does not help either, for the same reason.',
       '',
       'Use one of these instead:',
       '  - Run analyze without --embeddings (all other indexing still works).',
-      '  - Point GITNEXUS_EMBEDDING_URL (with GITNEXUS_EMBEDDING_MODEL) at an',
+      '  - Point YUMMYGRAPH_EMBEDDING_URL (with YUMMYGRAPH_EMBEDDING_MODEL) at an',
       '    OpenAI-compatible /v1/embeddings endpoint to embed over HTTP.',
-      '  - Run GitNexus on Linux or in Docker, where the native binding ships.',
-      '  - Run GitNexus on Apple Silicon (darwin/arm64), which ships a binding.',
-      '  - Use a future GitNexus build that restores darwin/x64 ONNX support.',
+      '  - Run YummyGraph on Linux or in Docker, where the native binding ships.',
+      '  - Run YummyGraph on Apple Silicon (darwin/arm64), which ships a binding.',
+      '  - Use a future YummyGraph build that restores darwin/x64 ONNX support.',
     ].join('\n');
   }
 

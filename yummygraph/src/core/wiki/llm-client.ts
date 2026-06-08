@@ -1,5 +1,5 @@
 import { logger } from '../logger.js';
-import { CircuitOpenError, ResilientFetchExhaustedError, resilientFetch } from 'gitnexus-shared';
+import { CircuitOpenError, ResilientFetchExhaustedError, resilientFetch } from 'yummygraph-shared';
 /**
  * LLM Client for Wiki Generation
  *
@@ -45,7 +45,7 @@ export interface LLMResponse {
 
 /**
  * Resolve LLM configuration from env vars, saved config, and optional overrides.
- * Priority: overrides (CLI flags) > env vars > ~/.gitnexus/config.json > error
+ * Priority: overrides (CLI flags) > env vars > ~/.yummygraph/config.json > error
  *
  * If no API key is found, returns config with empty apiKey (caller should handle).
  */
@@ -71,7 +71,7 @@ export async function resolveLLMConfig(overrides?: Partial<LLMConfig>): Promise<
 
   const apiKey =
     overrides?.apiKey ||
-    process.env.GITNEXUS_API_KEY ||
+    process.env.YUMMYGRAPH_API_KEY ||
     process.env.OPENAI_API_KEY ||
     savedConfig.apiKey ||
     '';
@@ -80,19 +80,19 @@ export async function resolveLLMConfig(overrides?: Partial<LLMConfig>): Promise<
     apiKey,
     baseUrl:
       overrides?.baseUrl ||
-      process.env.GITNEXUS_LLM_BASE_URL ||
+      process.env.YUMMYGRAPH_LLM_BASE_URL ||
       savedConfig.baseUrl ||
       'https://openrouter.ai/api/v1',
     model:
       overrides?.model ||
-      (localProvider ? undefined : process.env.GITNEXUS_MODEL) ||
+      (localProvider ? undefined : process.env.YUMMYGRAPH_MODEL) ||
       savedLocalModel ||
       (localProvider ? '' : savedConfig.model || 'minimax/minimax-m2.5'),
     maxTokens: overrides?.maxTokens ?? 16_384,
     temperature: overrides?.temperature ?? 0,
     provider: savedProvider ?? 'openai',
     apiVersion:
-      overrides?.apiVersion || process.env.GITNEXUS_AZURE_API_VERSION || savedConfig.apiVersion,
+      overrides?.apiVersion || process.env.YUMMYGRAPH_AZURE_API_VERSION || savedConfig.apiVersion,
     isReasoningModel: overrides?.isReasoningModel ?? savedConfig.isReasoningModel,
   };
 }
@@ -226,7 +226,7 @@ export async function callLLM(
   // Warn when using Azure legacy deployment URL without api-version
   if (azure && !config.apiVersion && config.baseUrl.includes('/deployments/')) {
     logger.warn(
-      '[gitnexus] Warning: Azure legacy deployment URL detected but no api-version set. Add --api-version 2024-10-21 or use the v1 API format.',
+      '[yummygraph] Warning: Azure legacy deployment URL detected but no api-version set. Add --api-version 2024-10-21 or use the v1 API format.',
     );
   }
 

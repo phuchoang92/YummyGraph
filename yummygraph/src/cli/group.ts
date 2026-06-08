@@ -1,4 +1,4 @@
-// gitnexus/src/cli/group.ts
+// yummygraph/src/cli/group.ts
 import { createRequire } from 'node:module';
 import type { Command } from 'commander';
 import { logger } from '../core/logger.js';
@@ -16,10 +16,10 @@ export function registerGroupCommands(program: Command): void {
     .description('Create a new group with template group.yaml')
     .option('--force', 'Overwrite existing group')
     .action(async (name: string, opts: { force?: boolean }) => {
-      const { createGroupDir, getDefaultGitnexusDir } = await import('../core/group/storage.js');
-      const dir = await createGroupDir(getDefaultGitnexusDir(), name, opts.force);
+      const { createGroupDir, getDefaultYummygraphDir } = await import('../core/group/storage.js');
+      const dir = await createGroupDir(getDefaultYummygraphDir(), name, opts.force);
       console.log(`Created group "${name}" at ${dir}`);
-      console.log('Edit group.yaml to add repos, then run: gitnexus group sync ' + name);
+      console.log('Edit group.yaml to add repos, then run: yummygraph group sync ' + name);
     });
 
   group
@@ -28,28 +28,28 @@ export function registerGroupCommands(program: Command): void {
       'Add a repo to a group. <groupPath> = hierarchy path (e.g. hr/hiring/backend), <registryName> = name from registry',
     )
     .action(async (groupName: string, groupPath: string, registryName: string) => {
-      const { getGroupDir, getDefaultGitnexusDir } = await import('../core/group/storage.js');
+      const { getGroupDir, getDefaultYummygraphDir } = await import('../core/group/storage.js');
       const { loadGroupConfig } = await import('../core/group/config-parser.js');
       const path = await import('node:path');
       const fs = await import('node:fs/promises');
-      const groupDir = getGroupDir(getDefaultGitnexusDir(), groupName);
+      const groupDir = getGroupDir(getDefaultYummygraphDir(), groupName);
       const config = await loadGroupConfig(groupDir);
       config.repos[groupPath] = registryName;
 
       await fs.writeFile(path.join(groupDir, 'group.yaml'), yaml.dump(config), 'utf-8');
       console.log(`Added ${registryName} as "${groupPath}" to group "${groupName}"`);
-      console.log(`Run: gitnexus group sync ${groupName}`);
+      console.log(`Run: yummygraph group sync ${groupName}`);
     });
 
   group
     .command('remove <group> <path>')
     .description('Remove a repo from a group')
     .action(async (groupName: string, repoPath: string) => {
-      const { getGroupDir, getDefaultGitnexusDir } = await import('../core/group/storage.js');
+      const { getGroupDir, getDefaultYummygraphDir } = await import('../core/group/storage.js');
       const { loadGroupConfig } = await import('../core/group/config-parser.js');
       const path = await import('node:path');
       const fs = await import('node:fs/promises');
-      const groupDir = getGroupDir(getDefaultGitnexusDir(), groupName);
+      const groupDir = getGroupDir(getDefaultYummygraphDir(), groupName);
       const config = await loadGroupConfig(groupDir);
       if (!(repoPath in config.repos)) {
         logger.error(`Repo path "${repoPath}" not found in group "${groupName}"`);
@@ -65,12 +65,12 @@ export function registerGroupCommands(program: Command): void {
     .command('list [name]')
     .description('List all groups or details of one')
     .action(async (name?: string) => {
-      const { listGroups, getDefaultGitnexusDir, getGroupDir } =
+      const { listGroups, getDefaultYummygraphDir, getGroupDir } =
         await import('../core/group/storage.js');
       if (!name) {
         const groups = await listGroups();
         if (groups.length === 0) {
-          console.log('No groups configured. Create one with: gitnexus group create <name>');
+          console.log('No groups configured. Create one with: yummygraph group create <name>');
           return;
         }
         console.log('Groups:');
@@ -78,7 +78,7 @@ export function registerGroupCommands(program: Command): void {
         return;
       }
       const { loadGroupConfig } = await import('../core/group/config-parser.js');
-      const groupDir = getGroupDir(getDefaultGitnexusDir(), name);
+      const groupDir = getGroupDir(getDefaultYummygraphDir(), name);
       const config = await loadGroupConfig(groupDir);
       console.log(`Group: ${config.name}`);
       if (config.description) console.log(`Description: ${config.description}`);
@@ -98,11 +98,11 @@ export function registerGroupCommands(program: Command): void {
     .command('status <name>')
     .description('Check staleness of group and repos')
     .action(async (name: string) => {
-      const { readContractRegistry, getGroupDir, getDefaultGitnexusDir } =
+      const { readContractRegistry, getGroupDir, getDefaultYummygraphDir } =
         await import('../core/group/storage.js');
       const { LocalBackend } = await import('../mcp/local/local-backend.js');
 
-      const groupDir = getGroupDir(getDefaultGitnexusDir(), name);
+      const groupDir = getGroupDir(getDefaultYummygraphDir(), name);
       const registry = await readContractRegistry(groupDir);
 
       console.log(
@@ -155,11 +155,11 @@ export function registerGroupCommands(program: Command): void {
     .option('--verbose', 'Show each cross-link detail')
     .option('--json', 'JSON output')
     .action(async (name: string, opts: Record<string, boolean | undefined>) => {
-      const { getGroupDir, getDefaultGitnexusDir } = await import('../core/group/storage.js');
+      const { getGroupDir, getDefaultYummygraphDir } = await import('../core/group/storage.js');
       const { loadGroupConfig } = await import('../core/group/config-parser.js');
       const { syncGroup } = await import('../core/group/sync.js');
 
-      const groupDir = getGroupDir(getDefaultGitnexusDir(), name);
+      const groupDir = getGroupDir(getDefaultYummygraphDir(), name);
       const config = await loadGroupConfig(groupDir);
 
       console.log(`Syncing group "${name}" (${Object.keys(config.repos).length} repos)...\n`);

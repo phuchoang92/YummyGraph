@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { NODE_TABLES, REL_TYPES } from 'gitnexus-shared';
+import { NODE_TABLES, REL_TYPES } from 'yummygraph-shared';
 
 // ---------------------------------------------------------------------------
 // Recreate the security guards locally so we can test the exact logic used in
 // production without exporting private helpers.
 //
 // Source locations:
-//   validLabel / validRelType  -- gitnexus-web/src/core/llm/tools.ts
-//   isSafeId                   -- gitnexus-web/src/components/ProcessesPanel.tsx
-//   readOnly guard (regex)     -- gitnexus-web/src/core/lbug/lbug-adapter.ts
+//   validLabel / validRelType  -- yummygraph-web/src/core/llm/tools.ts
+//   isSafeId                   -- yummygraph-web/src/components/ProcessesPanel.tsx
+//   readOnly guard (regex)     -- yummygraph-web/src/core/lbug/lbug-adapter.ts
 // ---------------------------------------------------------------------------
 
 const validLabel = (label: string): boolean => (NODE_TABLES as readonly string[]).includes(label);

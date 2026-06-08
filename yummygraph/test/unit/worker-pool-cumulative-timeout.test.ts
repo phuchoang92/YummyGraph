@@ -62,7 +62,7 @@ let tempDir: string;
 let workerUrl: URL;
 
 beforeEach(() => {
-  tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-worker-cumulative-timeout-'));
+  tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-worker-cumulative-timeout-'));
   const workerPath = path.join(tempDir, 'fake-worker.js');
   fs.writeFileSync(workerPath, '// fake');
   workerUrl = pathToFileURL(workerPath) as URL;

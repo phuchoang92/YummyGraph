@@ -1,6 +1,6 @@
-// gitnexus/src/core/ingestion/method-types.ts
+// yummygraph/src/core/ingestion/method-types.ts
 
-import type { ParameterTypeClass, SupportedLanguages } from 'gitnexus-shared';
+import type { ParameterTypeClass, SupportedLanguages } from 'yummygraph-shared';
 import type { FieldVisibility } from './field-types.js';
 import type { SyntaxNode } from './utils/ast-helpers.js';
 
@@ -62,7 +62,7 @@ export interface MethodExtractor {
   extractFunctionName?(
     node: SyntaxNode,
     filePath?: string,
-  ): { funcName: string | null; label: import('gitnexus-shared').NodeLabel } | null;
+  ): { funcName: string | null; label: import('yummygraph-shared').NodeLabel } | null;
 }
 
 export interface MethodExtractionConfig {
@@ -100,5 +100,5 @@ export interface MethodExtractionConfig {
   extractFunctionName?: (
     node: SyntaxNode,
     filePath?: string,
-  ) => { funcName: string | null; label: import('gitnexus-shared').NodeLabel } | null;
+  ) => { funcName: string | null; label: import('yummygraph-shared').NodeLabel } | null;
 }

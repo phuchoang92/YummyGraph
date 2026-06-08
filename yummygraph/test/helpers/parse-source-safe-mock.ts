@@ -2,7 +2,7 @@ import { vi } from 'vitest';
 import type * as SafeParseModule from '../../src/core/tree-sitter/safe-parse.js';
 
 /**
- * Build a vitest mock module for `gitnexus/src/core/tree-sitter/safe-parse.ts`
+ * Build a vitest mock module for `yummygraph/src/core/tree-sitter/safe-parse.ts`
  * that spies on `parseSourceSafe` while still delegating to the real
  * implementation.
  *

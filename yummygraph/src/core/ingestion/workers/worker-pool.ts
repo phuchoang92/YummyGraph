@@ -289,10 +289,10 @@ export class WorkerPoolInitializationError extends WorkerPoolDispatchError {
 }
 
 /**
- * Thrown when a caller asks GitNexus to parse without the worker pool —
- * `--workers 0`, `GITNEXUS_WORKER_POOL_SIZE=0`, or `skipWorkers: true`.
+ * Thrown when a caller asks YummyGraph to parse without the worker pool —
+ * `--workers 0`, `YUMMYGRAPH_WORKER_POOL_SIZE=0`, or `skipWorkers: true`.
  *
- * GitNexus no longer has a sequential parser: the worker pool (with its
+ * YummyGraph no longer has a sequential parser: the worker pool (with its
  * quarantine + respawn/recycle + circuit-breaker resilience) is the SOLE
  * parse path. These channels used to select an in-process fallback; they are
  * now hard configuration errors so the operator gets an actionable message
@@ -401,7 +401,7 @@ const WORKER_READY_TIMEOUT_MS = 5_000;
  * extraction / structured-clone overhead, and the marginal worker adds
  * memory pressure (tree-sitter state + sub-batch buffer) without much
  * throughput gain. Operators on bigger machines override via
- * `GITNEXUS_WORKER_POOL_SIZE` or `--workers <N>`.
+ * `YUMMYGRAPH_WORKER_POOL_SIZE` or `--workers <N>`.
  */
 const DEFAULT_POOL_SIZE_CAP = 16;
 
@@ -529,13 +529,13 @@ export function resolveWorkerPoolOptions(
 ): ResolvedWorkerPoolOptions {
   const subBatchIdleTimeoutMs =
     positiveInteger(options.subBatchIdleTimeoutMs) ??
-    positiveInteger(process.env.GITNEXUS_WORKER_SUB_BATCH_TIMEOUT_MS) ??
+    positiveInteger(process.env.YUMMYGRAPH_WORKER_SUB_BATCH_TIMEOUT_MS) ??
     DEFAULT_SUB_BATCH_IDLE_TIMEOUT_MS;
   return {
     subBatchSize: positiveInteger(options.subBatchSize) ?? SUB_BATCH_SIZE,
     subBatchMaxBytes:
       positiveInteger(options.subBatchMaxBytes) ??
-      positiveInteger(process.env.GITNEXUS_WORKER_SUB_BATCH_MAX_BYTES) ??
+      positiveInteger(process.env.YUMMYGRAPH_WORKER_SUB_BATCH_MAX_BYTES) ??
       SUB_BATCH_MAX_BYTES,
     subBatchIdleTimeoutMs,
     maxTimeoutRetries: nonNegativeInteger(options.maxTimeoutRetries) ?? DEFAULT_TIMEOUT_RETRIES,
@@ -543,37 +543,37 @@ export function resolveWorkerPoolOptions(
       positiveInteger(options.timeoutBackoffFactor) ?? DEFAULT_TIMEOUT_BACKOFF_FACTOR,
     maxRespawnsPerSlot:
       nonNegativeInteger(options.maxRespawnsPerSlot) ??
-      nonNegativeInteger(process.env.GITNEXUS_WORKER_MAX_RESPAWNS_PER_SLOT) ??
+      nonNegativeInteger(process.env.YUMMYGRAPH_WORKER_MAX_RESPAWNS_PER_SLOT) ??
       DEFAULT_MAX_RESPAWNS_PER_SLOT,
     maxCumulativeTimeoutMs:
       positiveInteger(options.maxCumulativeTimeoutMs) ??
-      positiveInteger(process.env.GITNEXUS_WORKER_MAX_CUMULATIVE_TIMEOUT_MS) ??
+      positiveInteger(process.env.YUMMYGRAPH_WORKER_MAX_CUMULATIVE_TIMEOUT_MS) ??
       subBatchIdleTimeoutMs * DEFAULT_MAX_CUMULATIVE_TIMEOUT_FACTOR,
     consecutiveFailureThreshold:
       positiveInteger(options.consecutiveFailureThreshold) ??
-      positiveInteger(process.env.GITNEXUS_WORKER_CONSECUTIVE_FAILURE_THRESHOLD) ??
+      positiveInteger(process.env.YUMMYGRAPH_WORKER_CONSECUTIVE_FAILURE_THRESHOLD) ??
       Math.max(DEFAULT_CONSECUTIVE_FAILURE_THRESHOLD_FLOOR, poolSize ?? 0),
   };
 }
 
 /**
- * The pool size requested via the `GITNEXUS_WORKER_POOL_SIZE` env var, or
+ * The pool size requested via the `YUMMYGRAPH_WORKER_POOL_SIZE` env var, or
  * `undefined` when unset, empty/whitespace, or invalid. Module-internal sizing
  * reader consumed by {@link resolveAutoPoolSize} (the env override) and
  * {@link workerPoolDisabledByEnv} (the disabled-channel check). Reads only —
  * never mutates `process.env`. Empty/whitespace is treated as *unset* (falls
  * through to the auto formula), not as 0 — an empty assignment (`export
- * GITNEXUS_WORKER_POOL_SIZE=`) is an accident, not a request for zero workers;
+ * YUMMYGRAPH_WORKER_POOL_SIZE=`) is an accident, not a request for zero workers;
  * only a literal `0` disables the pool.
  */
 function envWorkerPoolSize(): number | undefined {
-  const raw = process.env.GITNEXUS_WORKER_POOL_SIZE;
+  const raw = process.env.YUMMYGRAPH_WORKER_POOL_SIZE;
   if (raw === undefined || raw.trim() === '') return undefined;
   return nonNegativeInteger(raw);
 }
 
 /**
- * True when the operator set `GITNEXUS_WORKER_POOL_SIZE=0` — the env-channel
+ * True when the operator set `YUMMYGRAPH_WORKER_POOL_SIZE=0` — the env-channel
  * equivalent of `--workers 0`. The parse phase consults this (only when no
  * explicit `--workers <N>` was passed) and HARD-ERRORS: sequential parsing was
  * removed, so a disabled pool is an actionable configuration error, not a
@@ -587,7 +587,7 @@ export function workerPoolDisabledByEnv(): boolean {
  * Resolve the auto-default worker pool size when no explicit `poolSize`
  * arg is passed to `createWorkerPool`. Precedence:
  *
- * 1. `GITNEXUS_WORKER_POOL_SIZE` env var (operator override).
+ * 1. `YUMMYGRAPH_WORKER_POOL_SIZE` env var (operator override).
  * 2. `os.cpus().length - 1`, clamped to `[1, DEFAULT_POOL_SIZE_CAP]`.
  *
  * The cap exists because past ~16 workers the main-thread merge /

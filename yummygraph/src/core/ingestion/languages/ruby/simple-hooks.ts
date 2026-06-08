@@ -6,7 +6,7 @@ import type {
   ScopeTree,
   TypeRef,
   NodeLabel,
-} from 'gitnexus-shared';
+} from 'yummygraph-shared';
 import type { SyntaxNode } from '../../utils/ast-helpers.js';
 
 export function rubyBindingScopeFor(

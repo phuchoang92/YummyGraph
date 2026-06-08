@@ -108,7 +108,7 @@ let workerUrl: URL;
 
 beforeEach(() => {
   nextActions = [];
-  tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-quarantine-paths-'));
+  tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-quarantine-paths-'));
   const workerPath = path.join(tempDir, 'fake-worker.js');
   fs.writeFileSync(workerPath, '// fake');
   workerUrl = pathToFileURL(workerPath) as URL;

@@ -771,7 +771,7 @@ function findExportByName(
   // for them today; future languages get the same correctness
   // guarantee for free if they ever do.
   //
-  // See `gitnexus/test/integration/resolvers/typescript-hof-callbacks.test.ts`
+  // See `yummygraph/test/integration/resolvers/typescript-hof-callbacks.test.ts`
   // for the cross-file regression this rule prevents.
   let fallback: SymbolDefinition | undefined;
   for (const d of defs) {

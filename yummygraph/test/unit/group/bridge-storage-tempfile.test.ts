@@ -37,7 +37,7 @@ let tmpRoot: string;
 let groupDir: string;
 
 beforeAll(async () => {
-  tmpRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'gitnexus-u6-'));
+  tmpRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'yummygraph-u6-'));
   groupDir = path.join(tmpRoot, 'fixture-group');
   await fs.mkdir(groupDir, { recursive: true });
 });

@@ -66,7 +66,7 @@ let workerUrl: URL;
 let stderrSpy: ReturnType<typeof vi.spyOn>;
 
 beforeEach(() => {
-  tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-worker-startup-stderr-'));
+  tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-worker-startup-stderr-'));
   const workerPath = path.join(tempDir, 'fake-worker.js');
   fs.writeFileSync(workerPath, '// fake');
   workerUrl = pathToFileURL(workerPath) as URL;

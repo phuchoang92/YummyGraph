@@ -7,7 +7,7 @@
  * - installAntigravityHooks: writes ~/.gemini/settings.json with an
  *   AfterTool entry under the canonical Gemini CLI / Antigravity 2.0 layout
  *   (https://geminicli.com/docs/hooks/reference/); copies the adapter and
- *   lock helpers to ~/.gemini/config/hooks/gitnexus/; idempotent across
+ *   lock helpers to ~/.gemini/config/hooks/yummygraph/; idempotent across
  *   re-runs; preserves existing user hooks ("polite neighbor").
  * - installAntigravitySkills: lays out skills under ~/.gemini/antigravity/skills/.
  * - hook adapter: AfterTool emits `{hookSpecificOutput.additionalContext}`
@@ -24,7 +24,7 @@ import { createRequire } from 'module';
 
 const PKG_VERSION = (createRequire(import.meta.url)('../../package.json') as { version: string })
   .version;
-const NPX_REF = `gitnexus@${PKG_VERSION}`;
+const NPX_REF = `yummygraph@${PKG_VERSION}`;
 
 // vi.hoisted lets the mock factory below (which is hoisted by Vitest) see
 // these vi.fn instances. Plain top-level consts would be unreachable at
@@ -107,7 +107,7 @@ describe('setupAntigravity', () => {
     );
     const config = JSON.parse(raw);
 
-    expect(config.mcpServers.gitnexus).toEqual({
+    expect(config.mcpServers.yummygraph).toEqual({
       command: 'npx',
       args: ['-y', NPX_REF, 'mcp'],
     });
@@ -125,7 +125,7 @@ describe('setupAntigravity', () => {
     );
     const config = JSON.parse(raw);
 
-    expect(config.mcpServers.gitnexus).toEqual({
+    expect(config.mcpServers.yummygraph).toEqual({
       command: 'cmd',
       args: ['/c', 'npx', '-y', NPX_REF, 'mcp'],
     });
@@ -159,7 +159,7 @@ describe('setupAntigravity', () => {
 
     expect(config.existingKey).toBe('keep-me');
     expect(config.mcpServers.other).toEqual({ command: 'foo' });
-    expect(config.mcpServers.gitnexus).toBeDefined();
+    expect(config.mcpServers.yummygraph).toBeDefined();
   });
 
   it('leaves a corrupt mcp_config.json untouched', async () => {
@@ -183,9 +183,9 @@ describe('setupAntigravity', () => {
 
     expect(config.hooks.AfterTool).toBeInstanceOf(Array);
     expect(config.hooks.AfterTool[0].matcher).toBe('search_file_content|glob|run_shell_command');
-    expect(config.hooks.AfterTool[0].hooks[0].command).toMatch(/gitnexus-antigravity-hook\.cjs/);
+    expect(config.hooks.AfterTool[0].hooks[0].command).toMatch(/yummygraph-antigravity-hook\.cjs/);
     expect(config.hooks.AfterTool[0].hooks[0].timeout).toBe(10000);
-    expect(config.hooks.AfterTool[0].hooks[0].name).toBe('gitnexus');
+    expect(config.hooks.AfterTool[0].hooks[0].name).toBe('yummygraph');
   });
 
   it('is idempotent — re-running setup does not duplicate hook entries', async () => {
@@ -230,16 +230,16 @@ describe('setupAntigravity', () => {
     expect(config.hooks.AfterTool).toHaveLength(2);
     expect(config.hooks.AfterTool[0].hooks[0].command).toBe('echo "user-hook"');
     // Our entry appended after, not replacing
-    expect(config.hooks.AfterTool[1].hooks[0].command).toMatch(/gitnexus-antigravity-hook\.cjs/);
+    expect(config.hooks.AfterTool[1].hooks[0].command).toMatch(/yummygraph-antigravity-hook\.cjs/);
   });
 
-  it('copies adapter + lock helpers to ~/.gemini/config/hooks/gitnexus/', async () => {
+  it('copies adapter + lock helpers to ~/.gemini/config/hooks/yummygraph/', async () => {
     const { setupCommand } = await import('../../src/cli/setup.js');
     await setupCommand();
 
-    const destDir = path.join(tempHome, '.gemini', 'config', 'hooks', 'gitnexus');
+    const destDir = path.join(tempHome, '.gemini', 'config', 'hooks', 'yummygraph');
     await expect(
-      fs.access(path.join(destDir, 'gitnexus-antigravity-hook.cjs')),
+      fs.access(path.join(destDir, 'yummygraph-antigravity-hook.cjs')),
     ).resolves.toBeUndefined();
     await expect(fs.access(path.join(destDir, 'hook-lock.cjs'))).resolves.toBeUndefined();
     await expect(fs.access(path.join(destDir, 'hook-db-lock-probe.cjs'))).resolves.toBeUndefined();
@@ -254,15 +254,15 @@ describe('setupAntigravity', () => {
   it('installs skills under ~/.gemini/antigravity/skills/<name>/SKILL.md', async () => {
     // Stage a fixture skills tree so the assertion does not depend on
     // installSkillsTo's __dirname resolution (which is brittle under
-    // Vitest on Windows). Production reads the real gitnexus/skills/ dir.
+    // Vitest on Windows). Production reads the real yummygraph/skills/ dir.
     const fixtureSkillsRoot = path.join(tempHome, 'fixture-skills');
     await fs.mkdir(fixtureSkillsRoot, { recursive: true });
     await fs.writeFile(
-      path.join(fixtureSkillsRoot, 'gitnexus-test.md'),
-      '---\nname: gitnexus-test\ndescription: fixture\n---\nbody\n',
+      path.join(fixtureSkillsRoot, 'yummygraph-test.md'),
+      '---\nname: yummygraph-test\ndescription: fixture\n---\nbody\n',
       'utf-8',
     );
-    process.env.GITNEXUS_TEST_SKILLS_ROOT = fixtureSkillsRoot;
+    process.env.YUMMYGRAPH_TEST_SKILLS_ROOT = fixtureSkillsRoot;
 
     try {
       const { setupCommand } = await import('../../src/cli/setup.js');
@@ -272,12 +272,12 @@ describe('setupAntigravity', () => {
       const entries = await fs.readdir(skillsDir, { withFileTypes: true });
       const skillDirs = entries.filter((e) => e.isDirectory()).map((e) => e.name);
 
-      expect(skillDirs).toContain('gitnexus-test');
+      expect(skillDirs).toContain('yummygraph-test');
       await expect(
-        fs.access(path.join(skillsDir, 'gitnexus-test', 'SKILL.md')),
+        fs.access(path.join(skillsDir, 'yummygraph-test', 'SKILL.md')),
       ).resolves.toBeUndefined();
     } finally {
-      delete process.env.GITNEXUS_TEST_SKILLS_ROOT;
+      delete process.env.YUMMYGRAPH_TEST_SKILLS_ROOT;
     }
   });
 });
@@ -292,7 +292,7 @@ const ADAPTER_SRC = path.join(
   PROJECT_ROOT,
   'hooks',
   'antigravity',
-  'gitnexus-antigravity-hook.cjs',
+  'yummygraph-antigravity-hook.cjs',
 );
 const LOCK_SRC = path.join(PROJECT_ROOT, 'hooks', 'claude', 'hook-lock.cjs');
 const PROBE_SRC = path.join(PROJECT_ROOT, 'hooks', 'claude', 'hook-db-lock-probe.cjs');
@@ -301,7 +301,7 @@ const RESOLVE_SRC = path.join(PROJECT_ROOT, 'hooks', 'claude', 'resolve-analyze-
 
 async function stageAdapter(): Promise<string> {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'gn-antigravity-adapter-'));
-  await fs.copyFile(ADAPTER_SRC, path.join(tmp, 'gitnexus-antigravity-hook.cjs'));
+  await fs.copyFile(ADAPTER_SRC, path.join(tmp, 'yummygraph-antigravity-hook.cjs'));
   await fs.copyFile(LOCK_SRC, path.join(tmp, 'hook-lock.cjs'));
   await fs.copyFile(PROBE_SRC, path.join(tmp, 'hook-db-lock-probe.cjs'));
   // hook-db-lock-probe.cjs loads this PowerShell script on Windows; without it,
@@ -311,7 +311,7 @@ async function stageAdapter(): Promise<string> {
   // The adapter top-level `require('./resolve-analyze-cmd.cjs')`s this helper;
   // without staging it the spawned adapter crashes with MODULE_NOT_FOUND.
   await fs.copyFile(RESOLVE_SRC, path.join(tmp, 'resolve-analyze-cmd.cjs'));
-  return path.join(tmp, 'gitnexus-antigravity-hook.cjs');
+  return path.join(tmp, 'yummygraph-antigravity-hook.cjs');
 }
 
 function runAdapter(
@@ -339,7 +339,7 @@ function expectAdapterLoaded(stderr: string, status: number | null): void {
   expect(stderr).not.toMatch(/MODULE_NOT_FOUND|Cannot find module/);
 }
 
-describe('gitnexus-antigravity-hook adapter', () => {
+describe('yummygraph-antigravity-hook adapter', () => {
   let adapter: string;
   let workdir: string;
 
@@ -353,7 +353,7 @@ describe('gitnexus-antigravity-hook adapter', () => {
     await fs.rm(workdir, { recursive: true, force: true });
   });
 
-  it('AfterTool with no .gitnexus/ produces no stdout', async () => {
+  it('AfterTool with no .yummygraph/ produces no stdout', async () => {
     const { stdout, stderr, status } = runAdapter(
       adapter,
       {
@@ -382,12 +382,12 @@ describe('gitnexus-antigravity-hook adapter', () => {
       workdir,
     );
     expect(stdout.trim()).toBe('');
-    expect(stderr).not.toMatch(/\[GitNexus\]/);
+    expect(stderr).not.toMatch(/\[YummyGraph\]/);
     expectAdapterLoaded(stderr, status);
   });
 
   it('AfterTool ignores non-git run_shell_command silently', async () => {
-    const gnDir = path.join(workdir, '.gitnexus');
+    const gnDir = path.join(workdir, '.yummygraph');
     await fs.mkdir(gnDir, { recursive: true });
     await fs.writeFile(
       path.join(gnDir, 'meta.json'),
@@ -407,12 +407,12 @@ describe('gitnexus-antigravity-hook adapter', () => {
       workdir,
     );
     expect(stdout.trim()).toBe('');
-    expect(stderr).not.toMatch(/\[GitNexus\]/);
+    expect(stderr).not.toMatch(/\[YummyGraph\]/);
     expectAdapterLoaded(stderr, status);
   });
 
   it('AfterTool emits stale-index hint after a successful git commit', async () => {
-    // Initialize a git repo and a stale .gitnexus/meta.json.
+    // Initialize a git repo and a stale .yummygraph/meta.json.
     spawnSync('git', ['init', '-q'], { cwd: workdir });
     spawnSync('git', ['config', 'user.email', 'test@example.com'], { cwd: workdir });
     spawnSync('git', ['config', 'user.name', 'Test'], { cwd: workdir });
@@ -420,7 +420,7 @@ describe('gitnexus-antigravity-hook adapter', () => {
     spawnSync('git', ['add', '.'], { cwd: workdir });
     spawnSync('git', ['commit', '-q', '-m', 'init'], { cwd: workdir });
 
-    const gnDir = path.join(workdir, '.gitnexus');
+    const gnDir = path.join(workdir, '.yummygraph');
     await fs.mkdir(gnDir, { recursive: true });
     await fs.writeFile(
       path.join(gnDir, 'meta.json'),
@@ -439,14 +439,14 @@ describe('gitnexus-antigravity-hook adapter', () => {
       },
       workdir,
       // Force a deterministic invocation mode: the emitted analyze command
-      // varies by what's installed on each CI runner (gitnexus/pnpm/npx), and
-      // only the `gitnexus` mode yields the bare `gitnexus analyze` form.
-      { GITNEXUS_INVOCATION: 'gitnexus' },
+      // varies by what's installed on each CI runner (yummygraph/pnpm/npx), and
+      // only the `yummygraph` mode yields the bare `yummygraph analyze` form.
+      { YUMMYGRAPH_INVOCATION: 'yummygraph' },
     );
 
     // Hint surfaces both via the agent-visible channel and stderr (terminal).
-    expect(stderr).toMatch(/\[GitNexus\] index is stale/);
-    expect(stderr).toMatch(/gitnexus analyze/);
+    expect(stderr).toMatch(/\[YummyGraph\] index is stale/);
+    expect(stderr).toMatch(/yummygraph analyze/);
 
     const parsed = JSON.parse(stdout);
     expect(parsed.hookSpecificOutput.hookEventName).toBe('AfterTool');
@@ -454,7 +454,7 @@ describe('gitnexus-antigravity-hook adapter', () => {
   });
 
   it('AfterTool skips augment when the tool failed', async () => {
-    const gnDir = path.join(workdir, '.gitnexus');
+    const gnDir = path.join(workdir, '.yummygraph');
     await fs.mkdir(gnDir, { recursive: true });
     await fs.writeFile(
       path.join(gnDir, 'meta.json'),

@@ -136,7 +136,7 @@ describe('resolveLLMConfig', () => {
     vi.resetModules();
     tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'wiki-test-config-'));
     // Create empty config so loadCLIConfig returns {}
-    const configDir = path.join(tmpDir, '.gitnexus');
+    const configDir = path.join(tmpDir, '.yummygraph');
     await fs.mkdir(configDir, { recursive: true });
     await fs.writeFile(path.join(configDir, 'config.json'), JSON.stringify({}));
   });
@@ -273,31 +273,31 @@ describe('resolveLLMConfig', () => {
 // ─── --verbose flag ──────────────────────────────────────────────────
 
 describe('--verbose flag', () => {
-  const originalEnv = process.env.GITNEXUS_VERBOSE;
+  const originalEnv = process.env.YUMMYGRAPH_VERBOSE;
 
   afterEach(() => {
     if (originalEnv === undefined) {
-      delete process.env.GITNEXUS_VERBOSE;
+      delete process.env.YUMMYGRAPH_VERBOSE;
     } else {
-      process.env.GITNEXUS_VERBOSE = originalEnv;
+      process.env.YUMMYGRAPH_VERBOSE = originalEnv;
     }
   });
 
-  it('verboseLog writes to console when GITNEXUS_VERBOSE=1', async () => {
-    process.env.GITNEXUS_VERBOSE = '1';
+  it('verboseLog writes to console when YUMMYGRAPH_VERBOSE=1', async () => {
+    process.env.YUMMYGRAPH_VERBOSE = '1';
     const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
     // Import the module's isVerbose/verboseLog indirectly via detectCursorCLI's verbose path.
     // Instead, we test the isVerbose check directly since verboseLog is not exported.
     // The env var drives the behavior.
-    expect(process.env.GITNEXUS_VERBOSE).toBe('1');
+    expect(process.env.YUMMYGRAPH_VERBOSE).toBe('1');
 
     consoleSpy.mockRestore();
   });
 
-  it('verbose is off when GITNEXUS_VERBOSE is not set', () => {
-    delete process.env.GITNEXUS_VERBOSE;
-    expect(process.env.GITNEXUS_VERBOSE).toBeUndefined();
+  it('verbose is off when YUMMYGRAPH_VERBOSE is not set', () => {
+    delete process.env.YUMMYGRAPH_VERBOSE;
+    expect(process.env.YUMMYGRAPH_VERBOSE).toBeUndefined();
   });
 });
 
@@ -771,7 +771,7 @@ describe('CLI config round-trip with cursor provider', () => {
 
   beforeEach(async () => {
     tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'wiki-config-test-'));
-    const configDir = path.join(tmpDir, '.gitnexus');
+    const configDir = path.join(tmpDir, '.yummygraph');
     await fs.mkdir(configDir, { recursive: true });
     configPath = path.join(configDir, 'config.json');
   });

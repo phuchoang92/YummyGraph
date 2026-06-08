@@ -6,8 +6,8 @@
  * queries (TypeScript grammar has interface/type nodes), and language ID.
  */
 
-import { SupportedLanguages } from 'gitnexus-shared';
-import type { NodeLabel } from 'gitnexus-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
+import type { NodeLabel } from 'yummygraph-shared';
 import { defineLanguage } from '../language-provider.js';
 import type { AstFrameworkPatternConfig } from '../language-provider.js';
 import { createClassExtractor } from '../class-extractors/generic.js';

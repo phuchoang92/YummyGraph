@@ -4,7 +4,7 @@ using App.Other;
 namespace App.Services;
 
 // ============================================================================
-// Regression fixture for GitNexus issue #1066 (PR #1050 follow-up).
+// Regression fixture for YummyGraph issue #1066 (PR #1050 follow-up).
 //
 // This file is intentionally larger than the 32 KB tree-sitter default buffer.
 // The scope-resolution phase reparses the file on cache miss (worker mode

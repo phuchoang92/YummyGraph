@@ -67,9 +67,9 @@ describe('createLbugDatabase WAL replay option', () => {
     ['-1', -1],
     ['invalid', DEFAULT_THRESHOLD],
     ['', DEFAULT_THRESHOLD],
-  ])('respects GITNEXUS_WAL_CHECKPOINT_THRESHOLD=%s', (raw, expectedCheckpointThreshold) => {
+  ])('respects YUMMYGRAPH_WAL_CHECKPOINT_THRESHOLD=%s', (raw, expectedCheckpointThreshold) => {
     try {
-      vi.stubEnv('GITNEXUS_WAL_CHECKPOINT_THRESHOLD', raw);
+      vi.stubEnv('YUMMYGRAPH_WAL_CHECKPOINT_THRESHOLD', raw);
       const Database = vi.fn(function (this: any) {});
       const lbugModule = { Database } as any;
 
@@ -91,10 +91,10 @@ describe('createLbugDatabase WAL replay option', () => {
     }
   });
 
-  it('warns and falls back to default when GITNEXUS_WAL_CHECKPOINT_THRESHOLD is invalid', () => {
+  it('warns and falls back to default when YUMMYGRAPH_WAL_CHECKPOINT_THRESHOLD is invalid', () => {
     const cap = _captureLogger();
     try {
-      vi.stubEnv('GITNEXUS_WAL_CHECKPOINT_THRESHOLD', 'invalid');
+      vi.stubEnv('YUMMYGRAPH_WAL_CHECKPOINT_THRESHOLD', 'invalid');
       const Database = vi.fn(function (this: any) {});
       const lbugModule = { Database } as any;
 
@@ -105,7 +105,7 @@ describe('createLbugDatabase WAL replay option', () => {
         .find(
           (r) =>
             typeof r.msg === 'string' &&
-            r.msg.includes('Ignoring invalid GITNEXUS_WAL_CHECKPOINT_THRESHOLD'),
+            r.msg.includes('Ignoring invalid YUMMYGRAPH_WAL_CHECKPOINT_THRESHOLD'),
         );
       expect(warn).toBeDefined();
     } finally {
@@ -114,10 +114,10 @@ describe('createLbugDatabase WAL replay option', () => {
     }
   });
 
-  it('does NOT warn when GITNEXUS_WAL_CHECKPOINT_THRESHOLD is empty (treated as unset)', () => {
+  it('does NOT warn when YUMMYGRAPH_WAL_CHECKPOINT_THRESHOLD is empty (treated as unset)', () => {
     const cap = _captureLogger();
     try {
-      vi.stubEnv('GITNEXUS_WAL_CHECKPOINT_THRESHOLD', '');
+      vi.stubEnv('YUMMYGRAPH_WAL_CHECKPOINT_THRESHOLD', '');
       const Database = vi.fn(function (this: any) {});
       const lbugModule = { Database } as any;
 
@@ -128,7 +128,7 @@ describe('createLbugDatabase WAL replay option', () => {
         .find(
           (r) =>
             typeof r.msg === 'string' &&
-            r.msg.includes('Ignoring invalid GITNEXUS_WAL_CHECKPOINT_THRESHOLD'),
+            r.msg.includes('Ignoring invalid YUMMYGRAPH_WAL_CHECKPOINT_THRESHOLD'),
         );
       expect(warn).toBeUndefined();
     } finally {
@@ -165,11 +165,11 @@ describe('isLbugCheckpointIoError', () => {
   it.each([
     [
       'native rename failure (v0.16.x exact)',
-      'Runtime exception: IO exception: Error renaming file /repo/.gitnexus/lbug.wal to /repo/.gitnexus/lbug.wal.checkpoint. ErrorMessage: Permission denied',
+      'Runtime exception: IO exception: Error renaming file /repo/.yummygraph/lbug.wal to /repo/.yummygraph/lbug.wal.checkpoint. ErrorMessage: Permission denied',
     ],
     [
       'native remove failure (v0.16.x exact)',
-      'Runtime exception: IO exception: Error removing directory or file /repo/.gitnexus/lbug.wal.checkpoint.  Error Message: Permission denied',
+      'Runtime exception: IO exception: Error removing directory or file /repo/.yummygraph/lbug.wal.checkpoint.  Error Message: Permission denied',
     ],
   ])('matches strict %s', (_label, msg) => {
     expect(isLbugCheckpointIoError(msg)).toBe(true);
@@ -179,7 +179,7 @@ describe('isLbugCheckpointIoError', () => {
   it('matches permissive fallback for hypothetical message drift', () => {
     // Permissive matcher accepts any IO-exception-shaped message mentioning .wal.checkpoint.
     const drift =
-      'Some new wrapper preamble :: IO exception when finalizing /repo/.gitnexus/lbug.wal.checkpoint';
+      'Some new wrapper preamble :: IO exception when finalizing /repo/.yummygraph/lbug.wal.checkpoint';
     expect(isLbugCheckpointIoError(drift)).toBe(true);
   });
 

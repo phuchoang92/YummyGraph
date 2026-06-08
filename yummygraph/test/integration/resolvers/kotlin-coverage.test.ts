@@ -21,7 +21,7 @@ import Kotlin from 'tree-sitter-kotlin';
 import { emitKotlinScopeCaptures } from '../../../src/core/ingestion/languages/kotlin/captures.js';
 import { KOTLIN_QUERIES } from '../../../src/core/ingestion/tree-sitter-queries.js';
 import { FIXTURES, getRelationships, runPipelineFromRepo, type PipelineResult } from './helpers.js';
-import type { CaptureMatch } from 'gitnexus-shared';
+import type { CaptureMatch } from 'yummygraph-shared';
 
 // ---------------------------------------------------------------------------
 // F47 — callable references (scope layer)

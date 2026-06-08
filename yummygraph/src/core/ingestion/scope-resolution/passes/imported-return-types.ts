@@ -26,7 +26,7 @@
  *
  * collapses to `app.user → User` in a single pass instead of stopping
  * at the intermediate `getUser` ref. The motivating regression is the
- * `ts-simple` integration fixture (`gitnexus/test/fixtures/scope-
+ * `ts-simple` integration fixture (`yummygraph/test/fixtures/scope-
  * resolution/cross-file-binding/ts-simple/`), where `user.save()` and
  * `user.getName()` only resolve when the chain collapse happens
  * topologically.
@@ -39,7 +39,7 @@
  * scope-resolution generalization plan.
  */
 
-import type { ParsedFile, ScopeId, TypeRef } from 'gitnexus-shared';
+import type { ParsedFile, ScopeId, TypeRef } from 'yummygraph-shared';
 import type { ScopeResolutionIndexes } from '../../model/scope-resolution-indexes.js';
 import type { WorkspaceResolutionIndex } from '../workspace-index.js';
 import {

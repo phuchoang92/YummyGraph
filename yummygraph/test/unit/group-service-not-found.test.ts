@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const loadGroupConfigMock = vi.fn();
-const getGroupDirMock = vi.fn(() => '/fake/.gitnexus/groups/missing');
-const getDefaultGitnexusDirMock = vi.fn(() => '/fake/.gitnexus');
+const getGroupDirMock = vi.fn(() => '/fake/.yummygraph/groups/missing');
+const getDefaultYummygraphDirMock = vi.fn(() => '/fake/.yummygraph');
 const readContractRegistryMock = vi.fn(() => null);
 const listGroupsMock = vi.fn(() => []);
 const syncGroupMock = vi.fn();
@@ -15,7 +15,7 @@ vi.mock('../../src/core/group/config-parser.js', async () => {
 });
 
 vi.mock('../../src/core/group/storage.js', () => ({
-  getDefaultGitnexusDir: getDefaultGitnexusDirMock,
+  getDefaultYummygraphDir: getDefaultYummygraphDirMock,
   getGroupDir: getGroupDirMock,
   readContractRegistry: readContractRegistryMock,
   listGroups: listGroupsMock,

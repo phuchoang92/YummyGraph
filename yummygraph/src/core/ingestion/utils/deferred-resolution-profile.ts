@@ -3,8 +3,8 @@
  * (imports → heritage → heritage map → legacy call resolution).
  *
  * Enabled when either:
- *   - `GITNEXUS_VERBOSE=1` / `gitnexus analyze -v` (primary path for #1741), or
- *   - `GITNEXUS_PROFILE_DEFERRED=1` (force on without full verbose ingestion noise)
+ *   - `YUMMYGRAPH_VERBOSE=1` / `yummygraph analyze -v` (primary path for #1741), or
+ *   - `YUMMYGRAPH_PROFILE_DEFERRED=1` (force on without full verbose ingestion noise)
  *
  * Issue #1741: large Java/Kotlin repos appear stuck at "Resolving calls"
  * because the UI progress bar updates every 100 files and intermediate
@@ -24,12 +24,12 @@ const DEFAULT_SLOW_MS = 5_000;
 /**
  * Always-on (NOT gated on verbose/profile) threshold above which a single
  * file's deferred call resolution earns a `logger.warn`. The verbose
- * slow-file profile (above) only fires with `-v`/`GITNEXUS_PROFILE_DEFERRED`;
+ * slow-file profile (above) only fires with `-v`/`YUMMYGRAPH_PROFILE_DEFERRED`;
  * a plain `analyze` run that hangs in "Resolving calls" (the #1741 symptom)
  * gives the user a frozen progress bar and nothing in the log. This higher
  * default (15s — never hit by a healthy file) turns that silence into one
  * actionable line naming the expensive file. Override via
- * `GITNEXUS_SLOW_FILE_WARN_MS`; the throttle in the caller bounds volume.
+ * `YUMMYGRAPH_SLOW_FILE_WARN_MS`; the throttle in the caller bounds volume.
  */
 const DEFAULT_ALWAYS_ON_SLOW_FILE_WARN_MS = 15_000;
 /** Min wall-clock gap between always-on slow-file warnings (throttle). */
@@ -37,7 +37,7 @@ export const ALWAYS_ON_SLOW_FILE_WARN_THROTTLE_MS = 30_000;
 
 /** True when deferred-stage timing / progress logs should emit. */
 export const isDeferredResolutionProfileEnabled = (): boolean =>
-  isVerboseIngestionEnabled() || parseTruthyEnv(process.env.GITNEXUS_PROFILE_DEFERRED);
+  isVerboseIngestionEnabled() || parseTruthyEnv(process.env.YUMMYGRAPH_PROFILE_DEFERRED);
 
 /** Log a call-resolution progress line every N files (finer when verbose). */
 export const deferredCallLogEveryN = (): number =>
@@ -45,7 +45,7 @@ export const deferredCallLogEveryN = (): number =>
 
 /** Per-file call-resolution log threshold (ms). Lower default when verbose. */
 export const deferredCallFileSlowMs = (): number => {
-  const raw = process.env.GITNEXUS_PROFILE_DEFERRED_SLOW_MS;
+  const raw = process.env.YUMMYGRAPH_PROFILE_DEFERRED_SLOW_MS;
   if (raw) {
     // Use Number() not parseInt: parseInt('1e9', 10) === 1 (prefix-parses, drops the exponent),
     // which would turn a user-intended "effectively disabled" threshold into a 1 ms log storm.
@@ -60,10 +60,10 @@ export const deferredCallFileSlowMs = (): number => {
  * `processCallsFromExtracted`. Unlike {@link deferredCallFileSlowMs} this is
  * NOT gated on verbose/profile — it fires on every run. `0` (or a negative /
  * non-finite override) disables the watchdog entirely. Override via
- * `GITNEXUS_SLOW_FILE_WARN_MS`.
+ * `YUMMYGRAPH_SLOW_FILE_WARN_MS`.
  */
 export const alwaysOnSlowFileWarnMs = (): number => {
-  const raw = process.env.GITNEXUS_SLOW_FILE_WARN_MS;
+  const raw = process.env.YUMMYGRAPH_SLOW_FILE_WARN_MS;
   if (raw !== undefined) {
     const n = Number(raw);
     // 0 / negative / NaN → disabled. Use Number() not parseInt (see

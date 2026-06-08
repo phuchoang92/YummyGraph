@@ -107,28 +107,28 @@ describe('runCheckpointWithRetry — retry policy', () => {
 describe('isManualCheckpointEnabled — env var parsing', () => {
   let originalEnv: string | undefined;
   beforeEach(() => {
-    originalEnv = process.env.GITNEXUS_WAL_MANUAL_CHECKPOINT;
+    originalEnv = process.env.YUMMYGRAPH_WAL_MANUAL_CHECKPOINT;
   });
   afterEach(() => {
-    if (originalEnv === undefined) delete process.env.GITNEXUS_WAL_MANUAL_CHECKPOINT;
-    else process.env.GITNEXUS_WAL_MANUAL_CHECKPOINT = originalEnv;
+    if (originalEnv === undefined) delete process.env.YUMMYGRAPH_WAL_MANUAL_CHECKPOINT;
+    else process.env.YUMMYGRAPH_WAL_MANUAL_CHECKPOINT = originalEnv;
   });
 
   it('defaults to enabled when the env var is unset', () => {
-    delete process.env.GITNEXUS_WAL_MANUAL_CHECKPOINT;
+    delete process.env.YUMMYGRAPH_WAL_MANUAL_CHECKPOINT;
     expect(isManualCheckpointEnabled()).toBe(true);
   });
 
   it.each(['0', 'false', 'FALSE', 'off', 'no', ' 0 '])(
     'returns false for opt-out value %s',
     (value) => {
-      process.env.GITNEXUS_WAL_MANUAL_CHECKPOINT = value;
+      process.env.YUMMYGRAPH_WAL_MANUAL_CHECKPOINT = value;
       expect(isManualCheckpointEnabled()).toBe(false);
     },
   );
 
   it.each(['1', 'true', 'on', 'yes', ''])('returns true for non-opt-out value %s', (value) => {
-    process.env.GITNEXUS_WAL_MANUAL_CHECKPOINT = value;
+    process.env.YUMMYGRAPH_WAL_MANUAL_CHECKPOINT = value;
     expect(isManualCheckpointEnabled()).toBe(true);
   });
 });
@@ -136,22 +136,22 @@ describe('isManualCheckpointEnabled — env var parsing', () => {
 describe('startWalCheckpointDriver — lifecycle', () => {
   let originalEnv: string | undefined;
   beforeEach(() => {
-    originalEnv = process.env.GITNEXUS_WAL_MANUAL_CHECKPOINT;
+    originalEnv = process.env.YUMMYGRAPH_WAL_MANUAL_CHECKPOINT;
   });
   afterEach(() => {
-    if (originalEnv === undefined) delete process.env.GITNEXUS_WAL_MANUAL_CHECKPOINT;
-    else process.env.GITNEXUS_WAL_MANUAL_CHECKPOINT = originalEnv;
+    if (originalEnv === undefined) delete process.env.YUMMYGRAPH_WAL_MANUAL_CHECKPOINT;
+    else process.env.YUMMYGRAPH_WAL_MANUAL_CHECKPOINT = originalEnv;
   });
 
   it('returns a no-op handle when manual checkpoint is disabled', async () => {
-    process.env.GITNEXUS_WAL_MANUAL_CHECKPOINT = '0';
+    process.env.YUMMYGRAPH_WAL_MANUAL_CHECKPOINT = '0';
     const driver = startWalCheckpointDriver({ periodMs: 10 });
     // stop() must resolve cleanly even when no interval was scheduled.
     await expect(driver.stop()).resolves.toBeUndefined();
   });
 
   it('stop() is idempotent (second call resolves without throwing)', async () => {
-    process.env.GITNEXUS_WAL_MANUAL_CHECKPOINT = '0';
+    process.env.YUMMYGRAPH_WAL_MANUAL_CHECKPOINT = '0';
     const driver = startWalCheckpointDriver({ periodMs: 10 });
     await driver.stop();
     await expect(driver.stop()).resolves.toBeUndefined();

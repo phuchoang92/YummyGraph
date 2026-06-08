@@ -158,7 +158,7 @@ export type { PositionIndex } from './scope-resolution/position-index.js';
 
 // Resilient fetch primitives — bounded retries + per-process circuit breaker.
 // Test-only helpers (`__resetBreakerRegistry__`, `classifyOutcome`) are
-// reachable via the separate `gitnexus-shared/test-helpers` subpath; do
+// reachable via the separate `yummygraph-shared/test-helpers` subpath; do
 // NOT add them here. Production consumers must not call them.
 export { withRetry, computeBackoffMs } from './integrations/retry.js';
 export type { RetryOptions, RetryDecision } from './integrations/retry.js';

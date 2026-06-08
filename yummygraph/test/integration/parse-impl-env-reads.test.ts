@@ -3,7 +3,7 @@
  * in parse-impl.
  *
  * Pre-U14, `CHUNK_BYTE_BUDGET` was a module-load IIFE constant that
- * captured `GITNEXUS_CHUNK_BYTE_BUDGET` once and froze the value for
+ * captured `YUMMYGRAPH_CHUNK_BYTE_BUDGET` once and froze the value for
  * the module's lifetime. That defeated `PipelineOptions.chunkByteBudget`
  * (silently no-op'd because the body read the frozen constant) AND
  * forced tests to use `vi.resetModules` to vary the chunk layout (see
@@ -29,7 +29,7 @@ import path from 'node:path';
 import { runChunkedParseAndResolve } from '../../src/core/ingestion/pipeline-phases/parse-impl.js';
 import { createKnowledgeGraph } from '../../src/core/graph/graph.js';
 
-const ORIGINAL_BUDGET = process.env.GITNEXUS_CHUNK_BYTE_BUDGET;
+const ORIGINAL_BUDGET = process.env.YUMMYGRAPH_CHUNK_BYTE_BUDGET;
 
 type Fixture = Record<string, string>;
 
@@ -100,9 +100,9 @@ describe('parse-impl chunkByteBudget resolution (U14 / F7)', () => {
       fs.rmSync(repoPath, { recursive: true, force: true });
     }
     if (ORIGINAL_BUDGET === undefined) {
-      delete process.env.GITNEXUS_CHUNK_BYTE_BUDGET;
+      delete process.env.YUMMYGRAPH_CHUNK_BYTE_BUDGET;
     } else {
-      process.env.GITNEXUS_CHUNK_BYTE_BUDGET = ORIGINAL_BUDGET;
+      process.env.YUMMYGRAPH_CHUNK_BYTE_BUDGET = ORIGINAL_BUDGET;
     }
   });
 
@@ -110,15 +110,15 @@ describe('parse-impl chunkByteBudget resolution (U14 / F7)', () => {
     // Force the env to a HUGE value that would normally collapse the
     // fixture to a single chunk; pass a SMALL option that produces 3
     // chunks. If the option wins, we observe 3 chunks; if env wins, 1.
-    process.env.GITNEXUS_CHUNK_BYTE_BUDGET = String(10 * 1024 * 1024);
+    process.env.YUMMYGRAPH_CHUNK_BYTE_BUDGET = String(10 * 1024 * 1024);
     const chunks = await countChunksFromProgress(repoPath, ['a.ts', 'b.ts', 'c.ts'], {
       chunkByteBudget: 8,
     });
     expect(chunks).toBe(3);
   });
 
-  it('env-fallback: GITNEXUS_CHUNK_BYTE_BUDGET is honored when the option is absent', async () => {
-    process.env.GITNEXUS_CHUNK_BYTE_BUDGET = '8';
+  it('env-fallback: YUMMYGRAPH_CHUNK_BYTE_BUDGET is honored when the option is absent', async () => {
+    process.env.YUMMYGRAPH_CHUNK_BYTE_BUDGET = '8';
     const chunks = await countChunksFromProgress(repoPath, ['a.ts', 'b.ts', 'c.ts']);
     expect(chunks).toBe(3);
   });
@@ -126,7 +126,7 @@ describe('parse-impl chunkByteBudget resolution (U14 / F7)', () => {
   it('default-fallback: large built-in budget keeps the fixture in a single chunk', async () => {
     // Both option and env unset → falls through to DEFAULT_CHUNK_BYTE_BUDGET
     // (2 MB). The fixture totals well under that, so exactly one chunk.
-    delete process.env.GITNEXUS_CHUNK_BYTE_BUDGET;
+    delete process.env.YUMMYGRAPH_CHUNK_BYTE_BUDGET;
     const chunks = await countChunksFromProgress(repoPath, ['a.ts', 'b.ts', 'c.ts']);
     expect(chunks).toBe(1);
   });
@@ -138,7 +138,7 @@ describe('parse-impl chunkByteBudget resolution (U14 / F7)', () => {
     // not whatever the first call set (pre-U14, the module-load IIFE
     // froze the value at import — the option was a silent no-op).
     const files = ['a.ts', 'b.ts', 'c.ts'];
-    delete process.env.GITNEXUS_CHUNK_BYTE_BUDGET;
+    delete process.env.YUMMYGRAPH_CHUNK_BYTE_BUDGET;
     const small = await countChunksFromProgress(repoPath, files, {
       chunkByteBudget: 8,
     });

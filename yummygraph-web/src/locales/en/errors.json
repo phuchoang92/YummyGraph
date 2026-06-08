@@ -9,7 +9,7 @@
   "missingFolderPath": "Please enter a folder path.",
   "backend": {
     "reconnecting": "Server connection lost. Reconnecting…",
-    "network": "Unable to reach the GitNexus server. Make sure `gitnexus serve` is running.",
+    "network": "Unable to reach the YummyGraph server. Make sure `yummygraph serve` is running.",
     "timeout": "The server took too long to respond. Try again in a moment.",
     "rateLimited": "Too many requests. Try again in {{seconds}}s.",
     "notFound": "The requested repository or resource was not found.",

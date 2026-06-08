@@ -56,7 +56,7 @@ test.describe('language switching', () => {
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
     await expect(page.getByText('觉得不错就点星')).toBeVisible();
     await expect
-      .poll(() => page.evaluate(() => window.localStorage.getItem('gitnexus.lng')))
+      .poll(() => page.evaluate(() => window.localStorage.getItem('yummygraph.lng')))
       .toBe('zh-CN');
 
     await page.reload();

@@ -32,7 +32,7 @@ import crypto from 'crypto';
 import { emitSwiftScopeCaptures } from '../../../../src/core/ingestion/languages/swift/index.js';
 import { isLanguageAvailable } from '../../../../src/core/tree-sitter/parser-loader.js';
 import { SupportedLanguages } from '../../../../src/config/supported-languages.js';
-import type { CaptureMatch } from 'gitnexus-shared';
+import type { CaptureMatch } from 'yummygraph-shared';
 
 // Swift is an optional dependency; skip gracefully if the grammar isn't installed.
 const swiftAvailable = isLanguageAvailable(SupportedLanguages.Swift);

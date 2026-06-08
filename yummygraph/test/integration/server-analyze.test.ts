@@ -87,7 +87,7 @@ describe('server-side analyze integration', () => {
     expect(extractRepoName('https://github.com/facebook/react.git')).toBe('react');
     expect(extractRepoName('git@github.com:microsoft/vscode.git')).toBe('vscode');
     const dir = getCloneDir('react');
-    expect(dir).toMatch(/\.gitnexus/);
+    expect(dir).toMatch(/\.yummygraph/);
     expect(dir).toMatch(/repos/);
     expect(dir).toContain('react');
   });

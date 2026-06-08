@@ -1,4 +1,4 @@
-import { makeScopeId, type Capture, type CaptureMatch } from 'gitnexus-shared';
+import { makeScopeId, type Capture, type CaptureMatch } from 'yummygraph-shared';
 import {
   nodeIfType,
   nodeToCapture,

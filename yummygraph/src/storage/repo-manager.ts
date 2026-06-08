@@ -1,8 +1,8 @@
 /**
  * Repository Manager
  *
- * Manages GitNexus index storage in .gitnexus/ at repo root.
- * Also maintains a global registry at ~/.gitnexus/registry.json
+ * Manages YummyGraph index storage in .yummygraph/ at repo root.
+ * Also maintains a global registry at ~/.yummygraph/registry.json
  * so the MCP server can discover indexed repos from any cwd.
  */
 
@@ -30,7 +30,7 @@ import { logger } from '../core/logger.js';
  *     both sides to the long-name canonical path.
  *
  * Fallback behaviour: if the path does not exist on disk (e.g. a user
- * passed `gitnexus remove some-alias` and the alias misses every
+ * passed `yummygraph remove some-alias` and the alias misses every
  * registry entry, or the caller is resolving a path that was deleted
  * after registration), we return `path.resolve(p)` rather than
  * throwing. This preserves the idempotent-on-missing semantics of
@@ -115,7 +115,7 @@ export interface IndexedRepo {
 }
 
 /**
- * Shape of an entry in the global registry (~/.gitnexus/registry.json)
+ * Shape of an entry in the global registry (~/.yummygraph/registry.json)
  */
 export interface RegistryEntry {
   name: string;
@@ -128,16 +128,16 @@ export interface RegistryEntry {
   stats?: RepoMeta['stats'];
 }
 
-const GITNEXUS_DIR = '.gitnexus';
-const GITNEXUS_EXCLUDE_ENTRY = `${GITNEXUS_DIR}/`;
+const YUMMYGRAPH_DIR = '.yummygraph';
+const YUMMYGRAPH_EXCLUDE_ENTRY = `${YUMMYGRAPH_DIR}/`;
 
 // ─── Local Storage Helpers ─────────────────────────────────────────────
 
 /**
- * Get the .gitnexus storage path for a repository
+ * Get the .yummygraph storage path for a repository
  */
 export const getStoragePath = (repoPath: string): string => {
-  return path.join(path.resolve(repoPath), GITNEXUS_DIR);
+  return path.join(path.resolve(repoPath), YUMMYGRAPH_DIR);
 };
 
 /**
@@ -169,7 +169,7 @@ export const hasKuzuIndex = async (storagePath: string): Promise<boolean> => {
  * Clean up stale KuzuDB files after migration to LadybugDB.
  *
  * Returns:
- *   found        — true if .gitnexus/kuzu existed and was deleted
+ *   found        — true if .yummygraph/kuzu existed and was deleted
  *   needsReindex — true if kuzu existed but lbug does not (re-analyze required)
  *
  * Callers own the user-facing messaging; this function only deletes files.
@@ -239,7 +239,7 @@ export const saveMeta = async (storagePath: string, meta: RepoMeta): Promise<voi
 };
 
 /**
- * Check if a path has a GitNexus index
+ * Check if a path has a YummyGraph index
  */
 export const hasIndex = async (repoPath: string): Promise<boolean> => {
   const { metaPath } = getStoragePaths(repoPath);
@@ -267,7 +267,7 @@ export const loadRepo = async (repoPath: string): Promise<IndexedRepo | null> =>
 };
 
 /**
- * Find .gitnexus by walking up from a starting path
+ * Find .yummygraph by walking up from a starting path
  */
 export const findRepo = async (startPath: string): Promise<IndexedRepo | null> => {
   let current = path.resolve(startPath);
@@ -290,7 +290,7 @@ function isReadOnlyFilesystemError(err: unknown): boolean {
 /**
  * Keep generated index files ignored without modifying the user's root .gitignore.
  */
-export const ensureGitNexusIgnored = async (repoPath: string): Promise<void> => {
+export const ensureYummyGraphIgnored = async (repoPath: string): Promise<void> => {
   const gitignorePath = path.join(getStoragePath(repoPath), '.gitignore');
   const desired = '*\n';
 
@@ -314,7 +314,7 @@ export const ensureGitNexusIgnored = async (repoPath: string): Promise<void> => 
     if (isReadOnlyFilesystemError(err)) {
       logger.warn(
         { path: gitignorePath, code: err.code },
-        'GitNexus storage filesystem is not writable; skipping .gitnexus/.gitignore. Generated files may appear as untracked in this repo locally.',
+        'YummyGraph storage filesystem is not writable; skipping .yummygraph/.gitignore. Generated files may appear as untracked in this repo locally.',
       );
     } else {
       throw err;
@@ -346,17 +346,17 @@ const ensureGitInfoExclude = async (repoPath: string): Promise<void> => {
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter((line) => line && !line.startsWith('#'));
-  if (excludes.includes(GITNEXUS_DIR) || excludes.includes(GITNEXUS_EXCLUDE_ENTRY)) return;
+  if (excludes.includes(YUMMYGRAPH_DIR) || excludes.includes(YUMMYGRAPH_EXCLUDE_ENTRY)) return;
 
   const separator = content.length === 0 || content.endsWith('\n') ? '' : '\n';
   try {
     await fs.mkdir(path.dirname(excludePath), { recursive: true });
-    await fs.writeFile(excludePath, `${content}${separator}${GITNEXUS_EXCLUDE_ENTRY}\n`, 'utf-8');
+    await fs.writeFile(excludePath, `${content}${separator}${YUMMYGRAPH_EXCLUDE_ENTRY}\n`, 'utf-8');
   } catch (err: any) {
     if (isReadOnlyFilesystemError(err)) {
       logger.warn(
         { path: excludePath, code: err.code },
-        'GitNexus storage filesystem is not writable; skipping .git/info/exclude update. .gitnexus/ may appear as untracked in `git status` locally.',
+        'YummyGraph storage filesystem is not writable; skipping .git/info/exclude update. .yummygraph/ may appear as untracked in `git status` locally.',
       );
     } else {
       throw err;
@@ -364,13 +364,13 @@ const ensureGitInfoExclude = async (repoPath: string): Promise<void> => {
   }
 };
 
-// ─── Global Registry (~/.gitnexus/registry.json) ───────────────────────
+// ─── Global Registry (~/.yummygraph/registry.json) ───────────────────────
 
 /**
- * Get the path to the global GitNexus directory
+ * Get the path to the global YummyGraph directory
  */
 export const getGlobalDir = (): string => {
-  return process.env.GITNEXUS_HOME || path.join(os.homedir(), '.gitnexus');
+  return process.env.YUMMYGRAPH_HOME || path.join(os.homedir(), '.yummygraph');
 };
 
 /**
@@ -490,7 +490,7 @@ const hasCustomAlias = (entry: RegistryEntry, inferredName: string | null): bool
 
 /**
  * Register (add or update) a repo in the global registry.
- * Called after `gitnexus analyze` completes.
+ * Called after `yummygraph analyze` completes.
  *
  * Name resolution precedence (#829, #979):
  *   1. explicit `opts.name` (from `analyze --name <alias>`)
@@ -619,7 +619,7 @@ export const registerRepo = async (
 
 /**
  * Remove a repo from the global registry.
- * Called after `gitnexus clean`.
+ * Called after `yummygraph clean`.
  */
 export const unregisterRepo = async (repoPath: string): Promise<void> => {
   // Canonicalise BOTH sides so an unregister call issued with the
@@ -688,11 +688,11 @@ export class RegistryAmbiguousTargetError extends Error {
 /**
  * Thrown by {@link assertAnalysisFinalized} when a successful `analyze`
  * run did not actually persist `meta.json` or did not register the repo
- * in `~/.gitnexus/registry.json` (#1169).
+ * in `~/.yummygraph/registry.json` (#1169).
  *
- * Why this exists: on Windows, `gitnexus analyze` has been observed to
+ * Why this exists: on Windows, `yummygraph analyze` has been observed to
  * exit cleanly (code 0) with `lbug.wal` written but no `meta.json`,
- * leaving the repo invisible to `gitnexus list`/`status` and downstream
+ * leaving the repo invisible to `yummygraph list`/`status` and downstream
  * MCP discovery. The only signal to the user was an empty banner —
  * which is indistinguishable from a no-op early return. This invariant
  * fails loudly with an actionable diagnostic so the silent-finalize bug
@@ -715,7 +715,7 @@ export class AnalysisNotFinalizedError extends Error {
     super(
       `Analysis did not finalize for ${repoPath}: ${detail}. ` +
         `The on-disk index is incomplete and was not registered. ` +
-        `Re-run "gitnexus analyze" — if the problem persists, inspect ` +
+        `Re-run "yummygraph analyze" — if the problem persists, inspect ` +
         `${storagePath} for a stale lbug.wal that signals an aborted write.`,
     );
     this.name = 'AnalysisNotFinalizedError';
@@ -726,7 +726,7 @@ export class AnalysisNotFinalizedError extends Error {
  * Verify that a successful `analyze` call actually produced an indexed,
  * registered repo on disk. Two checks, both strictly required:
  *
- *   1. `meta.json` must exist at `<repoPath>/.gitnexus/meta.json`.
+ *   1. `meta.json` must exist at `<repoPath>/.yummygraph/meta.json`.
  *   2. The global registry (`getGlobalRegistryPath()`) must contain an
  *      entry whose canonical path matches `repoPath`.
  *
@@ -765,10 +765,10 @@ export const assertAnalysisFinalized = async (repoPath: string): Promise<void> =
 
 /**
  * Thrown by {@link assertSafeStoragePath} when a registry entry's
- * `storagePath` does NOT point at the expected `<entry.path>/.gitnexus`
+ * `storagePath` does NOT point at the expected `<entry.path>/.yummygraph`
  * subfolder. CLI destructive commands (`remove`, `clean --all`) should
  * catch this and exit non-zero without deleting anything — the usual
- * cause is a corrupted or hand-edited `~/.gitnexus/registry.json`, and
+ * cause is a corrupted or hand-edited `~/.yummygraph/registry.json`, and
  * proceeding would mean `fs.rm(recursive: true)` on whatever odd path
  * the entry is pointing at.
  */
@@ -781,10 +781,10 @@ export class UnsafeStoragePathError extends Error {
   ) {
     super(
       `Refusing to remove storage path for safety: expected ` +
-        `"${expectedStoragePath}" under the repo's .gitnexus subfolder, ` +
+        `"${expectedStoragePath}" under the repo's .yummygraph subfolder, ` +
         `but the registry entry has "${actualStoragePath}". ` +
         `This usually means the registry entry is corrupted or was ` +
-        `hand-edited. Delete the entry manually from ~/.gitnexus/registry.json ` +
+        `hand-edited. Delete the entry manually from ~/.yummygraph/registry.json ` +
         `and re-run analyze.`,
     );
     this.name = 'UnsafeStoragePathError';
@@ -794,12 +794,12 @@ export class UnsafeStoragePathError extends Error {
 /**
  * Guard rail for destructive CLI paths (`remove` #664,
  * `clean --all` #258, future MCP `remove` tool): verify that a
- * registry entry's `storagePath` is the canonical `<repo>/.gitnexus`
+ * registry entry's `storagePath` is the canonical `<repo>/.yummygraph`
  * subfolder of its `path`. If not, throw {@link UnsafeStoragePathError}
  * so the caller exits without touching disk.
  *
  * Why this exists (#1003 review — @magyargergo):
- *   - `~/.gitnexus/registry.json` is a plain-text user-writable file.
+ *   - `~/.yummygraph/registry.json` is a plain-text user-writable file.
  *     A corrupted, hand-edited, or downgrade/upgrade-racing entry
  *     could plausibly end up with `storagePath === ""` (resolves to
  *     cwd), `storagePath === path` (the repo root!), `storagePath`
@@ -821,7 +821,7 @@ export class UnsafeStoragePathError extends Error {
  * comparison shape used elsewhere in this module.
  */
 export const assertSafeStoragePath = (entry: RegistryEntry): void => {
-  const expected = path.join(path.resolve(entry.path), '.gitnexus');
+  const expected = path.join(path.resolve(entry.path), '.yummygraph');
   const actual = path.resolve(entry.storagePath);
   const matches =
     process.platform === 'win32'
@@ -833,7 +833,7 @@ export const assertSafeStoragePath = (entry: RegistryEntry): void => {
 };
 
 /**
- * Resolve a user-supplied target string (from `gitnexus remove <target>`
+ * Resolve a user-supplied target string (from `yummygraph remove <target>`
  * or equivalent MCP tool argument) to a single registry entry.
  *
  * Match precedence (first hit wins, subsequent tiers are only tried if
@@ -853,7 +853,7 @@ export const assertSafeStoragePath = (entry: RegistryEntry): void => {
  * `entries` is passed in (rather than re-read) so callers that already
  * hold the registry snapshot (e.g. to print a "before" state) can avoid
  * a second disk read, and so tests can inject fixtures without touching
- * `GITNEXUS_HOME`.
+ * `YUMMYGRAPH_HOME`.
  */
 export const resolveRegistryEntry = (entries: RegistryEntry[], target: string): RegistryEntry => {
   // Tier 1: path match. Canonicalise BOTH sides so symlink and
@@ -900,7 +900,7 @@ export const resolveRegistryEntry = (entries: RegistryEntry[], target: string): 
 
 /**
  * List all registered repos from the global registry.
- * Optionally validates that each entry's .gitnexus/ still exists.
+ * Optionally validates that each entry's .yummygraph/ still exists.
  */
 export const listRegisteredRepos = async (opts?: {
   validate?: boolean;
@@ -908,7 +908,7 @@ export const listRegisteredRepos = async (opts?: {
   const entries = await readRegistry();
   if (!opts?.validate) return entries;
 
-  // Validate each entry still has a .gitnexus/ directory
+  // Validate each entry still has a .yummygraph/ directory
   const valid: RegistryEntry[] = [];
   for (const entry of entries) {
     try {
@@ -927,7 +927,7 @@ export const listRegisteredRepos = async (opts?: {
   return valid;
 };
 
-// ─── Global CLI Config (~/.gitnexus/config.json) ─────────────────────────
+// ─── Global CLI Config (~/.yummygraph/config.json) ─────────────────────────
 
 export interface CLIConfig {
   apiKey?: string;
@@ -960,7 +960,7 @@ export const getGlobalConfigPath = (): string => {
 };
 
 /**
- * Load CLI config from ~/.gitnexus/config.json
+ * Load CLI config from ~/.yummygraph/config.json
  */
 export const loadCLIConfig = async (): Promise<CLIConfig> => {
   try {
@@ -972,7 +972,7 @@ export const loadCLIConfig = async (): Promise<CLIConfig> => {
 };
 
 /**
- * Save CLI config to ~/.gitnexus/config.json
+ * Save CLI config to ~/.yummygraph/config.json
  */
 export const saveCLIConfig = async (config: CLIConfig): Promise<void> => {
   const dir = getGlobalDir();

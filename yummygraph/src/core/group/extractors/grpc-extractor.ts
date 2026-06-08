@@ -263,7 +263,7 @@ async function buildProtoContext(repoPath: string): Promise<{
 }> {
   const servicesByName = new Map<string, ProtoServiceInfo[]>();
   const servicesByJavaPackage = new Map<string, ProtoServiceInfo[]>();
-  // `.gitnexusignore` / `.gitignore` honoured via the shared IgnoreService —
+  // `.yummygraphignore` / `.gitignore` honoured via the shared IgnoreService —
   // see `filesystem-walker.ts` for the canonical pattern. Replaces a
   // hardcoded `[node_modules, .git, vendor]` array; those names plus the
   // rest of `DEFAULT_IGNORE_LIST` are still excluded by default (#1185).
@@ -457,7 +457,7 @@ export class GrpcExtractor implements ContractExtractor {
     }
 
     // ─── Source files (+ .proto when plugin available) ────────────
-    // Honour `.gitnexusignore` / `.gitignore` via the shared IgnoreService —
+    // Honour `.yummygraphignore` / `.gitignore` via the shared IgnoreService —
     // mirrors `filesystem-walker.ts`. Replaces a hardcoded
     // `[node_modules, .git, vendor, dist, build]` array; those names are all
     // in `DEFAULT_IGNORE_LIST`, so default behaviour is preserved (#1185).

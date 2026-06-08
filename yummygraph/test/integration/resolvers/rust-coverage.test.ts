@@ -3,7 +3,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { emitRustScopeCaptures } from '../../../src/core/ingestion/languages/rust/index.js';
-import type { CaptureMatch } from 'gitnexus-shared';
+import type { CaptureMatch } from 'yummygraph-shared';
 
 // ---------------------------------------------------------------------------
 // F66/F68 — let binding patterns (identifier-only, works with let mut x)

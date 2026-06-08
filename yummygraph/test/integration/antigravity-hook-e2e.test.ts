@@ -4,10 +4,10 @@
  * Runs the FULL install + execute flow: invokes the real `setupCommand()`
  * to lay down the Antigravity hook adapter + helpers + win-rm-list-json.ps1
  * into a temp HOME, then spawns the installed adapter as a real child
- * process against a temp git repo + .gitnexus/ directory.
+ * process against a temp git repo + .yummygraph/ directory.
  *
  * Why install-then-spawn rather than spawning the source adapter directly:
- * the source `hooks/antigravity/gitnexus-antigravity-hook.cjs` requires
+ * the source `hooks/antigravity/yummygraph-antigravity-hook.cjs` requires
  * sibling .cjs helpers (`./hook-lock.cjs`, `./hook-db-lock-probe.cjs`)
  * that only live in `hooks/claude/`. The adapter is designed to be COPIED
  * to its install location alongside those helpers — running it from its
@@ -25,7 +25,7 @@ import os from 'os';
 import {
   runHook,
   parseHookOutput,
-  createGitNexusPathEntry,
+  createYummyGraphPathEntry,
   envWithPath,
 } from '../utils/hook-test-helpers.js';
 import { setupCommand } from '../../src/cli/setup.js';
@@ -33,7 +33,7 @@ import { setupCommand } from '../../src/cli/setup.js';
 let tempHome: string;
 let installedHook: string;
 let tmpDir: string;
-let gitNexusDir: string;
+let yummyGraphDir: string;
 const originalHome = process.env.HOME;
 const originalUserProfile = process.env.USERPROFILE;
 
@@ -59,8 +59,8 @@ beforeAll(async () => {
     '.gemini',
     'config',
     'hooks',
-    'gitnexus',
-    'gitnexus-antigravity-hook.cjs',
+    'yummygraph',
+    'yummygraph-antigravity-hook.cjs',
   );
 
   // Sanity-check the install. If this fails every downstream test would
@@ -80,10 +80,10 @@ beforeAll(async () => {
     }
   }
 
-  // Set up a temp git repo with .gitnexus/ for staleness tests.
+  // Set up a temp git repo with .yummygraph/ for staleness tests.
   tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'antigravity-hook-e2e-repo-'));
-  gitNexusDir = path.join(tmpDir, '.gitnexus');
-  fs.mkdirSync(gitNexusDir, { recursive: true });
+  yummyGraphDir = path.join(tmpDir, '.yummygraph');
+  fs.mkdirSync(yummyGraphDir, { recursive: true });
   spawnSync('git', ['init'], { cwd: tmpDir, stdio: 'pipe' });
   spawnSync('git', ['config', 'user.email', 'test@test.com'], { cwd: tmpDir, stdio: 'pipe' });
   spawnSync('git', ['config', 'user.name', 'Test'], { cwd: tmpDir, stdio: 'pipe' });
@@ -103,7 +103,7 @@ describe('antigravity hook adapter e2e', () => {
   describe('AfterTool — stale-index hint after git mutations', () => {
     it('emits the hint via both additionalContext and stderr after a successful git commit', () => {
       fs.writeFileSync(
-        path.join(gitNexusDir, 'meta.json'),
+        path.join(yummyGraphDir, 'meta.json'),
         JSON.stringify({ lastCommit: 'a'.repeat(40), stats: {} }),
       );
 
@@ -117,30 +117,30 @@ describe('antigravity hook adapter e2e', () => {
           cwd: tmpDir,
         },
         tmpDir,
-        { env: { ...process.env, GITNEXUS_INVOCATION: 'npx' } },
+        { env: { ...process.env, YUMMYGRAPH_INVOCATION: 'npx' } },
       );
 
       const output = parseHookOutput(result.stdout);
       expect(output).not.toBeNull();
       expect(output!.hookEventName).toBe('AfterTool');
       expect(output!.additionalContext).toContain('index is stale');
-      expect(output!.additionalContext).toContain('npx gitnexus@latest analyze');
+      expect(output!.additionalContext).toContain('npx yummygraph@latest analyze');
 
       // Mirror to stderr so terminal users see the hint even when the agent
       // discards additionalContext
-      expect(result.stderr).toContain('[GitNexus] index is stale');
+      expect(result.stderr).toContain('[YummyGraph] index is stale');
     });
 
-    it('auto-detects a PATH-installed gitnexus and suggests `gitnexus analyze` (no npx)', () => {
-      // No GITNEXUS_INVOCATION forcing — exercises the installed hook's real PATH
+    it('auto-detects a PATH-installed yummygraph and suggests `yummygraph analyze` (no npx)', () => {
+      // No YUMMYGRAPH_INVOCATION forcing — exercises the installed hook's real PATH
       // probe (#1938). The installed adapter resolves the analyze command through
       // the copied resolve-analyze-cmd.cjs, so a launcher on PATH yields
-      // `gitnexus analyze` rather than the npm-11 npx crash path.
+      // `yummygraph analyze` rather than the npm-11 npx crash path.
       fs.writeFileSync(
-        path.join(gitNexusDir, 'meta.json'),
+        path.join(yummyGraphDir, 'meta.json'),
         JSON.stringify({ lastCommit: 'a'.repeat(39) + 'b', stats: {} }),
       );
-      const gn = createGitNexusPathEntry();
+      const gn = createYummyGraphPathEntry();
       try {
         const result = runHook(
           installedHook,
@@ -157,8 +157,8 @@ describe('antigravity hook adapter e2e', () => {
 
         const output = parseHookOutput(result.stdout);
         expect(output).not.toBeNull();
-        expect(output!.additionalContext).toContain('Run `gitnexus analyze`');
-        expect(output!.additionalContext).not.toContain('npx gitnexus');
+        expect(output!.additionalContext).toContain('Run `yummygraph analyze`');
+        expect(output!.additionalContext).not.toContain('npx yummygraph');
       } finally {
         gn.cleanup();
       }
@@ -171,7 +171,7 @@ describe('antigravity hook adapter e2e', () => {
         stdio: ['pipe', 'pipe', 'pipe'],
       }).stdout.trim();
       fs.writeFileSync(
-        path.join(gitNexusDir, 'meta.json'),
+        path.join(yummyGraphDir, 'meta.json'),
         JSON.stringify({ lastCommit: head, stats: {} }),
       );
 
@@ -184,12 +184,12 @@ describe('antigravity hook adapter e2e', () => {
       });
 
       expect(parseHookOutput(result.stdout)).toBeNull();
-      expect(result.stderr).not.toContain('[GitNexus] index is stale');
+      expect(result.stderr).not.toContain('[YummyGraph] index is stale');
     });
 
     it('includes --embeddings flag when the previous index had embeddings', () => {
       fs.writeFileSync(
-        path.join(gitNexusDir, 'meta.json'),
+        path.join(yummyGraphDir, 'meta.json'),
         JSON.stringify({
           lastCommit: 'b'.repeat(40),
           stats: { embeddings: 42 },
@@ -206,16 +206,16 @@ describe('antigravity hook adapter e2e', () => {
           cwd: tmpDir,
         },
         tmpDir,
-        { env: { ...process.env, GITNEXUS_INVOCATION: 'npx' } },
+        { env: { ...process.env, YUMMYGRAPH_INVOCATION: 'npx' } },
       );
 
       const output = parseHookOutput(result.stdout);
       expect(output).not.toBeNull();
-      expect(output!.additionalContext).toContain('npx gitnexus@latest analyze --embeddings');
+      expect(output!.additionalContext).toContain('npx yummygraph@latest analyze --embeddings');
     });
 
     it('treats missing meta.json as stale', () => {
-      const metaPath = path.join(gitNexusDir, 'meta.json');
+      const metaPath = path.join(yummyGraphDir, 'meta.json');
       if (fs.existsSync(metaPath)) fs.unlinkSync(metaPath);
 
       const result = runHook(installedHook, {
@@ -233,7 +233,7 @@ describe('antigravity hook adapter e2e', () => {
 
     it('skips augment + hint when tool_response carries an error', () => {
       fs.writeFileSync(
-        path.join(gitNexusDir, 'meta.json'),
+        path.join(yummyGraphDir, 'meta.json'),
         JSON.stringify({ lastCommit: 'c'.repeat(40), stats: {} }),
       );
 
@@ -250,7 +250,7 @@ describe('antigravity hook adapter e2e', () => {
 
     it('skips augment + hint when tool_response.exit_code !== 0', () => {
       fs.writeFileSync(
-        path.join(gitNexusDir, 'meta.json'),
+        path.join(yummyGraphDir, 'meta.json'),
         JSON.stringify({ lastCommit: 'd'.repeat(40), stats: {} }),
       );
 
@@ -267,7 +267,7 @@ describe('antigravity hook adapter e2e', () => {
 
     it('detects all five documented git mutation types', () => {
       fs.writeFileSync(
-        path.join(gitNexusDir, 'meta.json'),
+        path.join(yummyGraphDir, 'meta.json'),
         JSON.stringify({ lastCommit: 'e'.repeat(40), stats: {} }),
       );
 
@@ -294,7 +294,7 @@ describe('antigravity hook adapter e2e', () => {
 
     it('ignores non-mutation git commands', () => {
       fs.writeFileSync(
-        path.join(gitNexusDir, 'meta.json'),
+        path.join(yummyGraphDir, 'meta.json'),
         JSON.stringify({ lastCommit: 'f'.repeat(40), stats: {} }),
       );
 
@@ -312,10 +312,10 @@ describe('antigravity hook adapter e2e', () => {
     });
   });
 
-  describe('AfterTool — augment branch (silent without gitnexus CLI)', () => {
+  describe('AfterTool — augment branch (silent without yummygraph CLI)', () => {
     it('does not crash on search_file_content with a real pattern', () => {
       fs.writeFileSync(
-        path.join(gitNexusDir, 'meta.json'),
+        path.join(yummyGraphDir, 'meta.json'),
         JSON.stringify({ lastCommit: '1'.repeat(40), stats: {} }),
       );
 
@@ -328,7 +328,7 @@ describe('antigravity hook adapter e2e', () => {
       });
 
       // Either exits cleanly (no augment found) or gets killed by the 10s
-      // hook timeout when spawned gitnexus CLI hangs in CI.
+      // hook timeout when spawned yummygraph CLI hangs in CI.
       expect(result.status === 0 || result.status === null).toBe(true);
     });
 
@@ -375,7 +375,7 @@ describe('antigravity hook adapter e2e', () => {
 
   describe('unhappy paths', () => {
     it('handles corrupted meta.json without crashing', () => {
-      fs.writeFileSync(path.join(gitNexusDir, 'meta.json'), 'THIS IS NOT JSON {{{');
+      fs.writeFileSync(path.join(yummyGraphDir, 'meta.json'), 'THIS IS NOT JSON {{{');
 
       const result = runHook(installedHook, {
         hook_event_name: 'AfterTool',
@@ -389,7 +389,7 @@ describe('antigravity hook adapter e2e', () => {
     });
 
     it('treats meta.json without lastCommit as stale', () => {
-      fs.writeFileSync(path.join(gitNexusDir, 'meta.json'), JSON.stringify({ stats: {} }));
+      fs.writeFileSync(path.join(yummyGraphDir, 'meta.json'), JSON.stringify({ stats: {} }));
 
       const result = runHook(installedHook, {
         hook_event_name: 'AfterTool',
@@ -441,42 +441,42 @@ describe('antigravity hook adapter e2e', () => {
     });
   });
 
-  describe('directory without .gitnexus', () => {
+  describe('directory without .yummygraph', () => {
     // Nest the test repo deeply at the filesystem root so parent traversal
-    // (5 levels) cannot accidentally pick up a .gitnexus from an ancestor.
-    let noGitNexusDir: string;
+    // (5 levels) cannot accidentally pick up a .yummygraph from an ancestor.
+    let noYummyGraphDir: string;
     let cleanupRoot: string;
 
     beforeAll(() => {
       const root = os.platform() === 'win32' ? 'C:\\' : '/tmp';
-      cleanupRoot = path.join(root, `no-gitnexus-antigravity-${Date.now()}-${process.pid}`);
-      noGitNexusDir = path.join(cleanupRoot, 'a', 'b', 'c', 'd', 'e', 'f');
-      fs.mkdirSync(noGitNexusDir, { recursive: true });
-      spawnSync('git', ['init'], { cwd: noGitNexusDir, stdio: 'pipe' });
+      cleanupRoot = path.join(root, `no-yummygraph-antigravity-${Date.now()}-${process.pid}`);
+      noYummyGraphDir = path.join(cleanupRoot, 'a', 'b', 'c', 'd', 'e', 'f');
+      fs.mkdirSync(noYummyGraphDir, { recursive: true });
+      spawnSync('git', ['init'], { cwd: noYummyGraphDir, stdio: 'pipe' });
     });
 
     afterAll(() => {
       cleanupTempDirSync(cleanupRoot);
     });
 
-    it('ignores AfterTool when no .gitnexus exists in cwd or any ancestor', () => {
+    it('ignores AfterTool when no .yummygraph exists in cwd or any ancestor', () => {
       const result = runHook(installedHook, {
         hook_event_name: 'AfterTool',
         tool_name: 'run_shell_command',
         tool_input: { command: 'git commit -m "x"' },
         tool_response: { llmContent: '[ok]' },
-        cwd: noGitNexusDir,
+        cwd: noYummyGraphDir,
       });
       expect(parseHookOutput(result.stdout)).toBeNull();
     });
 
-    it('ignores AfterTool search_file_content when no .gitnexus exists', () => {
+    it('ignores AfterTool search_file_content when no .yummygraph exists', () => {
       const result = runHook(installedHook, {
         hook_event_name: 'AfterTool',
         tool_name: 'search_file_content',
         tool_input: { pattern: 'handleRequest' },
         tool_response: { llmContent: '...' },
-        cwd: noGitNexusDir,
+        cwd: noYummyGraphDir,
       });
       expect(parseHookOutput(result.stdout)).toBeNull();
     });

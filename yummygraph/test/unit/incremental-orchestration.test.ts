@@ -4,7 +4,7 @@
  *
  * These tests exercise the *real runtime path* — they call
  * `runFullAnalysis` against a real on-disk git repo backed by a real
- * LadybugDB at `<repo>/.gitnexus/`, and assert behaviours that pure
+ * LadybugDB at `<repo>/.yummygraph/`, and assert behaviours that pure
  * unit tests on `diffFileHashes` / `extractChangedSubgraph` cannot
  * catch:
  *
@@ -42,7 +42,7 @@ const FIXTURE_SRC = path.resolve(HERE, '..', 'fixtures', 'mini-repo', 'src');
  * Returns the temp handle so the caller owns cleanup.
  */
 async function setupMiniRepo(): Promise<{ dbPath: string; cleanup: () => Promise<void> }> {
-  const tmp = await createTempDir('gitnexus-incr-orch-');
+  const tmp = await createTempDir('yummygraph-incr-orch-');
   const dest = path.join(tmp.dbPath, 'src');
   await mkdir(dest, { recursive: true });
   // Copy mini-repo fixture files
@@ -106,7 +106,7 @@ describe('runFullAnalysis — incremental orchestration', () => {
         { skipAgentsMd: true },
         { onProgress: () => {} },
       );
-      // lastCommit==HEAD && working tree clean (mod GitNexus output) →
+      // lastCommit==HEAD && working tree clean (mod YummyGraph output) →
       // early-return fast path.
       expect(second.alreadyUpToDate).toBe(true);
     } finally {

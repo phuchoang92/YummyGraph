@@ -2,7 +2,7 @@
  * Wiki Command
  *
  * Generates repository documentation from the knowledge graph.
- * Usage: gitnexus wiki [path] [options]
+ * Usage: yummygraph wiki [path] [options]
  */
 
 import path from 'path';
@@ -127,19 +127,19 @@ function prompt(question: string, hide = false): Promise<string> {
 }
 
 export const wikiCommand = async (inputPath?: string, options?: WikiCommandOptions) => {
-  // Snapshot GITNEXUS_VERBOSE at entry — wikiCommand mutates it (the impl
+  // Snapshot YUMMYGRAPH_VERBOSE at entry — wikiCommand mutates it (the impl
   // below) so cursor-client (process.env-driven) sees the right value during
   // this run. Restored in finally so back-to-back wiki calls in long-running
   // hosts don't leak verbose state from one invocation to the next. Pairs
   // with the same snapshot/restore pattern in `analyzeCommand`.
-  const originalVerbose = process.env.GITNEXUS_VERBOSE;
+  const originalVerbose = process.env.YUMMYGRAPH_VERBOSE;
   try {
     await wikiCommandImpl(inputPath, options);
   } finally {
     if (originalVerbose === undefined) {
-      delete process.env.GITNEXUS_VERBOSE;
+      delete process.env.YUMMYGRAPH_VERBOSE;
     } else {
-      process.env.GITNEXUS_VERBOSE = originalVerbose;
+      process.env.YUMMYGRAPH_VERBOSE = originalVerbose;
     }
   }
 };
@@ -147,10 +147,10 @@ export const wikiCommand = async (inputPath?: string, options?: WikiCommandOptio
 const wikiCommandImpl = async (inputPath?: string, options?: WikiCommandOptions): Promise<void> => {
   // Set verbose mode globally for cursor-client to pick up
   if (options?.verbose) {
-    process.env.GITNEXUS_VERBOSE = '1';
+    process.env.YUMMYGRAPH_VERBOSE = '1';
   }
 
-  console.log('\n  GitNexus Wiki Generator\n');
+  console.log('\n  YummyGraph Wiki Generator\n');
 
   // ── Resolve repo path ───────────────────────────────────────────────
   let repoPath: string;
@@ -177,8 +177,8 @@ const wikiCommandImpl = async (inputPath?: string, options?: WikiCommandOptions)
   const meta = await loadMeta(storagePath);
 
   if (!meta) {
-    console.log('  Error: No GitNexus index found.');
-    console.log('  Run `gitnexus analyze` first to index this repository.\n');
+    console.log('  Error: No YummyGraph index found.');
+    console.log('  Run `yummygraph analyze` first to index this repository.\n');
     process.exitCode = 1;
     return;
   }
@@ -221,7 +221,7 @@ const wikiCommandImpl = async (inputPath?: string, options?: WikiCommandOptions)
       }
     }
     await saveCLIConfig({ ...existing, ...updates });
-    console.log('  Config saved to ~/.gitnexus/config.json\n');
+    console.log('  Config saved to ~/.yummygraph/config.json\n');
   }
 
   const savedConfig = await loadCLIConfig();
@@ -254,7 +254,7 @@ const wikiCommandImpl = async (inputPath?: string, options?: WikiCommandOptions)
       // Non-interactive mode — need either API key or Cursor CLI
       if (!llmConfig.apiKey && !isLocalProvider(llmConfig.provider)) {
         console.log('  Error: No LLM API key found.');
-        console.log('  Set OPENAI_API_KEY or GITNEXUS_API_KEY environment variable,');
+        console.log('  Set OPENAI_API_KEY or YUMMYGRAPH_API_KEY environment variable,');
         console.log('  or pass --api-key <key>, or use --provider cursor|claude|codex|opencode.\n');
         process.exitCode = 1;
         return;
@@ -336,7 +336,7 @@ const wikiCommandImpl = async (inputPath?: string, options?: WikiCommandOptions)
         const localConfig = { ...savedConfig, provider };
         if (model) (localConfig as Record<string, unknown>)[localModelConfigKey(provider)] = model;
         await saveCLIConfig(localConfig);
-        console.log('  Config saved to ~/.gitnexus/config.json\n');
+        console.log('  Config saved to ~/.yummygraph/config.json\n');
 
         llmConfig = { ...llmConfig, provider, model, apiKey: '', baseUrl: '' };
       } else if (choice === '3') {
@@ -362,7 +362,7 @@ const wikiCommandImpl = async (inputPath?: string, options?: WikiCommandOptions)
         }
 
         // API key — use env var if available
-        const envKey = process.env.GITNEXUS_API_KEY || process.env.OPENAI_API_KEY || '';
+        const envKey = process.env.YUMMYGRAPH_API_KEY || process.env.OPENAI_API_KEY || '';
         let azureKey: string;
         if (envKey) {
           const masked = envKey.slice(0, 6) + '...' + envKey.slice(-4);
@@ -392,7 +392,7 @@ const wikiCommandImpl = async (inputPath?: string, options?: WikiCommandOptions)
           model: deploymentName,
           provider: 'azure',
         });
-        console.log('  Config saved to ~/.gitnexus/config.json\n');
+        console.log('  Config saved to ~/.yummygraph/config.json\n');
 
         llmConfig = {
           ...llmConfig,
@@ -427,7 +427,7 @@ const wikiCommandImpl = async (inputPath?: string, options?: WikiCommandOptions)
         const model = modelInput || defaultModel;
 
         // API key — pre-fill hint if env var exists
-        const envKey = process.env.GITNEXUS_API_KEY || process.env.OPENAI_API_KEY || '';
+        const envKey = process.env.YUMMYGRAPH_API_KEY || process.env.OPENAI_API_KEY || '';
         if (envKey) {
           const masked = envKey.slice(0, 6) + '...' + envKey.slice(-4);
           const useEnv = await prompt(`  Use existing env key (${masked})? (Y/n): `);
@@ -448,7 +448,7 @@ const wikiCommandImpl = async (inputPath?: string, options?: WikiCommandOptions)
 
         // Save
         await saveCLIConfig({ apiKey: key, baseUrl, model, provider });
-        console.log('  Config saved to ~/.gitnexus/config.json\n');
+        console.log('  Config saved to ~/.yummygraph/config.json\n');
 
         llmConfig = { ...llmConfig, apiKey: key, baseUrl, model, provider };
       }
@@ -567,7 +567,7 @@ const wikiCommandImpl = async (inputPath?: string, options?: WikiCommandOptions)
       const choice = answer.trim().toLowerCase();
 
       if (choice === 'n' || choice === 'no') {
-        console.log('\n  Generation cancelled. Run `gitnexus wiki` later to generate.\n');
+        console.log('\n  Generation cancelled. Run `yummygraph wiki` later to generate.\n');
         return;
       }
 
@@ -581,7 +581,7 @@ const wikiCommandImpl = async (inputPath?: string, options?: WikiCommandOptions)
           execFileSync(editor, [treeFile], { stdio: 'inherit', windowsHide: true });
         } catch {
           console.log(`  Could not open editor. Please edit manually:\n  ${treeFile}\n`);
-          console.log('  Then run `gitnexus wiki` to continue.\n');
+          console.log('  Then run `yummygraph wiki` to continue.\n');
           return;
         }
       }
@@ -697,12 +697,12 @@ const wikiCommandImpl = async (inputPath?: string, options?: WikiCommandOptions)
         if (!answer || answer === 'y' || answer === 'yes') {
           // Clear saved config so next run triggers interactive setup
           await saveCLIConfig({});
-          console.log('  Config cleared. Run `gitnexus wiki` again to reconfigure.\n');
+          console.log('  Config cleared. Run `yummygraph wiki` again to reconfigure.\n');
         }
       }
     } else {
       console.log(`\n  Error: ${err.message}\n`);
-      if (process.env.GITNEXUS_VERBOSE) {
+      if (process.env.YUMMYGRAPH_VERBOSE) {
         logger.error({ err }, 'wiki command failed');
       }
     }
@@ -757,7 +757,7 @@ function publishGist(htmlPath: string): { url: string; rawUrl: string } | null {
   try {
     const output = execFileSync(
       'gh',
-      ['gist', 'create', htmlPath, '--desc', 'Repository Wiki — generated by GitNexus', '--public'],
+      ['gist', 'create', htmlPath, '--desc', 'Repository Wiki — generated by YummyGraph', '--public'],
       { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true },
     ).trim();
 

@@ -45,7 +45,7 @@ HANDOFF*.md
 
 
 .env*.local
-.gitnexus
+.yummygraph
 .claude/settings.local.json
 
 # Claude Code worktrees
@@ -61,8 +61,8 @@ assets/
 repomix-output*
 
 # Playwright artifacts
-gitnexus-web/playwright-report/
-gitnexus-web/test-results/
+yummygraph-web/playwright-report/
+yummygraph-web/test-results/
 
 # Python test artifacts
 eval/.coverage
@@ -71,33 +71,33 @@ eval/.hypothesis/
 # Local docs
 docs/
 
-gitnexus/test/fixtures/mini-repo/*.md
-gitnexus/test/fixtures/mini-repo/.claude
-gitnexus/test/fixtures/mini-repo/.gitignore
+yummygraph/test/fixtures/mini-repo/*.md
+yummygraph/test/fixtures/mini-repo/.claude
+yummygraph/test/fixtures/mini-repo/.gitignore
 
 # Ignore csharp generated obj and bin folders
-gitnexus/test/fixtures/lang-resolution/**/obj
-gitnexus/test/fixtures/lang-resolution/**/bin
-GitNexus.sln
+yummygraph/test/fixtures/lang-resolution/**/obj
+yummygraph/test/fixtures/lang-resolution/**/bin
+YummyGraph.sln
 # Git worktrees
 .worktrees/
 
 # Vendored tree-sitter grammar build artifacts (created at install time,
 # never committed). See docs/plans/2026-04-15-002-fix-tree-sitter-proto-vendor-deps-plan.md
-gitnexus/vendor/**/build/
-gitnexus/vendor/**/node_modules/
+yummygraph/vendor/**/build/
+yummygraph/vendor/**/node_modules/
 
 /github/scripts/triage/__pycache__/
 
 .claude-flow/
 
 .claude/agents/*
-!.claude/agents/gitnexus-*.md
+!.claude/agents/yummygraph-*.md
 .claude/commands/
 .claude/helpers
 .claude/skills/*
-!.claude/skills/gitnexus/
-!.claude/skills/gitnexus-pr-swarm-review/
+!.claude/skills/yummygraph/
+!.claude/skills/yummygraph-pr-swarm-review/
 
 .history/
 
@@ -109,4 +109,4 @@ local_docs/
 .tmp/
 .agents/
 .context/
-gitnexus/web/
+yummygraph/web/

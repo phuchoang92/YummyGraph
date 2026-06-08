@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { GraphNode, GraphRelationship, NodeLabel, RelationshipType } from 'gitnexus-shared';
+import type { GraphNode, GraphRelationship, NodeLabel, RelationshipType } from 'yummygraph-shared';
 import { createKnowledgeGraph } from '../../src/core/graph/graph.js';
 import {
   pruneLocalValueSymbols,
@@ -175,8 +175,8 @@ describe('pruneLocalValueSymbols', () => {
     expect(graph.getNode('Function:inner')).toBeDefined();
   });
 
-  it('can be disabled with GITNEXUS_KEEP_LOCAL_VALUE_SYMBOLS', () => {
-    vi.stubEnv('GITNEXUS_KEEP_LOCAL_VALUE_SYMBOLS', '1');
+  it('can be disabled with YUMMYGRAPH_KEEP_LOCAL_VALUE_SYMBOLS', () => {
+    vi.stubEnv('YUMMYGRAPH_KEEP_LOCAL_VALUE_SYMBOLS', '1');
 
     const graph = createKnowledgeGraph();
     graph.addNode(fileNode());

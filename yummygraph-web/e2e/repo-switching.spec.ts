@@ -32,7 +32,7 @@ test.beforeAll(async () => {
       backendRes.status === 'rejected' ||
       (backendRes.status === 'fulfilled' && !backendRes.value.ok)
     ) {
-      test.skip(true, 'gitnexus serve not available');
+      test.skip(true, 'yummygraph serve not available');
       return;
     }
     if (
@@ -158,7 +158,7 @@ test.describe('Windows path normalization', () => {
     page,
   }) => {
     const repoName = firstRepoName || 'test-repo';
-    const windowsPath = `C:\\Users\\LENOVO\\.gitnexus\\repos\\${repoName}`;
+    const windowsPath = `C:\\Users\\LENOVO\\.yummygraph\\repos\\${repoName}`;
 
     // Mock /api/repo to return a Windows backslash path while keeping name correct
     await page.route(/\/api\/repo(?!s)(\?.*)?$/, (route) =>

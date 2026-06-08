@@ -8,7 +8,7 @@ import {
   useMemo,
   ReactNode,
 } from 'react';
-import type { GraphNode, NodeLabel, PipelineProgress } from 'gitnexus-shared';
+import type { GraphNode, NodeLabel, PipelineProgress } from 'yummygraph-shared';
 import type { KnowledgeGraph } from '../core/graph/types';
 import { createKnowledgeGraph } from '../core/graph/graph';
 import type {
@@ -45,7 +45,7 @@ import { normalizePath } from '../lib/path-resolution';
 import { FILE_REF_REGEX, NODE_REF_REGEX } from '../lib/grounding-patterns';
 import { GraphStateProvider, useGraphState } from './app-state/graph';
 
-export const AUTO_START_EMBEDDINGS_STORAGE_KEY = 'gitnexus.autoStartEmbeddings';
+export const AUTO_START_EMBEDDINGS_STORAGE_KEY = 'yummygraph.autoStartEmbeddings';
 
 export const shouldAutoStartEmbeddings = (): boolean => {
   if (typeof window === 'undefined' || !window.localStorage) return false;

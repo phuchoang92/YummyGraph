@@ -8,7 +8,7 @@ import { createRequire } from 'module';
 // so the test never goes stale on a release bump.
 const PKG_VERSION = (createRequire(import.meta.url)('../../package.json') as { version: string })
   .version;
-const MCP_PINNED_REF = `gitnexus@${PKG_VERSION}`;
+const MCP_PINNED_REF = `yummygraph@${PKG_VERSION}`;
 
 const execFileMock = vi.fn((...args: any[]) => {
   const callback = args.at(-1);
@@ -17,7 +17,7 @@ const execFileMock = vi.fn((...args: any[]) => {
   }
 });
 
-// By default, execFileSync throws (simulating `which gitnexus` not found)
+// By default, execFileSync throws (simulating `which yummygraph` not found)
 // so getMcpEntry() falls back to the npx path.
 const execFileSyncMock = vi.fn(() => {
   throw new Error('not found');
@@ -80,7 +80,7 @@ describe('setupClaudeCode', () => {
     const raw = await fs.readFile(path.join(tempHome, '.claude.json'), 'utf-8');
     const config = JSON.parse(raw);
 
-    expect(config.mcpServers.gitnexus).toEqual({
+    expect(config.mcpServers.yummygraph).toEqual({
       command: 'cmd',
       args: ['/c', 'npx', '-y', MCP_PINNED_REF, 'mcp'],
     });
@@ -95,7 +95,7 @@ describe('setupClaudeCode', () => {
     const raw = await fs.readFile(path.join(tempHome, '.claude.json'), 'utf-8');
     const config = JSON.parse(raw);
 
-    expect(config.mcpServers.gitnexus).toEqual({
+    expect(config.mcpServers.yummygraph).toEqual({
       command: 'npx',
       args: ['-y', MCP_PINNED_REF, 'mcp'],
     });
@@ -127,7 +127,7 @@ describe('setupClaudeCode', () => {
 
     expect(config.existingKey).toBe('keep-me');
     expect(config.mcpServers.other).toEqual({ command: 'foo' });
-    expect(config.mcpServers.gitnexus).toBeDefined();
+    expect(config.mcpServers.yummygraph).toBeDefined();
   });
 
   it('handles missing ~/.claude.json (creates fresh)', async () => {
@@ -142,7 +142,7 @@ describe('setupClaudeCode', () => {
     const raw = await fs.readFile(path.join(tempHome, '.claude.json'), 'utf-8');
     const config = JSON.parse(raw);
 
-    expect(config.mcpServers.gitnexus).toBeDefined();
+    expect(config.mcpServers.yummygraph).toBeDefined();
   });
 
   it('handles corrupt JSON gracefully', async () => {
@@ -159,9 +159,9 @@ describe('setupClaudeCode', () => {
     expect(raw).toBe(corrupt);
   });
 
-  it('uses global binary path when gitnexus is on PATH', async () => {
+  it('uses global binary path when yummygraph is on PATH', async () => {
     setPlatform('darwin');
-    execFileSyncMock.mockReturnValueOnce('/usr/local/bin/gitnexus\n');
+    execFileSyncMock.mockReturnValueOnce('/usr/local/bin/yummygraph\n');
 
     const { setupCommand } = await import('../../src/cli/setup.js');
     await setupCommand();
@@ -169,13 +169,13 @@ describe('setupClaudeCode', () => {
     const raw = await fs.readFile(path.join(tempHome, '.claude.json'), 'utf-8');
     const config = JSON.parse(raw);
 
-    expect(config.mcpServers.gitnexus).toEqual({
-      command: '/usr/local/bin/gitnexus',
+    expect(config.mcpServers.yummygraph).toEqual({
+      command: '/usr/local/bin/yummygraph',
       args: ['mcp'],
     });
   });
 
-  it('falls back to npx when gitnexus is not on PATH', async () => {
+  it('falls back to npx when yummygraph is not on PATH', async () => {
     setPlatform('darwin');
     execFileSyncMock.mockImplementationOnce(() => {
       throw new Error('not found');
@@ -187,7 +187,7 @@ describe('setupClaudeCode', () => {
     const raw = await fs.readFile(path.join(tempHome, '.claude.json'), 'utf-8');
     const config = JSON.parse(raw);
 
-    expect(config.mcpServers.gitnexus).toEqual({
+    expect(config.mcpServers.yummygraph).toEqual({
       command: 'npx',
       args: ['-y', MCP_PINNED_REF, 'mcp'],
     });
@@ -195,9 +195,9 @@ describe('setupClaudeCode', () => {
 
   it('picks .cmd wrapper from Windows where output (multiple lines)', async () => {
     setPlatform('win32');
-    // `where gitnexus` on Windows returns the POSIX script first, then .cmd
+    // `where yummygraph` on Windows returns the POSIX script first, then .cmd
     execFileSyncMock.mockReturnValueOnce(
-      'C:\\Users\\dev\\AppData\\Roaming\\npm\\gitnexus\nC:\\Users\\dev\\AppData\\Roaming\\npm\\gitnexus.cmd\n',
+      'C:\\Users\\dev\\AppData\\Roaming\\npm\\yummygraph\nC:\\Users\\dev\\AppData\\Roaming\\npm\\yummygraph.cmd\n',
     );
 
     const { setupCommand } = await import('../../src/cli/setup.js');
@@ -206,8 +206,8 @@ describe('setupClaudeCode', () => {
     const raw = await fs.readFile(path.join(tempHome, '.claude.json'), 'utf-8');
     const config = JSON.parse(raw);
 
-    expect(config.mcpServers.gitnexus).toEqual({
-      command: 'C:\\Users\\dev\\AppData\\Roaming\\npm\\gitnexus.cmd',
+    expect(config.mcpServers.yummygraph).toEqual({
+      command: 'C:\\Users\\dev\\AppData\\Roaming\\npm\\yummygraph.cmd',
       args: ['mcp'],
     });
   });
@@ -216,7 +216,7 @@ describe('setupClaudeCode', () => {
     setPlatform('win32');
     // Windows `where` produces CRLF line endings
     execFileSyncMock.mockReturnValueOnce(
-      'C:\\Users\\dev\\AppData\\Roaming\\npm\\gitnexus\r\nC:\\Users\\dev\\AppData\\Roaming\\npm\\gitnexus.cmd\r\n',
+      'C:\\Users\\dev\\AppData\\Roaming\\npm\\yummygraph\r\nC:\\Users\\dev\\AppData\\Roaming\\npm\\yummygraph.cmd\r\n',
     );
 
     const { setupCommand } = await import('../../src/cli/setup.js');
@@ -225,8 +225,8 @@ describe('setupClaudeCode', () => {
     const raw = await fs.readFile(path.join(tempHome, '.claude.json'), 'utf-8');
     const config = JSON.parse(raw);
 
-    expect(config.mcpServers.gitnexus).toEqual({
-      command: 'C:\\Users\\dev\\AppData\\Roaming\\npm\\gitnexus.cmd',
+    expect(config.mcpServers.yummygraph).toEqual({
+      command: 'C:\\Users\\dev\\AppData\\Roaming\\npm\\yummygraph.cmd',
       args: ['mcp'],
     });
   });
@@ -234,7 +234,7 @@ describe('setupClaudeCode', () => {
   it('picks .bat wrapper when .cmd is not present', async () => {
     setPlatform('win32');
     execFileSyncMock.mockReturnValueOnce(
-      'C:\\Users\\dev\\AppData\\Roaming\\npm\\gitnexus\nC:\\Users\\dev\\AppData\\Roaming\\npm\\gitnexus.bat\n',
+      'C:\\Users\\dev\\AppData\\Roaming\\npm\\yummygraph\nC:\\Users\\dev\\AppData\\Roaming\\npm\\yummygraph.bat\n',
     );
 
     const { setupCommand } = await import('../../src/cli/setup.js');
@@ -243,8 +243,8 @@ describe('setupClaudeCode', () => {
     const raw = await fs.readFile(path.join(tempHome, '.claude.json'), 'utf-8');
     const config = JSON.parse(raw);
 
-    expect(config.mcpServers.gitnexus).toEqual({
-      command: 'C:\\Users\\dev\\AppData\\Roaming\\npm\\gitnexus.bat',
+    expect(config.mcpServers.yummygraph).toEqual({
+      command: 'C:\\Users\\dev\\AppData\\Roaming\\npm\\yummygraph.bat',
       args: ['mcp'],
     });
   });
@@ -252,7 +252,7 @@ describe('setupClaudeCode', () => {
   it('handles uppercase .CMD extension (case-insensitive match)', async () => {
     setPlatform('win32');
     execFileSyncMock.mockReturnValueOnce(
-      'C:\\Users\\dev\\AppData\\Roaming\\npm\\gitnexus\nC:\\Users\\dev\\AppData\\Roaming\\npm\\gitnexus.CMD\n',
+      'C:\\Users\\dev\\AppData\\Roaming\\npm\\yummygraph\nC:\\Users\\dev\\AppData\\Roaming\\npm\\yummygraph.CMD\n',
     );
 
     const { setupCommand } = await import('../../src/cli/setup.js');
@@ -261,19 +261,19 @@ describe('setupClaudeCode', () => {
     const raw = await fs.readFile(path.join(tempHome, '.claude.json'), 'utf-8');
     const config = JSON.parse(raw);
 
-    expect(config.mcpServers.gitnexus).toEqual({
-      command: 'C:\\Users\\dev\\AppData\\Roaming\\npm\\gitnexus.CMD',
+    expect(config.mcpServers.yummygraph).toEqual({
+      command: 'C:\\Users\\dev\\AppData\\Roaming\\npm\\yummygraph.CMD',
       args: ['mcp'],
     });
   });
 
-  it('copies shared hook helpers (incl. resolve-analyze-cmd.cjs) to ~/.claude/hooks/gitnexus/', async () => {
+  it('copies shared hook helpers (incl. resolve-analyze-cmd.cjs) to ~/.claude/hooks/yummygraph/', async () => {
     setPlatform('linux');
 
     const { setupCommand } = await import('../../src/cli/setup.js');
     await setupCommand();
 
-    const destHooksDir = path.join(tempHome, '.claude', 'hooks', 'gitnexus');
+    const destHooksDir = path.join(tempHome, '.claude', 'hooks', 'yummygraph');
     await expect(fs.access(path.join(destHooksDir, 'hook-lock.cjs'))).resolves.toBeUndefined();
     await expect(
       fs.access(path.join(destHooksDir, 'hook-db-lock-probe.cjs')),
@@ -352,7 +352,7 @@ describe('setupClaudeCode', () => {
     const settingsPath = path.join(tempHome, '.claude', 'settings.json');
     let registered = false;
     try {
-      registered = (await fs.readFile(settingsPath, 'utf-8')).includes('gitnexus-hook.cjs');
+      registered = (await fs.readFile(settingsPath, 'utf-8')).includes('yummygraph-hook.cjs');
     } catch {
       registered = false;
     }
@@ -362,7 +362,7 @@ describe('setupClaudeCode', () => {
   it('falls back to npx on Windows when no .cmd/.bat wrapper is found', async () => {
     setPlatform('win32');
     // Edge case: where returns only a non-spawnable shim (no .cmd wrapper)
-    execFileSyncMock.mockReturnValueOnce('C:\\Users\\dev\\AppData\\Roaming\\npm\\gitnexus\n');
+    execFileSyncMock.mockReturnValueOnce('C:\\Users\\dev\\AppData\\Roaming\\npm\\yummygraph\n');
 
     const { setupCommand } = await import('../../src/cli/setup.js');
     await setupCommand();
@@ -370,7 +370,7 @@ describe('setupClaudeCode', () => {
     const raw = await fs.readFile(path.join(tempHome, '.claude.json'), 'utf-8');
     const config = JSON.parse(raw);
 
-    expect(config.mcpServers.gitnexus).toEqual({
+    expect(config.mcpServers.yummygraph).toEqual({
       command: 'cmd',
       args: ['/c', 'npx', '-y', MCP_PINNED_REF, 'mcp'],
     });
@@ -378,7 +378,7 @@ describe('setupClaudeCode', () => {
 
   it('falls back to npx on Windows when where returns only a .ps1 path', async () => {
     setPlatform('win32');
-    execFileSyncMock.mockReturnValueOnce('C:\\Users\\dev\\AppData\\Roaming\\npm\\gitnexus.ps1\n');
+    execFileSyncMock.mockReturnValueOnce('C:\\Users\\dev\\AppData\\Roaming\\npm\\yummygraph.ps1\n');
 
     const { setupCommand } = await import('../../src/cli/setup.js');
     await setupCommand();
@@ -386,7 +386,7 @@ describe('setupClaudeCode', () => {
     const raw = await fs.readFile(path.join(tempHome, '.claude.json'), 'utf-8');
     const config = JSON.parse(raw);
 
-    expect(config.mcpServers.gitnexus).toEqual({
+    expect(config.mcpServers.yummygraph).toEqual({
       command: 'cmd',
       args: ['/c', 'npx', '-y', MCP_PINNED_REF, 'mcp'],
     });
@@ -409,7 +409,7 @@ describe('setupClaudeCode', () => {
     // before quoting, so normalize the expected path the same way — otherwise
     // path.join emits backslashes on the Windows runner and this mismatches.
     const hookPath = path
-      .join(tempHome, '.claude', 'hooks', 'gitnexus', 'gitnexus-hook.cjs')
+      .join(tempHome, '.claude', 'hooks', 'yummygraph', 'yummygraph-hook.cjs')
       .replace(/\\/g, '/');
     // Single-quoted, not double-quoted, and the path is the literal inside quotes.
     expect(cmd).toBe(`node '${hookPath}'`);
@@ -426,32 +426,32 @@ describe('formatHookCommand (hook command escaping, #1945)', () => {
   });
 
   it('single-quotes an ordinary POSIX path', () => {
-    expect(mod.formatHookCommand('/home/dev/.claude/hooks/gitnexus/gitnexus-hook.cjs', false)).toBe(
-      "node '/home/dev/.claude/hooks/gitnexus/gitnexus-hook.cjs'",
+    expect(mod.formatHookCommand('/home/dev/.claude/hooks/yummygraph/yummygraph-hook.cjs', false)).toBe(
+      "node '/home/dev/.claude/hooks/yummygraph/yummygraph-hook.cjs'",
     );
   });
 
   it('neutralizes spaces in a POSIX path (no word-splitting)', () => {
-    expect(mod.formatHookCommand('/home/a b/.claude/gitnexus-hook.cjs', false)).toBe(
-      "node '/home/a b/.claude/gitnexus-hook.cjs'",
+    expect(mod.formatHookCommand('/home/a b/.claude/yummygraph-hook.cjs', false)).toBe(
+      "node '/home/a b/.claude/yummygraph-hook.cjs'",
     );
   });
 
   it('neutralizes shell metacharacters in a POSIX path ($, backtick, ;)', () => {
     // Single-quoting means none of these can expand or run as a command.
-    const evil = '/home/u$(id)/`whoami`/a;b/.claude/gitnexus-hook.cjs';
+    const evil = '/home/u$(id)/`whoami`/a;b/.claude/yummygraph-hook.cjs';
     expect(mod.formatHookCommand(evil, false)).toBe(`node '${evil}'`);
   });
 
   it("escapes a single quote in a POSIX path via the '\\'' idiom", () => {
-    expect(mod.formatHookCommand("/home/o'brien/.claude/gitnexus-hook.cjs", false)).toBe(
-      "node '/home/o'\\''brien/.claude/gitnexus-hook.cjs'",
+    expect(mod.formatHookCommand("/home/o'brien/.claude/yummygraph-hook.cjs", false)).toBe(
+      "node '/home/o'\\''brien/.claude/yummygraph-hook.cjs'",
     );
   });
 
   it('keeps the double-quoted form on Windows (metacharacters are illegal in filenames)', () => {
-    expect(mod.formatHookCommand('C:/Users/dev/.claude/gitnexus-hook.cjs', true)).toBe(
-      'node "C:/Users/dev/.claude/gitnexus-hook.cjs"',
+    expect(mod.formatHookCommand('C:/Users/dev/.claude/yummygraph-hook.cjs', true)).toBe(
+      'node "C:/Users/dev/.claude/yummygraph-hook.cjs"',
     );
   });
 });

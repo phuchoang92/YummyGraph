@@ -1,5 +1,5 @@
 import type { SyntaxNode } from '../../utils/ast-helpers.js';
-import type { ParameterTypeClass } from 'gitnexus-shared';
+import type { ParameterTypeClass } from 'yummygraph-shared';
 
 export interface CppArityInfo {
   parameterCount?: number;

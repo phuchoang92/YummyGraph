@@ -1,20 +1,20 @@
-# Runbook — GitNexus
+# Runbook — YummyGraph
 
 Short, copy-paste operations for **local development**, **MCP**, and **CI**. Commands assume a Unix shell; on Windows use Git Bash or equivalent paths.
 
 ## Prerequisites
 
-- **Node.js** ≥ 20 (`gitnexus-web/package.json` `engines`).  
+- **Node.js** ≥ 20 (`yummygraph-web/package.json` `engines`).  
 - **Git** (analyze requires a git repository).  
 - From repo root, install and build the CLI package:
 
 ```bash
-cd gitnexus
+cd yummygraph
 npm install
 npm run build
 ```
 
-Use `npx gitnexus …` from any path after global/published install, or `node dist/cli/index.js …` when developing from `gitnexus/` with a local build.
+Use `npx yummygraph …` from any path after global/published install, or `node dist/cli/index.js …` when developing from `yummygraph/` with a local build.
 
 ---
 
@@ -25,25 +25,25 @@ Use `npx gitnexus …` from any path after global/published install, or `node di
 **Fix (from the target repo root):**
 
 ```bash
-npx gitnexus analyze
+npx yummygraph analyze
 ```
 
 **Force full rebuild** (same commit but suspect corruption or changed ignore rules):
 
 ```bash
-npx gitnexus analyze --force
+npx yummygraph analyze --force
 ```
 
 **Check status:**
 
 ```bash
-npx gitnexus status
+npx yummygraph status
 ```
 
 **List what MCP knows about:**
 
 ```bash
-npx gitnexus list
+npx yummygraph list
 ```
 
 ---
@@ -53,10 +53,10 @@ npx gitnexus list
 **First time with vectors** (slower, more disk/RAM):
 
 ```bash
-npx gitnexus analyze --embeddings
+npx yummygraph analyze --embeddings
 ```
 
-**Important:** If you already had embeddings, **always** pass `--embeddings` on later analyzes, or they can be dropped. See `stats.embeddings` in `.gitnexus/meta.json` (0 means none).
+**Important:** If you already had embeddings, **always** pass `--embeddings` on later analyzes, or they can be dropped. See `stats.embeddings` in `.yummygraph/meta.json` (0 means none).
 
 **Large repos:** Analyze may skip or limit embedding work when node counts are very high; watch CLI output.
 
@@ -64,13 +64,13 @@ npx gitnexus analyze --embeddings
 
 ## MCP: no repos / empty tools
 
-**Symptom:** `GitNexus: No indexed repos yet` on stderr when starting MCP.
+**Symptom:** `YummyGraph: No indexed repos yet` on stderr when starting MCP.
 
 **Fix:** In each project you want indexed:
 
 ```bash
 cd /path/to/repo
-npx gitnexus analyze
+npx yummygraph analyze
 ```
 
 Restart the editor MCP session if needed. The server **refreshes the registry lazily**; new analyzes are picked up without necessarily reinstalling MCP.
@@ -79,35 +79,35 @@ Restart the editor MCP session if needed. The server **refreshes the registry la
 
 ---
 
-## Clean slate (corrupt or huge `.gitnexus`)
+## Clean slate (corrupt or huge `.yummygraph`)
 
 **Current repo only** (prompts for confirmation):
 
 ```bash
-npx gitnexus clean
+npx yummygraph clean
 ```
 
 **Skip confirmation:**
 
 ```bash
-npx gitnexus clean --force
+npx yummygraph clean --force
 ```
 
 **All registered repos:**
 
 ```bash
-npx gitnexus clean --all --force
+npx yummygraph clean --all --force
 ```
 
-Then re-run `npx gitnexus analyze` (and `--embeddings` if you need vectors).
+Then re-run `npx yummygraph analyze` (and `--embeddings` if you need vectors).
 
 ---
 
 ## Local bridge for the web UI
 
 ```bash
-cd gitnexus
-npx gitnexus serve
+cd yummygraph
+npx yummygraph serve
 # default http://127.0.0.1:4747 — see serve --help for port/host
 ```
 
@@ -120,11 +120,11 @@ Use when the browser UI should talk to **local** indexed repos instead of WASM-o
 Useful for debugging without an editor:
 
 ```bash
-cd gitnexus
-npx gitnexus query "authentication flow" --repo MyRepo
-npx gitnexus context SomeSymbol --repo MyRepo
-npx gitnexus impact SomeSymbol --direction upstream --repo MyRepo
-npx gitnexus cypher "MATCH (n) RETURN count(n) LIMIT 1" --repo MyRepo
+cd yummygraph
+npx yummygraph query "authentication flow" --repo MyRepo
+npx yummygraph context SomeSymbol --repo MyRepo
+npx yummygraph impact SomeSymbol --direction upstream --repo MyRepo
+npx yummygraph cypher "MATCH (n) RETURN count(n) LIMIT 1" --repo MyRepo
 ```
 
 ---
@@ -135,10 +135,10 @@ Orchestrator: `.github/workflows/ci.yml`.
 
 | Job | Typical local repro |
 |-----|---------------------|
-| **quality** | `cd gitnexus && npx tsc --noEmit` |
-| **unit-tests** | `cd gitnexus && npx vitest run test/unit` |
-| **integration** | `cd gitnexus && npx vitest run test/integration` (see workflow matrix for groups) |
-| **e2e** | Triggered when `gitnexus-web/` changes; `cd gitnexus-web && E2E=1 npx playwright test` (requires `gitnexus serve` + `npm run dev`) |
+| **quality** | `cd yummygraph && npx tsc --noEmit` |
+| **unit-tests** | `cd yummygraph && npx vitest run test/unit` |
+| **integration** | `cd yummygraph && npx vitest run test/integration` (see workflow matrix for groups) |
+| **e2e** | Triggered when `yummygraph-web/` changes; `cd yummygraph-web && E2E=1 npx playwright test` (requires `yummygraph serve` + `npm run dev`) |
 
 **Note:** Pushes that touch only certain markdown paths may be skipped by `paths-ignore` in CI — see workflow file for exact patterns.
 
@@ -152,7 +152,7 @@ Analyze re-execs Node with a **large old-space heap** when needed (`analyze.ts`)
 
 ## LadybugDB / lock errors
 
-Only one process should open a repo’s `.gitnexus/lbug` store at a time. If MCP and a second `analyze` run conflict, stop one process, then retry `analyze` or restart MCP.
+Only one process should open a repo’s `.yummygraph/lbug` store at a time. If MCP and a second `analyze` run conflict, stop one process, then retry `analyze` or restart MCP.
 
 ---
 

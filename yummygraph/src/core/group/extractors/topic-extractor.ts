@@ -57,7 +57,7 @@ export class TopicExtractor implements ContractExtractor {
     repoPath: string,
     _repo: RepoHandle,
   ): Promise<ExtractedContract[]> {
-    // Honour `.gitnexusignore` / `.gitignore` via the shared IgnoreService —
+    // Honour `.yummygraphignore` / `.gitignore` via the shared IgnoreService —
     // mirrors `filesystem-walker.ts`. The 5-name hardcoded list
     // (`node_modules, .git, vendor, dist, build`) is preserved because every
     // entry is in `DEFAULT_IGNORE_LIST`, so default behaviour is unchanged

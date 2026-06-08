@@ -240,9 +240,9 @@ describe('parse-impl worker pool lazy startup', () => {
     expect(Array.from(graph.nodes.values()).some((n) => n.properties.name === 'fatal')).toBe(false);
   });
 
-  it('throws when GITNEXUS_WORKER_POOL_SIZE=0 and no --workers flag (sequential parsing removed)', async () => {
-    const saved = process.env.GITNEXUS_WORKER_POOL_SIZE;
-    process.env.GITNEXUS_WORKER_POOL_SIZE = '0';
+  it('throws when YUMMYGRAPH_WORKER_POOL_SIZE=0 and no --workers flag (sequential parsing removed)', async () => {
+    const saved = process.env.YUMMYGRAPH_WORKER_POOL_SIZE;
+    process.env.YUMMYGRAPH_WORKER_POOL_SIZE = '0';
     try {
       const rel = 'src/env0.ts';
       const content = 'export function env0() { return 1; }\n';
@@ -271,20 +271,20 @@ describe('parse-impl worker pool lazy startup', () => {
             // No workerPoolSize option — the ambient env=0 is the only signal.
           },
         ),
-      ).rejects.toThrow(/GITNEXUS_WORKER_POOL_SIZE=0/);
+      ).rejects.toThrow(/YUMMYGRAPH_WORKER_POOL_SIZE=0/);
 
       // Sequential parsing was removed: env=0 is a hard error, not a silent
       // sequential run. The validation throws before any pool is constructed.
       expect(fs.existsSync(markerPath)).toBe(false);
     } finally {
-      if (saved === undefined) delete process.env.GITNEXUS_WORKER_POOL_SIZE;
-      else process.env.GITNEXUS_WORKER_POOL_SIZE = saved;
+      if (saved === undefined) delete process.env.YUMMYGRAPH_WORKER_POOL_SIZE;
+      else process.env.YUMMYGRAPH_WORKER_POOL_SIZE = saved;
     }
   });
 
-  it('an explicit --workers wins over an ambient GITNEXUS_WORKER_POOL_SIZE=0 (#1741)', async () => {
-    const saved = process.env.GITNEXUS_WORKER_POOL_SIZE;
-    process.env.GITNEXUS_WORKER_POOL_SIZE = '0';
+  it('an explicit --workers wins over an ambient YUMMYGRAPH_WORKER_POOL_SIZE=0 (#1741)', async () => {
+    const saved = process.env.YUMMYGRAPH_WORKER_POOL_SIZE;
+    process.env.YUMMYGRAPH_WORKER_POOL_SIZE = '0';
     try {
       const rel = 'src/precedence.ts';
       const content = 'export function precedence() { return 1; }\n';
@@ -314,8 +314,8 @@ describe('parse-impl worker pool lazy startup', () => {
       expect(result.usedWorkerPool).toBe(true); // explicit flag wins; env=0 ignored
       expect(fs.existsSync(markerPath)).toBe(true); // worker was spawned
     } finally {
-      if (saved === undefined) delete process.env.GITNEXUS_WORKER_POOL_SIZE;
-      else process.env.GITNEXUS_WORKER_POOL_SIZE = saved;
+      if (saved === undefined) delete process.env.YUMMYGRAPH_WORKER_POOL_SIZE;
+      else process.env.YUMMYGRAPH_WORKER_POOL_SIZE = saved;
     }
   });
 });

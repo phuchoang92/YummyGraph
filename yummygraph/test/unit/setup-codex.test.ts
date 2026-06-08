@@ -6,7 +6,7 @@ import { createRequire } from 'module';
 
 const PKG_VERSION = (createRequire(import.meta.url)('../../package.json') as { version: string })
   .version;
-const NPX_REF = `gitnexus@${PKG_VERSION}`;
+const NPX_REF = `yummygraph@${PKG_VERSION}`;
 
 const execFileMock = vi.fn((...args: any[]) => {
   const callback = args.at(-1);
@@ -73,14 +73,14 @@ describe('setupCommand codex execution', () => {
 
     expect(execFileMock).toHaveBeenCalledWith(
       'codex',
-      ['mcp', 'add', 'gitnexus', '--', 'cmd', '/c', 'npx', '-y', NPX_REF, 'mcp'],
+      ['mcp', 'add', 'yummygraph', '--', 'cmd', '/c', 'npx', '-y', NPX_REF, 'mcp'],
       { shell: true, windowsHide: true },
       expect.any(Function),
     );
   });
 
   it('uses Windows npx fallback arguments when where returns only a non-wrapper shim', async () => {
-    execFileSyncMock.mockReturnValueOnce('C:\\Users\\dev\\AppData\\Roaming\\npm\\gitnexus\n');
+    execFileSyncMock.mockReturnValueOnce('C:\\Users\\dev\\AppData\\Roaming\\npm\\yummygraph\n');
 
     const { setupCommand } = await import('../../src/cli/setup.js');
 
@@ -88,7 +88,7 @@ describe('setupCommand codex execution', () => {
 
     expect(execFileMock).toHaveBeenCalledWith(
       'codex',
-      ['mcp', 'add', 'gitnexus', '--', 'cmd', '/c', 'npx', '-y', NPX_REF, 'mcp'],
+      ['mcp', 'add', 'yummygraph', '--', 'cmd', '/c', 'npx', '-y', NPX_REF, 'mcp'],
       { shell: true, windowsHide: true },
       expect.any(Function),
     );
@@ -103,7 +103,7 @@ describe('setupCommand codex execution', () => {
 
     expect(execFileMock).toHaveBeenCalledWith(
       'codex',
-      ['mcp', 'add', 'gitnexus', '--', 'npx', '-y', NPX_REF, 'mcp'],
+      ['mcp', 'add', 'yummygraph', '--', 'npx', '-y', NPX_REF, 'mcp'],
       { shell: false, windowsHide: true },
       expect.any(Function),
     );

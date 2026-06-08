@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import type { ParsedFile, ScopeResolutionIndexes } from 'gitnexus-shared';
+import type { ParsedFile, ScopeResolutionIndexes } from 'yummygraph-shared';
 import { extractParsedFile } from '../../src/core/ingestion/scope-extractor-bridge.js';
 import { goScopeResolver } from '../../src/core/ingestion/languages/go/scope-resolver.js';
 import { cppScopeResolver } from '../../src/core/ingestion/languages/cpp/scope-resolver.js';
@@ -24,13 +24,13 @@ import { populateJavaPackageSiblings } from '../../src/core/ingestion/languages/
  * assumption the safe-parse timeout suite relies on).
  */
 
-const ORIGINAL_BUDGET = process.env.GITNEXUS_PARSE_TIMEOUT_MS;
+const ORIGINAL_BUDGET = process.env.YUMMYGRAPH_PARSE_TIMEOUT_MS;
 
 afterEach(() => {
   if (ORIGINAL_BUDGET === undefined) {
-    delete process.env.GITNEXUS_PARSE_TIMEOUT_MS;
+    delete process.env.YUMMYGRAPH_PARSE_TIMEOUT_MS;
   } else {
-    process.env.GITNEXUS_PARSE_TIMEOUT_MS = ORIGINAL_BUDGET;
+    process.env.YUMMYGRAPH_PARSE_TIMEOUT_MS = ORIGINAL_BUDGET;
   }
 });
 
@@ -93,7 +93,7 @@ func main() {
     // asserted here: range-binding resolves types from state populated by
     // earlier pipeline phases (propagateImportedReturnTypes etc.) that this
     // isolated hook-level test does not run, so it would be undefined either way.
-    process.env.GITNEXUS_PARSE_TIMEOUT_MS = '1';
+    process.env.YUMMYGRAPH_PARSE_TIMEOUT_MS = '1';
     expect(() =>
       populateGoRangeBindings([badParsed, goodParsed], makeEmptyIndexes(), { fileContents }),
     ).not.toThrow();
@@ -118,7 +118,7 @@ void f(std::vector<User>& users) {
     // Not throwing is the regression assertion (the timeout on the first file
     // is caught and the loop continues to the good file). The resolved binding
     // value depends on earlier pipeline phases not run in this isolated test.
-    process.env.GITNEXUS_PARSE_TIMEOUT_MS = '1';
+    process.env.YUMMYGRAPH_PARSE_TIMEOUT_MS = '1';
     expect(() =>
       populateCppRangeBindings([badParsed, goodParsed], makeEmptyIndexes(), { fileContents }),
     ).not.toThrow();
@@ -144,7 +144,7 @@ fn main() {
     // Not throwing is the regression assertion (the timeout on the first file
     // is caught and the loop continues to the good file). The resolved binding
     // value depends on earlier pipeline phases not run in this isolated test.
-    process.env.GITNEXUS_PARSE_TIMEOUT_MS = '1';
+    process.env.YUMMYGRAPH_PARSE_TIMEOUT_MS = '1';
     expect(() =>
       populateRustRangeBindings([badParsed, goodParsed], makeEmptyIndexes(), { fileContents }),
     ).not.toThrow();
@@ -169,7 +169,7 @@ class B {}`;
       ['Bad.java', bad],
     ]);
 
-    process.env.GITNEXUS_PARSE_TIMEOUT_MS = '1';
+    process.env.YUMMYGRAPH_PARSE_TIMEOUT_MS = '1';
     expect(() =>
       populateJavaPackageSiblings([badParsed, aParsed, bParsed], makeEmptyIndexes(), {
         fileContents,

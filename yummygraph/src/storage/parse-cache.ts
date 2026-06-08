@@ -33,11 +33,11 @@ import type { ParseWorkerResult } from '../core/ingestion/workers/parse-worker.j
  * Cache version composed of:
  *   - A schema bump knob (`SCHEMA_BUMP`) for hand-controlled invalidation
  *     when ParseWorkerResult shape or upstream parse semantics change.
- *   - The current `gitnexus` npm package version, read at module load.
+ *   - The current `yummygraph` npm package version, read at module load.
  *     Any release that ships an updated tree-sitter grammar or revised
  *     extractor logic implies a version bump in package.json, which
  *     automatically invalidates the on-disk cache. Without this, a user
- *     running `npm i -g gitnexus@latest` after a parser-affecting
+ *     running `npm i -g yummygraph@latest` after a parser-affecting
  *     release would silently replay pre-upgrade ParseWorkerResults
  *     against the new graph schema (Bugbot/Claude review on #1479).
  *
@@ -56,14 +56,14 @@ import type { ParseWorkerResult } from '../core/ingestion/workers/parse-worker.j
 // any future change to the `ParsedFile` serialization shape MUST bump
 // SCHEMA_BUMP so both invalidate in lockstep.
 const SCHEMA_BUMP = 4;
-const GITNEXUS_PKG_VERSION = (() => {
+const YUMMYGRAPH_PKG_VERSION = (() => {
   try {
-    // package.json sits at gitnexus/package.json — two levels up from
-    // gitnexus/src/storage/parse-cache.ts (or its dist/ equivalent).
+    // package.json sits at yummygraph/package.json — two levels up from
+    // yummygraph/src/storage/parse-cache.ts (or its dist/ equivalent).
     const here = path.dirname(fileURLToPath(import.meta.url));
     const candidates = [
-      path.join(here, '..', '..', 'package.json'), // src/storage → gitnexus/
-      path.join(here, '..', '..', '..', 'package.json'), // dist/storage → gitnexus/
+      path.join(here, '..', '..', 'package.json'), // src/storage → yummygraph/
+      path.join(here, '..', '..', '..', 'package.json'), // dist/storage → yummygraph/
     ];
     const requireCJS = createRequire(import.meta.url);
     for (const c of candidates) {
@@ -79,7 +79,7 @@ const GITNEXUS_PKG_VERSION = (() => {
   }
   return '0.0.0-unknown';
 })();
-export const PARSE_CACHE_VERSION = `${SCHEMA_BUMP}+${GITNEXUS_PKG_VERSION}`;
+export const PARSE_CACHE_VERSION = `${SCHEMA_BUMP}+${YUMMYGRAPH_PKG_VERSION}`;
 
 const LEGACY_CACHE_FILENAME = 'parse-cache.json';
 const CACHE_DIRNAME = 'parse-cache';

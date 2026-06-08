@@ -2,8 +2,8 @@
  * TypeScript: CALLS edges from JSX element invocations.
  *
  * `<Foo />` is syntactic sugar for `Foo(props)` — the React renderer
- * invokes the component at runtime. For `gitnexus_impact` and
- * `gitnexus_context` to give meaningful answers on `.tsx` codebases,
+ * invokes the component at runtime. For `yummygraph_impact` and
+ * `yummygraph_context` to give meaningful answers on `.tsx` codebases,
  * JSX usage must surface as a CALLS edge.
  *
  * Pre-fix scope: in a real React monorepo (Sourcerer-fe), `.tsx` files
@@ -119,7 +119,7 @@ describe('TypeScript JSX-as-call CALLS edges', () => {
     // `jsx_self_closing_element` and a generic call pattern firing, or
     // both an opening-tag and a closing-tag capture), this would catch
     // the regression — duplicate CALLS edges silently inflate
-    // blast-radius counts in `gitnexus_impact`.
+    // blast-radius counts in `yummygraph_impact`.
     const calls = getRelationships(result, 'CALLS').filter(
       (c) => c.source === 'Wrapped' && c.target === 'Foo',
     );

@@ -1,5 +1,5 @@
-import type { ParsedFile, SymbolDefinition } from 'gitnexus-shared';
-import type { ScopeId } from 'gitnexus-shared';
+import type { ParsedFile, SymbolDefinition } from 'yummygraph-shared';
+import type { ScopeId } from 'yummygraph-shared';
 import { normalizeCppParamType } from './arity-metadata.js';
 
 const userDefinedConversions = new Set<string>();

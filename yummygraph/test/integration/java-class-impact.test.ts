@@ -134,7 +134,7 @@ withTestLbugDB(
       });
 
       it('default call (no includeTests) finds the 1 production caller and excludes test callers', async () => {
-        // Exact call from the issue: gitnexus_impact({target: "SessionTracker", direction: "upstream"})
+        // Exact call from the issue: yummygraph_impact({target: "SessionTracker", direction: "upstream"})
         // Before fix: impactedCount: 0, risk: LOW, byDepth: {}
         const result = await backend.callTool('impact', {
           target: 'SessionTracker',
@@ -240,7 +240,7 @@ withTestLbugDB(
       });
 
       it('incoming.calls contains Constructor callers (was empty before fix)', async () => {
-        // Exact call from issue: gitnexus_context({name: "SessionTracker", file_path: "api/.../SessionTracker.java"})
+        // Exact call from issue: yummygraph_context({name: "SessionTracker", file_path: "api/.../SessionTracker.java"})
         // Before fix: incoming: {}
         const result = await backend.callTool('context', {
           name: 'SessionTracker',

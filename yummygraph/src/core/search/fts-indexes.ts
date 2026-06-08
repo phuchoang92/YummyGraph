@@ -31,7 +31,7 @@ export async function verifySearchFTSIndexes(
     const safeTable = safeIdentifier(table);
     const safeIndex = safeIdentifier(indexName);
     const probe = `
-      CALL QUERY_FTS_INDEX('${safeTable}', '${safeIndex}', '__gitnexus_fts_probe__', conjunctive := false)
+      CALL QUERY_FTS_INDEX('${safeTable}', '${safeIndex}', '__yummygraph_fts_probe__', conjunctive := false)
       RETURN score
       LIMIT 1
     `;

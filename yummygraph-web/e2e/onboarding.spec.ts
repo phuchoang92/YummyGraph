@@ -10,7 +10,7 @@ import { test, expect } from '@playwright/test';
  *   - Flow 4: Repo dropdown in exploring view
  *
  * Most tests mock the backend at the network level so they don't
- * require a live gitnexus server.
+ * require a live yummygraph server.
  */
 
 const BACKEND_URL = 'http://localhost:4747';
@@ -245,7 +245,7 @@ test.describe('Flow 3: Analyze form', () => {
 // ── Flow 4: Repo dropdown (requires running server) ────────────────────────
 
 test.describe('Flow 4: Repo dropdown in exploring view', () => {
-  const SKIP_MSG = 'Requires running gitnexus server with indexed repos';
+  const SKIP_MSG = 'Requires running yummygraph server with indexed repos';
 
   // enterExploringView() can take up to ~45s under parallel CI workers; combined
   // with the dropdown interactions this can exceed the default 60s test budget.

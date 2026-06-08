@@ -25,7 +25,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-const ORIGINAL_BUDGET = process.env.GITNEXUS_CHUNK_BYTE_BUDGET;
+const ORIGINAL_BUDGET = process.env.YUMMYGRAPH_CHUNK_BYTE_BUDGET;
 const WALL_CLOCK_BUDGET_MS = 30_000;
 
 function buildFixture(): Record<string, string> {
@@ -66,7 +66,7 @@ async function runFixture(): Promise<{
   // Force multi-chunk parsing on the small fixture by lowering the byte
   // budget below each file's size. parse-impl reads the budget at module
   // load — vi.resetModules() forces a fresh module so the env takes effect.
-  process.env.GITNEXUS_CHUNK_BYTE_BUDGET = '64';
+  process.env.YUMMYGRAPH_CHUNK_BYTE_BUDGET = '64';
   vi.resetModules();
   const { runChunkedParseAndResolve } =
     await import('../../src/core/ingestion/pipeline-phases/parse-impl.js');
@@ -133,9 +133,9 @@ describe('parse-impl wall-clock integration on multi-chunk fixture (U6 / B3)', (
 
   afterEach(() => {
     if (ORIGINAL_BUDGET === undefined) {
-      delete process.env.GITNEXUS_CHUNK_BYTE_BUDGET;
+      delete process.env.YUMMYGRAPH_CHUNK_BYTE_BUDGET;
     } else {
-      process.env.GITNEXUS_CHUNK_BYTE_BUDGET = ORIGINAL_BUDGET;
+      process.env.YUMMYGRAPH_CHUNK_BYTE_BUDGET = ORIGINAL_BUDGET;
     }
   });
 

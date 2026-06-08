@@ -87,7 +87,7 @@ export const doctorCommand = async () => {
   console.log(t('doctor.runtime'));
   console.log(`  ${label('doctor.labels.os', 10)}${fingerprint.platform}/${fingerprint.arch}`);
   console.log(`  ${label('doctor.labels.node', 10)}${fingerprint.node}`);
-  console.log(`  ${label('doctor.labels.gitnexus', 10)}${fingerprint.gitnexus}`);
+  console.log(`  ${label('doctor.labels.yummygraph', 10)}${fingerprint.yummygraph}`);
   console.log(`  ${label('doctor.labels.ladybugdb', 10)}${fingerprint.ladybugdb ?? 'unknown'}`);
   const nativeCheck = checkLbugNative();
   if (nativeCheck.ok) {

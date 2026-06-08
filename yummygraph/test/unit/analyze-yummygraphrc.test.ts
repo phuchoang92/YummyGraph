@@ -4,10 +4,10 @@ import path from 'path';
 import os from 'os';
 
 /**
- * End-to-end wiring tests for project-local `.gitnexusrc` (#243).
+ * End-to-end wiring tests for project-local `.yummygraphrc` (#243).
  *
  * Unlike analyze-config.test.ts (which unit-tests the pure config module), these
- * drive the REAL `analyzeCommand` with a REAL `.gitnexusrc` on disk and a real
+ * drive the REAL `analyzeCommand` with a REAL `.yummygraphrc` on disk and a real
  * `analyze-config` module — only the heavy pipeline (`runFullAnalysis`,
  * `generateAIContextFiles`, skill-gen, LadybugDB) and git are mocked. They fail
  * if config is parsed but not threaded into the analyze/context path.
@@ -43,8 +43,8 @@ vi.mock('../../src/core/lbug/lbug-adapter.js', () => ({ closeLbug: vi.fn(async (
 
 vi.mock('../../src/storage/repo-manager.js', () => ({
   getStoragePaths: vi.fn((repoPath: string) => ({
-    storagePath: path.join(repoPath, '.gitnexus'),
-    lbugPath: path.join(repoPath, '.gitnexus', 'lbug'),
+    storagePath: path.join(repoPath, '.yummygraph'),
+    lbugPath: path.join(repoPath, '.yummygraph', 'lbug'),
   })),
   getGlobalRegistryPath: vi.fn(() => 'registry.json'),
   RegistryNameCollisionError: class RegistryNameCollisionError extends Error {},
@@ -70,7 +70,7 @@ const upToDate = {
   alreadyUpToDate: true,
 };
 
-describe('analyzeCommand .gitnexusrc wiring (#243)', () => {
+describe('analyzeCommand .yummygraphrc wiring (#243)', () => {
   let dir: string;
 
   beforeEach(async () => {
@@ -99,9 +99,9 @@ describe('analyzeCommand .gitnexusrc wiring (#243)', () => {
   });
 
   const writeRc = (obj: unknown) =>
-    fs.writeFile(path.join(dir, '.gitnexusrc'), JSON.stringify(obj));
+    fs.writeFile(path.join(dir, '.yummygraphrc'), JSON.stringify(obj));
 
-  it('maps .gitnexusrc skipContextFiles to skipAgentsMd without implying skipSkills', async () => {
+  it('maps .yummygraphrc skipContextFiles to skipAgentsMd without implying skipSkills', async () => {
     await writeRc({ skipContextFiles: true });
     const { analyzeCommand } = await import('../../src/cli/analyze.js');
 
@@ -124,7 +124,7 @@ describe('analyzeCommand .gitnexusrc wiring (#243)', () => {
     expect(opts.skipSkills).toBe(true);
   });
 
-  it('uses .gitnexusrc defaultBranch for generated context', async () => {
+  it('uses .yummygraphrc defaultBranch for generated context', async () => {
     await writeRc({ defaultBranch: 'develop' });
     const { analyzeCommand } = await import('../../src/cli/analyze.js');
 
@@ -136,7 +136,7 @@ describe('analyzeCommand .gitnexusrc wiring (#243)', () => {
     expect(getDefaultBranchMock).not.toHaveBeenCalled();
   });
 
-  it('lets --default-branch override .gitnexusrc defaultBranch', async () => {
+  it('lets --default-branch override .yummygraphrc defaultBranch', async () => {
     await writeRc({ defaultBranch: 'develop' });
     const { analyzeCommand } = await import('../../src/cli/analyze.js');
 
@@ -147,7 +147,7 @@ describe('analyzeCommand .gitnexusrc wiring (#243)', () => {
   });
 
   it('auto-detects the default branch when neither CLI nor config set it', async () => {
-    // No .gitnexusrc on disk.
+    // No .yummygraphrc on disk.
     getDefaultBranchMock.mockReturnValue('trunk');
     const { analyzeCommand } = await import('../../src/cli/analyze.js');
 
@@ -158,8 +158,8 @@ describe('analyzeCommand .gitnexusrc wiring (#243)', () => {
     expect(opts.defaultBranch).toBe('trunk');
   });
 
-  it('fails before analysis on an invalid .gitnexusrc, with an actionable error', async () => {
-    await fs.writeFile(path.join(dir, '.gitnexusrc'), '{ broken json ');
+  it('fails before analysis on an invalid .yummygraphrc, with an actionable error', async () => {
+    await fs.writeFile(path.join(dir, '.yummygraphrc'), '{ broken json ');
     const { analyzeCommand } = await import('../../src/cli/analyze.js');
 
     await analyzeCommand(dir, {});
@@ -167,8 +167,8 @@ describe('analyzeCommand .gitnexusrc wiring (#243)', () => {
     expect(process.exitCode).toBe(1);
     expect(runFullAnalysisMock).not.toHaveBeenCalled();
     expect(cliErrorMock).toHaveBeenCalledWith(
-      expect.stringMatching(/\.gitnexusrc/),
-      expect.objectContaining({ recoveryHint: 'gitnexusrc-invalid' }),
+      expect.stringMatching(/\.yummygraphrc/),
+      expect.objectContaining({ recoveryHint: 'yummygraphrc-invalid' }),
     );
   });
 

@@ -1,6 +1,6 @@
-// gitnexus/src/core/ingestion/variable-extractors/configs/csharp.ts
+// yummygraph/src/core/ingestion/variable-extractors/configs/csharp.ts
 
-import { SupportedLanguages } from 'gitnexus-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 import type { VariableExtractionConfig } from '../../variable-types.js';
 import type { VariableVisibility } from '../../variable-types.js';
 import { collectModifierTexts } from '../../field-extractors/configs/helpers.js';

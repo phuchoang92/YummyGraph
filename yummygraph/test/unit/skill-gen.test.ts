@@ -627,7 +627,7 @@ describe('generateSkillFiles — file output', () => {
   /**
    * The "How to Explore" section must reference MCP tools by their registered
    * (unprefixed) names — the server registers `context`/`query`, not
-   * `gitnexus_context`/`gitnexus_query`, so the prefixed form points agents at
+   * `yummygraph_context`/`yummygraph_query`, so the prefixed form points agents at
    * tools that do not exist (#2059).
    */
   it('references MCP tools by their registered (unprefixed) names (#2059)', async () => {
@@ -648,7 +648,7 @@ describe('generateSkillFiles — file output', () => {
       path.join(tmpDir, '.claude', 'skills', 'generated', 'alpha', 'SKILL.md'),
       'utf-8',
     );
-    expect(content).not.toMatch(/gitnexus_(context|query|impact|detect_changes|rename|cypher)/);
+    expect(content).not.toMatch(/yummygraph_(context|query|impact|detect_changes|rename|cypher)/);
     expect(content).toContain('context({name:');
     expect(content).toContain('query({query:');
   });

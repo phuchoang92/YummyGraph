@@ -8,7 +8,7 @@ describe('JavaWorkspaceExtractor', () => {
   let tmpDir: string;
 
   beforeEach(async () => {
-    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'gitnexus-java-ws-'));
+    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'yummygraph-java-ws-'));
   });
 
   afterEach(async () => {

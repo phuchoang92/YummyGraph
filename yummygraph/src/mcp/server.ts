@@ -23,7 +23,7 @@ import {
   ListPromptsRequestSchema,
   GetPromptRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
-import { GITNEXUS_TOOLS } from './tools.js';
+import { YUMMYGRAPH_TOOLS } from './tools.js';
 import { installGlobalStdoutSentinel } from './stdio-context.js';
 import type { LocalBackend } from './local/local-backend.js';
 import { getResourceDefinitions, getResourceTemplates, readResource } from './resources.js';
@@ -44,25 +44,25 @@ function getNextStepHint(toolName: string, args: Record<string, any> | undefined
 
   switch (toolName) {
     case 'list_repos':
-      return `\n\n---\n**Next:** READ gitnexus://repo/{name}/context for any repo above to get its overview and check staleness.`;
+      return `\n\n---\n**Next:** READ yummygraph://repo/{name}/context for any repo above to get its overview and check staleness.`;
 
     case 'query':
       return `\n\n---\n**Next:** To understand a specific symbol in depth, use context({name: "<symbol_name>"${repoParam}}) to see categorized refs and process participation.`;
 
     case 'context':
-      return `\n\n---\n**Next:** If planning changes, use impact({target: "${args?.name || '<name>'}", direction: "upstream"${repoParam}}) to check blast radius. To see execution flows, READ gitnexus://repo/${repoPath}/processes.`;
+      return `\n\n---\n**Next:** If planning changes, use impact({target: "${args?.name || '<name>'}", direction: "upstream"${repoParam}}) to check blast radius. To see execution flows, READ yummygraph://repo/${repoPath}/processes.`;
 
     case 'impact':
-      return `\n\n---\n**Next:** Review d=1 items first (WILL BREAK). To check affected execution flows, READ gitnexus://repo/${repoPath}/processes.`;
+      return `\n\n---\n**Next:** Review d=1 items first (WILL BREAK). To check affected execution flows, READ yummygraph://repo/${repoPath}/processes.`;
 
     case 'detect_changes':
-      return `\n\n---\n**Next:** Review affected processes. Use context() on high-risk changed symbols. READ gitnexus://repo/${repoPath}/process/{name} for full execution traces.`;
+      return `\n\n---\n**Next:** Review affected processes. Use context() on high-risk changed symbols. READ yummygraph://repo/${repoPath}/process/{name} for full execution traces.`;
 
     case 'rename':
       return `\n\n---\n**Next:** Run detect_changes(${repoParam ? `{repo: "${repo}"}` : ''}) to verify no unexpected side effects from the rename.`;
 
     case 'cypher':
-      return `\n\n---\n**Next:** To explore a result symbol, use context({name: "<name>"${repoParam}}). For schema reference, READ gitnexus://repo/${repoPath}/schema.`;
+      return `\n\n---\n**Next:** To explore a result symbol, use context({name: "<name>"${repoParam}}). For schema reference, READ yummygraph://repo/${repoPath}/schema.`;
 
     // Legacy tool names — still return useful hints
     case 'search':
@@ -70,7 +70,7 @@ function getNextStepHint(toolName: string, args: Record<string, any> | undefined
     case 'explore':
       return `\n\n---\n**Next:** If planning changes, use impact({target: "<name>", direction: "upstream"${repoParam}}).`;
     case 'overview':
-      return `\n\n---\n**Next:** To drill into an area, READ gitnexus://repo/${repoPath}/cluster/{name}. To see execution flows, READ gitnexus://repo/${repoPath}/processes.`;
+      return `\n\n---\n**Next:** To drill into an area, READ yummygraph://repo/${repoPath}/cluster/{name}. To see execution flows, READ yummygraph://repo/${repoPath}/processes.`;
 
     default:
       return '';
@@ -86,7 +86,7 @@ export function createMCPServer(backend: LocalBackend): Server {
   const pkgVersion: string = require('../../package.json').version;
   const server = new Server(
     {
-      name: 'gitnexus',
+      name: 'yummygraph',
       version: pkgVersion,
     },
     {
@@ -154,7 +154,7 @@ export function createMCPServer(backend: LocalBackend): Server {
 
   // Handle list tools request
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
-    tools: GITNEXUS_TOOLS.map((tool) => ({
+    tools: YUMMYGRAPH_TOOLS.map((tool) => ({
       name: tool.name,
       description: tool.description,
       inputSchema: tool.inputSchema,
@@ -263,10 +263,10 @@ Present the analysis as a clear risk report.`,
               text: `Generate architecture documentation for this codebase using the knowledge graph.
 
 Follow these steps:
-1. READ \`gitnexus://repo/${repo || '{name}'}/context\` for codebase stats
-2. READ \`gitnexus://repo/${repo || '{name}'}/clusters\` to see all functional areas
-3. READ \`gitnexus://repo/${repo || '{name}'}/processes\` to see all execution flows
-4. For the top 5 most important processes, READ \`gitnexus://repo/${repo || '{name}'}/process/{name}\` for step-by-step traces
+1. READ \`yummygraph://repo/${repo || '{name}'}/context\` for codebase stats
+2. READ \`yummygraph://repo/${repo || '{name}'}/clusters\` to see all functional areas
+3. READ \`yummygraph://repo/${repo || '{name}'}/processes\` to see all execution flows
+4. For the top 5 most important processes, READ \`yummygraph://repo/${repo || '{name}'}/process/{name}\` for step-by-step traces
 5. Generate a mermaid architecture diagram showing the major areas and their connections
 6. Write an ARCHITECTURE.md file with: overview, functional areas, key execution flows, and the mermaid diagram`,
             },
@@ -346,7 +346,7 @@ export async function startMCPServer(backend: LocalBackend): Promise<void> {
   // (buffered), so we must `flushLoggerSync()` before `process.exit` —
   // otherwise records emitted during disconnect/close are lost. The flush
   // is a no-op when the singleton was never used or when running under
-  // vitest. See `gitnexus/src/core/logger.ts`.
+  // vitest. See `yummygraph/src/core/logger.ts`.
   let shuttingDown = false;
   const shutdown = async (exitCode = 0) => {
     if (shuttingDown) return;
@@ -380,11 +380,11 @@ export async function startMCPServer(backend: LocalBackend): Promise<void> {
   // unhandledRejection is logged but kept non-fatal (availability-first):
   // killing the server for one missed catch would be worse than logging it.
   process.on('uncaughtException', (err) => {
-    process.stderr.write(`GitNexus MCP uncaughtException: ${err?.stack || err}\n`);
+    process.stderr.write(`YummyGraph MCP uncaughtException: ${err?.stack || err}\n`);
     void shutdown(1);
   });
   process.on('unhandledRejection', (reason: any) => {
-    process.stderr.write(`GitNexus MCP unhandledRejection: ${reason?.stack || reason}\n`);
+    process.stderr.write(`YummyGraph MCP unhandledRejection: ${reason?.stack || reason}\n`);
   });
 
   // Handle stdio errors — stdin close means the parent process is gone.

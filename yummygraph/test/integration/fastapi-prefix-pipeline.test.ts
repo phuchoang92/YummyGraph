@@ -31,7 +31,7 @@
  *    `non-app host` cases in `http-route-extractor.test.ts`.
  *
  * The fixture lives at `test/fixtures/fastapi-prefix-app/` so the
- * pipeline can scan a real on-disk repo (mirroring how `gitnexus
+ * pipeline can scan a real on-disk repo (mirroring how `yummygraph
  * analyze` is used in production) and so reviewers can inspect the
  * inputs without reading test source.
  */

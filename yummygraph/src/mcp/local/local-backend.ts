@@ -1,7 +1,7 @@
 /**
  * Local Backend (Multi-Repo)
  *
- * Provides tool implementations using local .gitnexus/ indexes.
+ * Provides tool implementations using local .yummygraph/ indexes.
  * Supports multiple indexed repositories via a global registry.
  * LadybugDB connections are opened lazily per repo on first query.
  */
@@ -51,7 +51,7 @@ import {
 import { PhaseTimer } from '../../core/search/phase-timer.js';
 import { checkStalenessAsync, checkCwdMatch } from '../../core/git-staleness.js';
 import { logger } from '../../core/logger.js';
-// AI context generation is CLI-only (gitnexus analyze)
+// AI context generation is CLI-only (yummygraph analyze)
 // import { generateAIContextFiles } from '../../cli/ai-context.js';
 
 /**
@@ -174,7 +174,7 @@ const confidenceForRelType = (relType: string | undefined): number =>
 /** Structured error logging for query failures — replaces empty catch blocks */
 function logQueryError(context: string, err: unknown): void {
   const msg = err instanceof Error ? err.message : String(err);
-  logger.error({ context, err: msg }, 'GitNexus query failed');
+  logger.error({ context, err: msg }, 'YummyGraph query failed');
 }
 
 const isReadOnlyDbError = (err: unknown): boolean => {
@@ -195,7 +195,7 @@ const isReadOnlyDbError = (err: unknown): boolean => {
  * Per-query latency telemetry for production aggregation (#553).
  *
  * Logged at `debug` level — timing is observability/telemetry, not an
- * error. Operators wanting per-query timing set `GITNEXUS_LOG_LEVEL=debug`
+ * error. Operators wanting per-query timing set `YUMMYGRAPH_LOG_LEVEL=debug`
  * (or equivalent). Emitting at `error` level (the original migration
  * artifact) caused alerting rules to fire on every successful query and
  * inflated stderr noise for every MCP/CLI invocation.
@@ -208,7 +208,7 @@ const isReadOnlyDbError = (err: unknown): boolean => {
 function logQueryTiming(query: string, phases: Record<string, number>): void {
   const totalMs = phases.wall ?? Object.values(phases).reduce((a, b) => a + b, 0);
   const truncated = query.length > 80 ? `${query.slice(0, 80)}…` : query;
-  logger.debug({ query: truncated, totalMs, phases }, 'GitNexus query timing');
+  logger.debug({ query: truncated, totalMs, phases }, 'YummyGraph query timing');
 }
 
 export interface CodebaseContext {
@@ -439,7 +439,7 @@ export class LocalBackend {
       const kuzu = await cleanupOldKuzuFiles(storagePath);
       if (kuzu.found && kuzu.needsReindex) {
         logger.error(
-          `GitNexus: "${entry.name}" has a stale KuzuDB index. Run: gitnexus analyze ${entry.path}`,
+          `YummyGraph: "${entry.name}" has a stale KuzuDB index. Run: yummygraph analyze ${entry.path}`,
         );
       }
 
@@ -549,7 +549,7 @@ export class LocalBackend {
     // break, not a runtime condition — fail loudly rather than silently
     // overwrite a different repo's handle (#2054 invariant).
     throw new Error(
-      `GitNexus internal: unable to assign a unique repo id for "${name}" at ${repoPath}`,
+      `YummyGraph internal: unable to assign a unique repo id for "${name}" at ${repoPath}`,
     );
   }
 
@@ -603,7 +603,7 @@ export class LocalBackend {
 
     // Still no match — throw with helpful message
     if (this.repos.size === 0) {
-      throw new Error('No indexed repositories. Run: gitnexus analyze');
+      throw new Error('No indexed repositories. Run: yummygraph analyze');
     }
 
     // Build a disambiguated "Available: …" list (#829). When two handles
@@ -903,7 +903,7 @@ export class LocalBackend {
    * Limitation: in MCP stdio server mode `process.cwd()` is the
    * server's CWD at start time, *not* the agent client's CWD. The
    * warning therefore only fires when the MCP server itself was
-   * launched from inside a sibling clone (typical for `npx gitnexus
+   * launched from inside a sibling clone (typical for `npx yummygraph
    * serve` from a polecat workspace). Surfacing the client's CWD
    * would require a per-tool-call `cwd` parameter — out of scope for
    * the current MCP contract.
@@ -945,7 +945,7 @@ export class LocalBackend {
     }
 
     this.warnedSiblingDrift.add(cacheKey);
-    logger.error(`GitNexus: ${match.hint}`);
+    logger.error(`YummyGraph: ${match.hint}`);
   }
 
   // ─── Tool Dispatch ───────────────────────────────────────────────
@@ -1283,7 +1283,7 @@ export class LocalBackend {
       timing,
       ...(!ftsUsed && {
         warning:
-          'FTS indexes missing — keyword search degraded. Run: gitnexus analyze --repair-fts (or gitnexus analyze --force) to rebuild indexes.',
+          'FTS indexes missing — keyword search degraded. Run: yummygraph analyze --repair-fts (or yummygraph analyze --force) to rebuild indexes.',
       }),
     };
   }
@@ -1303,7 +1303,7 @@ export class LocalBackend {
       // Module import can fail in sandboxed MCP contexts (#1489)
       logger.warn(
         { err: err?.message },
-        'GitNexus: bm25-index.js import failed — falling back to semantic-only',
+        'YummyGraph: bm25-index.js import failed — falling back to semantic-only',
       );
       return { results: [], ftsUsed: false };
     }
@@ -1313,7 +1313,7 @@ export class LocalBackend {
     } catch (err: any) {
       logger.error(
         { err: err.message },
-        'GitNexus: BM25/FTS search failed (FTS indexes may not exist) -',
+        'YummyGraph: BM25/FTS search failed (FTS indexes may not exist) -',
       );
       return { results: [], ftsUsed: false };
     }
@@ -1442,7 +1442,7 @@ export class LocalBackend {
         // noisy stderr on hot semantic-search paths (DoD §2.8).
         this.warnedVectorUnsupported = true;
         logger.warn(
-          'GitNexus [query:vector]: VECTOR extension not supported on this platform; using exact scan fallback',
+          'YummyGraph [query:vector]: VECTOR extension not supported on this platform; using exact scan fallback',
         );
       }
 
@@ -2877,7 +2877,7 @@ export class LocalBackend {
         direction: params.direction,
         impactedCount: 0,
         risk: 'UNKNOWN',
-        suggestion: 'The graph query failed — try gitnexus context <symbol> as a fallback',
+        suggestion: 'The graph query failed — try yummygraph context <symbol> as a fallback',
         ...(isWalCorruptionError(err) ? { recoverySuggestion: WAL_RECOVERY_SUGGESTION } : {}),
       };
     }
@@ -3807,7 +3807,7 @@ export class LocalBackend {
   }
 
   /**
-   * MCP resource body for `gitnexus://group/{name}/contracts` (Issue #794).
+   * MCP resource body for `yummygraph://group/{name}/contracts` (Issue #794).
    */
   async readGroupContractsResource(
     groupName: string,
@@ -3826,7 +3826,7 @@ export class LocalBackend {
   }
 
   /**
-   * MCP resource body for `gitnexus://group/{name}/status` (Issue #794).
+   * MCP resource body for `yummygraph://group/{name}/status` (Issue #794).
    */
   async readGroupStatusResource(groupName: string): Promise<string> {
     try {

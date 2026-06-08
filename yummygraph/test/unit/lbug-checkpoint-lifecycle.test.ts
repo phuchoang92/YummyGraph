@@ -62,7 +62,7 @@ describe('lbug adapter CHECKPOINT lifecycle', () => {
   it('removes orphan sidecars when main DB file is missing before opening LadybugDB', async () => {
     vi.resetModules();
 
-    const dbPath = '/tmp/gitnexus-lbug-orphan-sidecar/lbug';
+    const dbPath = '/tmp/yummygraph-lbug-orphan-sidecar/lbug';
     const ENOENT_ERROR = makeErrnoError(
       'ENOENT',
       `ENOENT: no such file or directory, access '${dbPath}'`,
@@ -121,10 +121,10 @@ describe('lbug adapter CHECKPOINT lifecycle', () => {
     expect(unlinkMock).toHaveBeenCalledWith(`${dbPath}.init.lock`);
     expect(warnMock).toHaveBeenCalledTimes(2);
     expect(warnMock).toHaveBeenCalledWith(
-      'GitNexus: removed orphan sidecar lbug.shadow (no main DB file present)',
+      'YummyGraph: removed orphan sidecar lbug.shadow (no main DB file present)',
     );
     expect(warnMock).toHaveBeenCalledWith(
-      'GitNexus: removed orphan sidecar lbug.wal.checkpoint (no main DB file present)',
+      'YummyGraph: removed orphan sidecar lbug.wal.checkpoint (no main DB file present)',
     );
 
     await adapter.closeLbug();
@@ -133,7 +133,7 @@ describe('lbug adapter CHECKPOINT lifecycle', () => {
   it('skips orphan sidecar cleanup when db access fails with non-ENOENT errors', async () => {
     vi.resetModules();
 
-    const dbPath = '/tmp/gitnexus-lbug-orphan-sidecar-eacces/lbug';
+    const dbPath = '/tmp/yummygraph-lbug-orphan-sidecar-eacces/lbug';
     const ENOENT_ERROR = makeErrnoError(
       'ENOENT',
       `ENOENT: no such file or directory, access '${dbPath}'`,
@@ -191,7 +191,7 @@ describe('lbug adapter CHECKPOINT lifecycle', () => {
     expect(unlinkMock).toHaveBeenCalledWith(`${dbPath}.init.lock`);
     expect(warnMock).toHaveBeenCalledTimes(1);
     expect(warnMock.mock.calls[0]?.[0]).toContain(
-      'GitNexus: unable to verify main DB file before orphan sidecar cleanup (EACCES); skipping cleanup:',
+      'YummyGraph: unable to verify main DB file before orphan sidecar cleanup (EACCES); skipping cleanup:',
     );
 
     await adapter.closeLbug();
@@ -200,7 +200,7 @@ describe('lbug adapter CHECKPOINT lifecycle', () => {
   it('does not remove sidecars when main db file is present', async () => {
     vi.resetModules();
 
-    const dbPath = '/tmp/gitnexus-lbug-present/lbug';
+    const dbPath = '/tmp/yummygraph-lbug-present/lbug';
     const ENOENT_ERROR = makeErrnoError(
       'ENOENT',
       `ENOENT: no such file or directory, access '${dbPath}'`,
@@ -262,12 +262,12 @@ describe('lbug adapter CHECKPOINT lifecycle', () => {
     {
       code: 'EPERM',
       message: 'operation not permitted',
-      dbPath: '/tmp/gitnexus-lbug-lstat-eperm/lbug',
+      dbPath: '/tmp/yummygraph-lbug-lstat-eperm/lbug',
     },
     {
       code: 'EACCES',
       message: 'permission denied',
-      dbPath: '/tmp/gitnexus-lbug-lstat-eacces/lbug',
+      dbPath: '/tmp/yummygraph-lbug-lstat-eacces/lbug',
     },
   ])('throws when db path lstat fails with non-ENOENT %s', async ({ code, message, dbPath }) => {
     vi.resetModules();
@@ -321,7 +321,7 @@ describe('lbug adapter CHECKPOINT lifecycle', () => {
   it('handles partial orphan sidecar state and removes only present sidecars', async () => {
     vi.resetModules();
 
-    const dbPath = '/tmp/gitnexus-lbug-partial-sidecar/lbug';
+    const dbPath = '/tmp/yummygraph-lbug-partial-sidecar/lbug';
     const ENOENT_ERROR = makeErrnoError(
       'ENOENT',
       `ENOENT: no such file or directory, access '${dbPath}'`,
@@ -378,7 +378,7 @@ describe('lbug adapter CHECKPOINT lifecycle', () => {
     expect(unlinkMock).toHaveBeenCalledWith(`${dbPath}.wal.checkpoint`);
     expect(warnMock).toHaveBeenCalledTimes(1);
     expect(warnMock).toHaveBeenCalledWith(
-      'GitNexus: removed orphan sidecar lbug.wal.checkpoint (no main DB file present)',
+      'YummyGraph: removed orphan sidecar lbug.wal.checkpoint (no main DB file present)',
     );
 
     await adapter.closeLbug();
@@ -387,7 +387,7 @@ describe('lbug adapter CHECKPOINT lifecycle', () => {
   it('proceeds to openLbugConnection when orphan sidecar unlink fails', async () => {
     vi.resetModules();
 
-    const dbPath = '/tmp/gitnexus-lbug-sidecar-unlink-fail/lbug';
+    const dbPath = '/tmp/yummygraph-lbug-sidecar-unlink-fail/lbug';
     const ENOENT_ERROR = makeErrnoError(
       'ENOENT',
       `ENOENT: no such file or directory, access '${dbPath}'`,
@@ -448,12 +448,12 @@ describe('lbug adapter CHECKPOINT lifecycle', () => {
     expect(unlinkMock).toHaveBeenCalledTimes(3);
     expect(warnMock).toHaveBeenCalledTimes(3);
     expect(warnMock.mock.calls[0]?.[0]).toContain(
-      'GitNexus: failed to remove orphan sidecar lbug.shadow (EPERM) while main DB file is missing; LadybugDB open may still fail:',
+      'YummyGraph: failed to remove orphan sidecar lbug.shadow (EPERM) while main DB file is missing; LadybugDB open may still fail:',
     );
     expect(warnMock.mock.calls[1]?.[0]).toContain(
-      'GitNexus: failed to remove orphan sidecar lbug.wal.checkpoint (EPERM) while main DB file is missing; LadybugDB open may still fail:',
+      'YummyGraph: failed to remove orphan sidecar lbug.wal.checkpoint (EPERM) while main DB file is missing; LadybugDB open may still fail:',
     );
-    expect(warnMock.mock.calls[2]?.[0]).toContain('GitNexus: failed to release init lock (EPERM)');
+    expect(warnMock.mock.calls[2]?.[0]).toContain('YummyGraph: failed to release init lock (EPERM)');
     expect(openLbugConnectionMock).toHaveBeenCalledWith(expect.anything(), dbPath);
 
     await adapter.closeLbug();
@@ -492,7 +492,7 @@ describe('lbug adapter CHECKPOINT lifecycle', () => {
       }),
     };
 
-    mockFsForInit('/tmp/gitnexus-lbug-checkpoint-lifecycle/lbug');
+    mockFsForInit('/tmp/yummygraph-lbug-checkpoint-lifecycle/lbug');
     vi.doMock('../../src/core/lbug/lbug-config.js', () => ({
       openLbugConnection: vi.fn(async () => ({ db, conn })),
       closeLbugConnection: vi.fn(async () => {}),
@@ -509,7 +509,7 @@ describe('lbug adapter CHECKPOINT lifecycle', () => {
     }));
 
     const adapter = await import('../../src/core/lbug/lbug-adapter.js');
-    await adapter.initLbug('/tmp/gitnexus-lbug-checkpoint-lifecycle/lbug');
+    await adapter.initLbug('/tmp/yummygraph-lbug-checkpoint-lifecycle/lbug');
 
     events.length = 0;
     await adapter.closeLbug();
@@ -551,7 +551,7 @@ describe('lbug adapter CHECKPOINT lifecycle', () => {
       close: vi.fn(async () => {}),
     };
 
-    mockFsForInit('/tmp/gitnexus-lbug-query-lifecycle/lbug');
+    mockFsForInit('/tmp/yummygraph-lbug-query-lifecycle/lbug');
     vi.doMock('../../src/core/lbug/lbug-config.js', () => ({
       openLbugConnection: vi.fn(async () => ({ db, conn })),
       closeLbugConnection: vi.fn(async () => {}),
@@ -568,7 +568,7 @@ describe('lbug adapter CHECKPOINT lifecycle', () => {
     }));
 
     const adapter = await import('../../src/core/lbug/lbug-adapter.js');
-    await adapter.initLbug('/tmp/gitnexus-lbug-query-lifecycle/lbug');
+    await adapter.initLbug('/tmp/yummygraph-lbug-query-lifecycle/lbug');
 
     events.length = 0;
     await expect(adapter.executeQuery('MATCH (n:File) RETURN n.id AS id')).resolves.toEqual([
@@ -603,7 +603,7 @@ describe('lbug adapter CHECKPOINT lifecycle', () => {
       close: vi.fn(async () => {}),
     };
 
-    mockFsForInit('/tmp/gitnexus-lbug-sync-close-lifecycle/lbug');
+    mockFsForInit('/tmp/yummygraph-lbug-sync-close-lifecycle/lbug');
     vi.doMock('../../src/core/lbug/lbug-config.js', () => ({
       openLbugConnection: vi.fn(async () => ({ db, conn })),
       closeLbugConnection: vi.fn(async () => {}),
@@ -620,7 +620,7 @@ describe('lbug adapter CHECKPOINT lifecycle', () => {
     }));
 
     const adapter = await import('../../src/core/lbug/lbug-adapter.js');
-    await adapter.initLbug('/tmp/gitnexus-lbug-sync-close-lifecycle/lbug');
+    await adapter.initLbug('/tmp/yummygraph-lbug-sync-close-lifecycle/lbug');
 
     await expect(adapter.executeQuery('MATCH (n:File) RETURN n.id AS id')).resolves.toEqual([
       { id: 'file:a' },
@@ -666,7 +666,7 @@ describe('lbug adapter CHECKPOINT lifecycle', () => {
       close: vi.fn(async () => {}),
     };
 
-    mockFsForInit('/tmp/gitnexus-lbug-array-error-lifecycle/lbug');
+    mockFsForInit('/tmp/yummygraph-lbug-array-error-lifecycle/lbug');
     vi.doMock('../../src/core/lbug/lbug-config.js', () => ({
       openLbugConnection: vi.fn(async () => ({ db, conn })),
       closeLbugConnection: vi.fn(async () => {}),
@@ -683,7 +683,7 @@ describe('lbug adapter CHECKPOINT lifecycle', () => {
     }));
 
     const adapter = await import('../../src/core/lbug/lbug-adapter.js');
-    await adapter.initLbug('/tmp/gitnexus-lbug-array-error-lifecycle/lbug');
+    await adapter.initLbug('/tmp/yummygraph-lbug-array-error-lifecycle/lbug');
 
     await expect(adapter.executeQuery('MATCH (n:File) RETURN n.id AS id')).rejects.toThrow(
       'read failed',
@@ -744,7 +744,7 @@ describe('lbug adapter CHECKPOINT lifecycle', () => {
       close: vi.fn(async () => {}),
     };
 
-    mockFsForInit('/tmp/gitnexus-lbug-stream-lifecycle/lbug');
+    mockFsForInit('/tmp/yummygraph-lbug-stream-lifecycle/lbug');
     vi.doMock('../../src/core/lbug/lbug-config.js', () => ({
       openLbugConnection: vi.fn(async () => ({ db, conn })),
       closeLbugConnection: vi.fn(async () => {}),
@@ -761,7 +761,7 @@ describe('lbug adapter CHECKPOINT lifecycle', () => {
     }));
 
     const adapter = await import('../../src/core/lbug/lbug-adapter.js');
-    await adapter.initLbug('/tmp/gitnexus-lbug-stream-lifecycle/lbug');
+    await adapter.initLbug('/tmp/yummygraph-lbug-stream-lifecycle/lbug');
 
     const rows: unknown[] = [];
     events.length = 0;
@@ -822,7 +822,7 @@ describe('lbug adapter CHECKPOINT lifecycle', () => {
       close: vi.fn(async () => {}),
     };
 
-    mockFsForInit('/tmp/gitnexus-lbug-stream-error-lifecycle/lbug');
+    mockFsForInit('/tmp/yummygraph-lbug-stream-error-lifecycle/lbug');
     vi.doMock('../../src/core/lbug/lbug-config.js', () => ({
       openLbugConnection: vi.fn(async () => ({ db, conn })),
       closeLbugConnection: vi.fn(async () => {}),
@@ -839,7 +839,7 @@ describe('lbug adapter CHECKPOINT lifecycle', () => {
     }));
 
     const adapter = await import('../../src/core/lbug/lbug-adapter.js');
-    await adapter.initLbug('/tmp/gitnexus-lbug-stream-error-lifecycle/lbug');
+    await adapter.initLbug('/tmp/yummygraph-lbug-stream-error-lifecycle/lbug');
 
     await expect(
       adapter.streamQuery('MATCH (n:File) RETURN n.id AS id', () => {

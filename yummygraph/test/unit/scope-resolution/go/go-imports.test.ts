@@ -5,7 +5,7 @@ import {
   resolveGoImportTarget,
 } from '../../../../src/core/ingestion/languages/go/index.js';
 import { getGoParser } from '../../../../src/core/ingestion/languages/go/query.js';
-import type { CaptureMatch } from 'gitnexus-shared';
+import type { CaptureMatch } from 'yummygraph-shared';
 
 function parseThenSplit(src: string): CaptureMatch[] {
   const tree = getGoParser().parse(src);

@@ -9,7 +9,7 @@
  * markers). Type-binding matches arrive from the raw query captures.
  */
 
-import type { CaptureMatch, ParsedImport, ParsedTypeBinding, TypeRef } from 'gitnexus-shared';
+import type { CaptureMatch, ParsedImport, ParsedTypeBinding, TypeRef } from 'yummygraph-shared';
 
 // ─── interpretImport ──────────────────────────────────────────────────────
 

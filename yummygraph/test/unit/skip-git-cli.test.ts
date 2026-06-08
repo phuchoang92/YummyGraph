@@ -54,15 +54,15 @@ describe('--skip-git CLI flag', () => {
     // pipeline re-index complete and silently no skill files written — the
     // silent-contradiction case flagged in PR 1485 review.
     const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gn-index-only-skills-'));
-    const gitnexusHome = fs.mkdtempSync(path.join(os.tmpdir(), 'gn-index-only-skills-home-'));
+    const yummygraphHome = fs.mkdtempSync(path.join(os.tmpdir(), 'gn-index-only-skills-home-'));
     // Make tmpDir a git repo so analyze accepts it without --skip-git.
     execSync('git init', { cwd: tmpDir, stdio: 'ignore' });
     fs.writeFileSync(path.join(tmpDir, 'a.ts'), 'export const a = 1;\n');
 
     const env = {
       ...process.env,
-      HOME: gitnexusHome,
-      GITNEXUS_HOME: gitnexusHome,
+      HOME: yummygraphHome,
+      YUMMYGRAPH_HOME: yummygraphHome,
     };
 
     try {
@@ -86,7 +86,7 @@ describe('--skip-git CLI flag', () => {
       expect(output).toContain('--index-only overrides --skills');
     } finally {
       fs.rmSync(tmpDir, { recursive: true, force: true });
-      fs.rmSync(gitnexusHome, { recursive: true, force: true });
+      fs.rmSync(yummygraphHome, { recursive: true, force: true });
     }
   });
 
@@ -109,12 +109,12 @@ describe('--skip-git CLI flag', () => {
     }
   });
 
-  it('still respects .gitnexusignore when run with --skip-git', () => {
+  it('still respects .yummygraphignore when run with --skip-git', () => {
     const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gn-skip-git-ignore-'));
-    const gitnexusHome = fs.mkdtempSync(path.join(os.tmpdir(), 'gn-skip-git-ignore-home-'));
+    const yummygraphHome = fs.mkdtempSync(path.join(os.tmpdir(), 'gn-skip-git-ignore-home-'));
     fs.mkdirSync(path.join(tmpDir, 'src'), { recursive: true });
     fs.mkdirSync(path.join(tmpDir, 'customskip'), { recursive: true });
-    fs.writeFileSync(path.join(tmpDir, '.gitnexusignore'), 'customskip/\n');
+    fs.writeFileSync(path.join(tmpDir, '.yummygraphignore'), 'customskip/\n');
     fs.writeFileSync(path.join(tmpDir, 'src', 'keep.ts'), 'export function keep() { return 1; }\n');
     fs.writeFileSync(
       path.join(tmpDir, 'customskip', 'leaked.ts'),
@@ -123,8 +123,8 @@ describe('--skip-git CLI flag', () => {
 
     const env = {
       ...process.env,
-      HOME: gitnexusHome,
-      GITNEXUS_HOME: gitnexusHome,
+      HOME: yummygraphHome,
+      YUMMYGRAPH_HOME: yummygraphHome,
     };
 
     try {
@@ -138,7 +138,7 @@ describe('--skip-git CLI flag', () => {
         if (
           shouldSkipForFtsUnavailable(
             err,
-            'still respects .gitnexusignore when run with --skip-git',
+            'still respects .yummygraphignore when run with --skip-git',
           )
         )
           return;
@@ -167,24 +167,24 @@ describe('--skip-git CLI flag', () => {
       expect(leakedContext).toContain(`"error": "Symbol 'leaked' not found"`);
     } finally {
       fs.rmSync(tmpDir, { recursive: true, force: true });
-      fs.rmSync(gitnexusHome, { recursive: true, force: true });
+      fs.rmSync(yummygraphHome, { recursive: true, force: true });
     }
   });
 
   describe('--skip-git does not walk up to parent git repo (#1232)', () => {
     let parentDir: string;
-    let gitnexusHome: string;
+    let yummygraphHome: string;
 
     function testEnv() {
       return {
         ...process.env,
-        HOME: gitnexusHome,
-        GITNEXUS_HOME: gitnexusHome,
+        HOME: yummygraphHome,
+        YUMMYGRAPH_HOME: yummygraphHome,
       };
     }
 
     function readRegistry(): Array<{ name: string; path: string }> {
-      const registryPath = path.join(gitnexusHome, 'registry.json');
+      const registryPath = path.join(yummygraphHome, 'registry.json');
       expect(fs.existsSync(registryPath)).toBe(true);
       return JSON.parse(fs.readFileSync(registryPath, 'utf8'));
     }
@@ -232,7 +232,7 @@ describe('--skip-git CLI flag', () => {
       //       package.json
       //       src/index.ts
       parentDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gn-skip-git-'));
-      gitnexusHome = fs.mkdtempSync(path.join(os.tmpdir(), 'gn-skip-git-home-'));
+      yummygraphHome = fs.mkdtempSync(path.join(os.tmpdir(), 'gn-skip-git-home-'));
       initParentGitRepo();
       fs.mkdirSync(path.join(parentDir, 'COOLIO', 'src'), { recursive: true });
       fs.writeFileSync(
@@ -259,8 +259,8 @@ describe('--skip-git CLI flag', () => {
       if (parentDir) {
         fs.rmSync(parentDir, { recursive: true, force: true });
       }
-      if (gitnexusHome) {
-        fs.rmSync(gitnexusHome, { recursive: true, force: true });
+      if (yummygraphHome) {
+        fs.rmSync(yummygraphHome, { recursive: true, force: true });
       }
     }
 
@@ -333,7 +333,7 @@ describe('--skip-git CLI flag', () => {
         }
 
         expect(
-          fs.readFileSync(path.join(parentDir, 'COOLIO', '.gitnexus', '.gitignore'), 'utf8'),
+          fs.readFileSync(path.join(parentDir, 'COOLIO', '.yummygraph', '.gitignore'), 'utf8'),
         ).toBe('*\n');
         const status = execSync('git status --short', {
           cwd: parentDir,

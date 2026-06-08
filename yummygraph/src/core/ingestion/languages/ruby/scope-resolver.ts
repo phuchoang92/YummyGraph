@@ -1,5 +1,5 @@
-import type { ParsedFile, ScopeId } from 'gitnexus-shared';
-import { SupportedLanguages } from 'gitnexus-shared';
+import type { ParsedFile, ScopeId } from 'yummygraph-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 import { buildMro, defaultLinearize } from '../../scope-resolution/passes/mro.js';
 import type { ScopeResolver } from '../../scope-resolution/contract/scope-resolver.js';
 import { rubyProvider } from '../ruby.js';

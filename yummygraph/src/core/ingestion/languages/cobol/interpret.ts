@@ -19,7 +19,7 @@ import type {
   ScopeTree,
   Scope,
   TypeRef,
-} from 'gitnexus-shared';
+} from 'yummygraph-shared';
 
 // ─── interpretImport ──────────────────────────────────────────────────────
 

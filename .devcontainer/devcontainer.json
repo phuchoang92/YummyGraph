@@ -1,4 +1,4 @@
-// Devcontainer for GitNexus. It pre-installs Claude Code, the OpenAI Codex
+// Devcontainer for YummyGraph. It pre-installs Claude Code, the OpenAI Codex
 // CLI, and the Cursor CLI, plus the Node.js native build chain. It works on
 // macOS, Linux, Windows via WSL2, and Windows native. Windows native needs a
 // one-time HOME setup. That setup runs automatically via initializeCommand.
@@ -8,7 +8,7 @@
 // For first-time setup, auth flows, and troubleshooting, see
 // .devcontainer/README.md.
 {
-  "name": "GitNexus AI CLI Devcontainer",
+  "name": "YummyGraph AI CLI Devcontainer",
 
   "build": {
     "dockerfile": "Dockerfile",
@@ -82,7 +82,7 @@
   //    bind-mounted, because single-file binds break on Docker Desktop Windows
   //    (the EXDEV error — see the SINGLE-FILE note below). Container-managed
   //    state (sessions, history, caches, IDE locks) stays separate per
-  //    devcontainer. So two GitNexus checkouts on the same host can't corrupt
+  //    devcontainer. So two YummyGraph checkouts on the same host can't corrupt
   //    each other.
   //
   // 3. Other host config — read-only bind mounts for credential and identity
@@ -288,9 +288,9 @@
     "source=commandhistory-${devcontainerId},target=/commandhistory,type=volume",
     "source=npm-cache-${devcontainerId},target=/home/node/.npm,type=volume",
     "source=${localWorkspaceFolderBasename}-root-node-modules-${devcontainerId},target=/workspace/node_modules,type=volume",
-    "source=${localWorkspaceFolderBasename}-gitnexus-node-modules-${devcontainerId},target=/workspace/gitnexus/node_modules,type=volume",
-    "source=${localWorkspaceFolderBasename}-gitnexus-web-node-modules-${devcontainerId},target=/workspace/gitnexus-web/node_modules,type=volume",
-    "source=${localWorkspaceFolderBasename}-gitnexus-shared-node-modules-${devcontainerId},target=/workspace/gitnexus-shared/node_modules,type=volume"
+    "source=${localWorkspaceFolderBasename}-yummygraph-node-modules-${devcontainerId},target=/workspace/yummygraph/node_modules,type=volume",
+    "source=${localWorkspaceFolderBasename}-yummygraph-web-node-modules-${devcontainerId},target=/workspace/yummygraph-web/node_modules,type=volume",
+    "source=${localWorkspaceFolderBasename}-yummygraph-shared-node-modules-${devcontainerId},target=/workspace/yummygraph-shared/node_modules,type=volume"
   ],
 
   // Interactive login is the default way to authenticate for all three CLIs.
@@ -362,16 +362,16 @@
     }
   },
 
-  // Do not remap port 4747 (gitnexus serve). gitnexus-web hardcodes
+  // Do not remap port 4747 (yummygraph serve). yummygraph-web hardcodes
   // http://localhost:4747 as its default backend URL.
   "forwardPorts": [5173, 4747, 4173],
   "portsAttributes": {
     "5173": {
-      "label": "Vite dev (gitnexus-web)",
+      "label": "Vite dev (yummygraph-web)",
       "onAutoForward": "notify"
     },
     "4747": {
-      "label": "gitnexus serve HTTP API",
+      "label": "yummygraph serve HTTP API",
       "onAutoForward": "notify",
       "requireLocalPort": true
     },

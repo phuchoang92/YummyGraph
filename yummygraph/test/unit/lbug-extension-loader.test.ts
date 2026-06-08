@@ -225,57 +225,57 @@ describe('installDuckDbExtensionOutOfProcess child process', () => {
 
 describe('getExtensionInstallPolicy', () => {
   it('defaults to load-only when env var is unset', () => {
-    const original = process.env.GITNEXUS_LBUG_EXTENSION_INSTALL;
-    delete process.env.GITNEXUS_LBUG_EXTENSION_INSTALL;
+    const original = process.env.YUMMYGRAPH_LBUG_EXTENSION_INSTALL;
+    delete process.env.YUMMYGRAPH_LBUG_EXTENSION_INSTALL;
     try {
       expect(getExtensionInstallPolicy()).toBe('load-only');
     } finally {
       if (original === undefined) {
-        delete process.env.GITNEXUS_LBUG_EXTENSION_INSTALL;
+        delete process.env.YUMMYGRAPH_LBUG_EXTENSION_INSTALL;
       } else {
-        process.env.GITNEXUS_LBUG_EXTENSION_INSTALL = original;
+        process.env.YUMMYGRAPH_LBUG_EXTENSION_INSTALL = original;
       }
     }
   });
 
   it('returns auto when env var is set to auto', () => {
-    const original = process.env.GITNEXUS_LBUG_EXTENSION_INSTALL;
-    process.env.GITNEXUS_LBUG_EXTENSION_INSTALL = 'auto';
+    const original = process.env.YUMMYGRAPH_LBUG_EXTENSION_INSTALL;
+    process.env.YUMMYGRAPH_LBUG_EXTENSION_INSTALL = 'auto';
     try {
       expect(getExtensionInstallPolicy()).toBe('auto');
     } finally {
       if (original === undefined) {
-        delete process.env.GITNEXUS_LBUG_EXTENSION_INSTALL;
+        delete process.env.YUMMYGRAPH_LBUG_EXTENSION_INSTALL;
       } else {
-        process.env.GITNEXUS_LBUG_EXTENSION_INSTALL = original;
+        process.env.YUMMYGRAPH_LBUG_EXTENSION_INSTALL = original;
       }
     }
   });
 
   it('returns never when env var is set to never', () => {
-    const original = process.env.GITNEXUS_LBUG_EXTENSION_INSTALL;
-    process.env.GITNEXUS_LBUG_EXTENSION_INSTALL = 'never';
+    const original = process.env.YUMMYGRAPH_LBUG_EXTENSION_INSTALL;
+    process.env.YUMMYGRAPH_LBUG_EXTENSION_INSTALL = 'never';
     try {
       expect(getExtensionInstallPolicy()).toBe('never');
     } finally {
       if (original === undefined) {
-        delete process.env.GITNEXUS_LBUG_EXTENSION_INSTALL;
+        delete process.env.YUMMYGRAPH_LBUG_EXTENSION_INSTALL;
       } else {
-        process.env.GITNEXUS_LBUG_EXTENSION_INSTALL = original;
+        process.env.YUMMYGRAPH_LBUG_EXTENSION_INSTALL = original;
       }
     }
   });
 
   it('falls back to load-only for invalid env var values', () => {
-    const original = process.env.GITNEXUS_LBUG_EXTENSION_INSTALL;
-    process.env.GITNEXUS_LBUG_EXTENSION_INSTALL = 'bogus';
+    const original = process.env.YUMMYGRAPH_LBUG_EXTENSION_INSTALL;
+    process.env.YUMMYGRAPH_LBUG_EXTENSION_INSTALL = 'bogus';
     try {
       expect(getExtensionInstallPolicy()).toBe('load-only');
     } finally {
       if (original === undefined) {
-        delete process.env.GITNEXUS_LBUG_EXTENSION_INSTALL;
+        delete process.env.YUMMYGRAPH_LBUG_EXTENSION_INSTALL;
       } else {
-        process.env.GITNEXUS_LBUG_EXTENSION_INSTALL = original;
+        process.env.YUMMYGRAPH_LBUG_EXTENSION_INSTALL = original;
       }
     }
   });
@@ -283,33 +283,33 @@ describe('getExtensionInstallPolicy', () => {
 
 describe('getExtensionInstallTimeoutMs', () => {
   it('reads a positive override from the environment', () => {
-    const original = process.env.GITNEXUS_LBUG_EXTENSION_INSTALL_TIMEOUT_MS;
-    process.env.GITNEXUS_LBUG_EXTENSION_INSTALL_TIMEOUT_MS = '42';
+    const original = process.env.YUMMYGRAPH_LBUG_EXTENSION_INSTALL_TIMEOUT_MS;
+    process.env.YUMMYGRAPH_LBUG_EXTENSION_INSTALL_TIMEOUT_MS = '42';
     try {
       expect(getExtensionInstallTimeoutMs()).toBe(42);
     } finally {
       if (original === undefined) {
-        delete process.env.GITNEXUS_LBUG_EXTENSION_INSTALL_TIMEOUT_MS;
+        delete process.env.YUMMYGRAPH_LBUG_EXTENSION_INSTALL_TIMEOUT_MS;
       } else {
-        process.env.GITNEXUS_LBUG_EXTENSION_INSTALL_TIMEOUT_MS = original;
+        process.env.YUMMYGRAPH_LBUG_EXTENSION_INSTALL_TIMEOUT_MS = original;
       }
     }
   });
 
   it('falls back to the default when the env var is missing or invalid', () => {
-    const original = process.env.GITNEXUS_LBUG_EXTENSION_INSTALL_TIMEOUT_MS;
-    delete process.env.GITNEXUS_LBUG_EXTENSION_INSTALL_TIMEOUT_MS;
+    const original = process.env.YUMMYGRAPH_LBUG_EXTENSION_INSTALL_TIMEOUT_MS;
+    delete process.env.YUMMYGRAPH_LBUG_EXTENSION_INSTALL_TIMEOUT_MS;
     try {
       expect(getExtensionInstallTimeoutMs()).toBe(15_000);
-      process.env.GITNEXUS_LBUG_EXTENSION_INSTALL_TIMEOUT_MS = 'notanumber';
+      process.env.YUMMYGRAPH_LBUG_EXTENSION_INSTALL_TIMEOUT_MS = 'notanumber';
       expect(getExtensionInstallTimeoutMs()).toBe(15_000);
-      process.env.GITNEXUS_LBUG_EXTENSION_INSTALL_TIMEOUT_MS = '0';
+      process.env.YUMMYGRAPH_LBUG_EXTENSION_INSTALL_TIMEOUT_MS = '0';
       expect(getExtensionInstallTimeoutMs()).toBe(15_000);
     } finally {
       if (original === undefined) {
-        delete process.env.GITNEXUS_LBUG_EXTENSION_INSTALL_TIMEOUT_MS;
+        delete process.env.YUMMYGRAPH_LBUG_EXTENSION_INSTALL_TIMEOUT_MS;
       } else {
-        process.env.GITNEXUS_LBUG_EXTENSION_INSTALL_TIMEOUT_MS = original;
+        process.env.YUMMYGRAPH_LBUG_EXTENSION_INSTALL_TIMEOUT_MS = original;
       }
     }
   });

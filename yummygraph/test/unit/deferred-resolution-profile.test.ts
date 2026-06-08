@@ -16,10 +16,10 @@ import { _captureLogger } from '../../src/core/logger.js';
 
 describe('deferred-resolution-profile', () => {
   afterEach(() => {
-    delete process.env.GITNEXUS_PROFILE_DEFERRED;
-    delete process.env.GITNEXUS_PROFILE_DEFERRED_SLOW_MS;
-    delete process.env.GITNEXUS_SLOW_FILE_WARN_MS;
-    delete process.env.GITNEXUS_VERBOSE;
+    delete process.env.YUMMYGRAPH_PROFILE_DEFERRED;
+    delete process.env.YUMMYGRAPH_PROFILE_DEFERRED_SLOW_MS;
+    delete process.env.YUMMYGRAPH_SLOW_FILE_WARN_MS;
+    delete process.env.YUMMYGRAPH_VERBOSE;
     resetDeferredProfileDroppedCount();
     vi.restoreAllMocks();
   });
@@ -31,23 +31,23 @@ describe('deferred-resolution-profile', () => {
       expect(isDeferredResolutionProfileEnabled()).toBe(false);
     });
 
-    it('reads a positive override from GITNEXUS_SLOW_FILE_WARN_MS', () => {
-      process.env.GITNEXUS_SLOW_FILE_WARN_MS = '2000';
+    it('reads a positive override from YUMMYGRAPH_SLOW_FILE_WARN_MS', () => {
+      process.env.YUMMYGRAPH_SLOW_FILE_WARN_MS = '2000';
       expect(alwaysOnSlowFileWarnMs()).toBe(2000);
     });
 
     it('treats 0 / negative / non-numeric as disabled (0)', () => {
-      process.env.GITNEXUS_SLOW_FILE_WARN_MS = '0';
+      process.env.YUMMYGRAPH_SLOW_FILE_WARN_MS = '0';
       expect(alwaysOnSlowFileWarnMs()).toBe(0);
-      process.env.GITNEXUS_SLOW_FILE_WARN_MS = '-5';
+      process.env.YUMMYGRAPH_SLOW_FILE_WARN_MS = '-5';
       expect(alwaysOnSlowFileWarnMs()).toBe(0);
-      process.env.GITNEXUS_SLOW_FILE_WARN_MS = 'nope';
+      process.env.YUMMYGRAPH_SLOW_FILE_WARN_MS = 'nope';
       expect(alwaysOnSlowFileWarnMs()).toBe(0);
     });
 
     it('does not prefix-parse exponent notation into a tiny value', () => {
       // Number('1e9') === 1e9 (unlike parseInt('1e9',10) === 1).
-      process.env.GITNEXUS_SLOW_FILE_WARN_MS = '1e9';
+      process.env.YUMMYGRAPH_SLOW_FILE_WARN_MS = '1e9';
       expect(alwaysOnSlowFileWarnMs()).toBe(1_000_000_000);
     });
   });
@@ -56,26 +56,26 @@ describe('deferred-resolution-profile', () => {
     expect(isDeferredResolutionProfileEnabled()).toBe(false);
   });
 
-  it('enables on GITNEXUS_VERBOSE=1', () => {
-    process.env.GITNEXUS_VERBOSE = '1';
+  it('enables on YUMMYGRAPH_VERBOSE=1', () => {
+    process.env.YUMMYGRAPH_VERBOSE = '1';
     expect(isDeferredResolutionProfileEnabled()).toBe(true);
     expect(deferredCallLogEveryN()).toBe(10);
     expect(deferredCallFileSlowMs()).toBe(3000);
   });
 
-  it('enables on GITNEXUS_PROFILE_DEFERRED=1', () => {
-    process.env.GITNEXUS_PROFILE_DEFERRED = '1';
+  it('enables on YUMMYGRAPH_PROFILE_DEFERRED=1', () => {
+    process.env.YUMMYGRAPH_PROFILE_DEFERRED = '1';
     expect(isDeferredResolutionProfileEnabled()).toBe(true);
     expect(deferredCallLogEveryN()).toBe(100);
   });
 
   it('reads slow-file threshold from env', () => {
-    process.env.GITNEXUS_PROFILE_DEFERRED_SLOW_MS = '250';
+    process.env.YUMMYGRAPH_PROFILE_DEFERRED_SLOW_MS = '250';
     expect(deferredCallFileSlowMs()).toBe(250);
   });
 
   describe('logDeferredProfile dropped-line counter (U4)', () => {
-    // Background: `logger` (gitnexus/src/core/logger.ts) is a Proxy with a lazy
+    // Background: `logger` (yummygraph/src/core/logger.ts) is a Proxy with a lazy
     // `get` trap and no `set` trap, so vi.spyOn on `logger.info` fails with
     // "property is not defined on the object" — the inner pino method isn't a
     // stable own-property to wrap. These tests exercise the helper API and the

@@ -1,7 +1,7 @@
 /**
  * Analyze Command
  *
- * Indexes a repository and stores the knowledge graph in .gitnexus/
+ * Indexes a repository and stores the knowledge graph in .yummygraph/
  *
  * Delegates core analysis to the shared runFullAnalysis orchestrator.
  * This CLI wrapper handles: heap management, progress bar, SIGINT,
@@ -33,7 +33,7 @@ import {
   mergeAnalyzeOptions,
   resolveDefaultBranch,
   validateBranchName,
-  GitNexusRcError,
+  YummyGraphRcError,
 } from './analyze-config.js';
 import { runFullAnalysis } from '../core/run-analyze.js';
 import { getMaxFileSizeBannerMessage } from '../core/ingestion/utils/max-file-size.js';
@@ -129,7 +129,7 @@ function readConstrainedBytes(): number | null {
 }
 
 const HEAP_MB = computeHeapCapMb(os.totalmem(), readConstrainedBytes());
-const TEST_RESPAWN_HEAP_MB = Number(process.env.GITNEXUS_TEST_RESPAWN_HEAP_MB);
+const TEST_RESPAWN_HEAP_MB = Number(process.env.YUMMYGRAPH_TEST_RESPAWN_HEAP_MB);
 const RESPAWN_HEAP_MB =
   Number.isFinite(TEST_RESPAWN_HEAP_MB) && TEST_RESPAWN_HEAP_MB > 0
     ? Math.floor(TEST_RESPAWN_HEAP_MB)
@@ -144,7 +144,7 @@ const SEMI_FLAG = `--max-semi-space-size=${SEMI_SPACE_MB}`;
 const STACK_KB = 4096;
 const STACK_FLAG = `--stack-size=${STACK_KB}`;
 const RESPAWN_OUTPUT_TAIL_CHARS = 1024 * 1024;
-const RESPAWN_PROGRESS_ENV = 'GITNEXUS_RESPAWN_PROGRESS_TTY';
+const RESPAWN_PROGRESS_ENV = 'YUMMYGRAPH_RESPAWN_PROGRESS_TTY';
 
 interface CliProgressTerminal {
   cursorSave(): void;
@@ -473,7 +473,7 @@ const childProcessLikelyNativeAbort = (err: unknown): boolean => {
 };
 
 const forceHeapOOMForTestIfEnabled = (): void => {
-  if (process.env.GITNEXUS_TEST_FORCE_HEAP_OOM !== '1') return;
+  if (process.env.YUMMYGRAPH_TEST_FORCE_HEAP_OOM !== '1') return;
   // Allocate JS strings (not Buffers) so pressure lands on V8 heap itself.
   // Buffers can allocate off-heap, which makes OOM triggering less reliable.
   const chunks: string[] = [];
@@ -482,11 +482,11 @@ const forceHeapOOMForTestIfEnabled = (): void => {
 
 // 64 MiB keeps auto-checkpoint enabled but triggers less frequently than
 // Ladybug's stock ~16 MiB threshold, reducing rename/remove churn on large
-// runs. Also matches the GitNexus default in `lbug-config.ts`.
+// runs. Also matches the YummyGraph default in `lbug-config.ts`.
 //
-// IMPORTANT: keep README examples (`README.md`, `gitnexus/README.md`) and
+// IMPORTANT: keep README examples (`README.md`, `yummygraph/README.md`) and
 // the `DEFAULT_WAL_CHECKPOINT_THRESHOLD` constant in
-// `gitnexus/src/core/lbug/lbug-config.ts` in sync with this value.
+// `yummygraph/src/core/lbug/lbug-config.ts` in sync with this value.
 const RECOMMENDED_WAL_CHECKPOINT_THRESHOLD = 64 * 1024 * 1024;
 
 /** Re-exec the process with the RAM-aware auto heap cap + larger semi-space/stack
@@ -516,8 +516,8 @@ async function ensureHeap(): Promise<boolean> {
         `  Analysis likely ran out of memory (heap cap auto-sized to ${RESPAWN_HEAP_MB}MB ≈ 0.75x RAM).\n` +
           `  This repository's working set exceeds available RAM. Use a machine with more RAM,\n` +
           `  or override the cap (a cap above physical RAM causes swap-thrash — use with care):\n` +
-          `    NODE_OPTIONS="--max-old-space-size=<MB>" gitnexus analyze [your-args]\n` +
-          `    (Windows: set NODE_OPTIONS=--max-old-space-size=<MB> && gitnexus analyze [your-args])\n` +
+          `    NODE_OPTIONS="--max-old-space-size=<MB>" yummygraph analyze [your-args]\n` +
+          `    (Windows: set NODE_OPTIONS=--max-old-space-size=<MB> && yummygraph analyze [your-args])\n` +
           `  If this persists, it may be a native crash unrelated to heap size.\n`,
         { recoveryHint: 'heap-oom-respawn' },
       );
@@ -525,7 +525,7 @@ async function ensureHeap(): Promise<boolean> {
       cliError(
         `  Analysis aborted in a native worker or native binding path.\n` +
           `  Try one of these recovery paths:\n` +
-          `    npm uninstall -g gitnexus && npm install -g gitnexus@latest (rebuilds native bindings)\n` +
+          `    npm uninstall -g yummygraph && npm install -g yummygraph@latest (rebuilds native bindings)\n` +
           `    Use Node 22 LTS if you are on a newer non-LTS runtime.\n`,
         { recoveryHint: 'native-worker-abort' },
       );
@@ -538,28 +538,28 @@ async function ensureHeap(): Promise<boolean> {
 }
 
 /**
- * GITNEXUS_* env vars that `analyzeCommand` writes for backward-compatible
+ * YUMMYGRAPH_* env vars that `analyzeCommand` writes for backward-compatible
  * downstream consumption. Snapshotted at function entry and restored in the
  * finally block so that programmatic callers (tests, long-running hosts)
- * don't see leaked state across invocations. `GITNEXUS_WORKER_POOL_SIZE` is
+ * don't see leaked state across invocations. `YUMMYGRAPH_WORKER_POOL_SIZE` is
  * NOT in this list: that knob is threaded through `runFullAnalysis` options
  * (see `workerPoolSize` plumbing) so the CLI never has to mutate `process.env`
  * for it in the first place.
  */
 const ANALYZE_CLI_ENV_KEYS = [
-  'GITNEXUS_VERBOSE',
-  'GITNEXUS_PROFILE_DEFERRED',
-  'GITNEXUS_PROFILE_DEFERRED_SLOW_MS',
-  'GITNEXUS_DEBUG_HEAP',
-  'GITNEXUS_MAX_FILE_SIZE',
-  'GITNEXUS_WORKER_SUB_BATCH_TIMEOUT_MS',
-  'GITNEXUS_WAL_CHECKPOINT_THRESHOLD',
-  'GITNEXUS_WAL_MANUAL_CHECKPOINT',
-  'GITNEXUS_EMBEDDING_THREADS',
-  'GITNEXUS_EMBEDDING_BATCH_SIZE',
-  'GITNEXUS_EMBEDDING_SUB_BATCH_SIZE',
-  'GITNEXUS_EMBEDDING_DEVICE',
-  'GITNEXUS_ANALYZE_PROGRESS_ACTIVE',
+  'YUMMYGRAPH_VERBOSE',
+  'YUMMYGRAPH_PROFILE_DEFERRED',
+  'YUMMYGRAPH_PROFILE_DEFERRED_SLOW_MS',
+  'YUMMYGRAPH_DEBUG_HEAP',
+  'YUMMYGRAPH_MAX_FILE_SIZE',
+  'YUMMYGRAPH_WORKER_SUB_BATCH_TIMEOUT_MS',
+  'YUMMYGRAPH_WAL_CHECKPOINT_THRESHOLD',
+  'YUMMYGRAPH_WAL_MANUAL_CHECKPOINT',
+  'YUMMYGRAPH_EMBEDDING_THREADS',
+  'YUMMYGRAPH_EMBEDDING_BATCH_SIZE',
+  'YUMMYGRAPH_EMBEDDING_SUB_BATCH_SIZE',
+  'YUMMYGRAPH_EMBEDDING_DEVICE',
+  'YUMMYGRAPH_ANALYZE_PROGRESS_ACTIVE',
 ] as const;
 
 type AnalyzeEnvSnapshot = Record<(typeof ANALYZE_CLI_ENV_KEYS)[number], string | undefined>;
@@ -597,7 +597,7 @@ export interface AnalyzeOptions {
   dropEmbeddings?: boolean;
   skills?: boolean;
   verbose?: boolean;
-  /** Skip AGENTS.md and CLAUDE.md gitnexus block updates. */
+  /** Skip AGENTS.md and CLAUDE.md yummygraph block updates. */
   skipAgentsMd?: boolean;
   /**
    * Stats inclusion in AGENTS.md and CLAUDE.md.
@@ -611,12 +611,12 @@ export interface AnalyzeOptions {
    * default-on case.
    */
   stats?: boolean;
-  /** Skip installing standard GitNexus skill files to .claude/skills/gitnexus/. */
+  /** Skip installing standard YummyGraph skill files to .claude/skills/yummygraph/. */
   skipSkills?: boolean;
   /**
    * Default branch for the generated regression-compare example (#243). From
-   * `--default-branch`; may also be supplied via `.gitnexusrc`. Resolved to a
-   * concrete branch (CLI > `.gitnexusrc` > auto-detected origin/HEAD > "main")
+   * `--default-branch`; may also be supplied via `.yummygraphrc`. Resolved to a
+   * concrete branch (CLI > `.yummygraphrc` > auto-detected origin/HEAD > "main")
    * before being threaded into the generated AGENTS.md / CLAUDE.md content.
    */
   defaultBranch?: string;
@@ -642,7 +642,7 @@ export interface AnalyzeOptions {
   /**
    * Override the walker's large-file skip threshold (#991). Value in KB;
    * clamped downstream to the tree-sitter 32 MB ceiling. Sets
-   * `GITNEXUS_MAX_FILE_SIZE` for the rest of the pipeline.
+   * `YUMMYGRAPH_MAX_FILE_SIZE` for the rest of the pipeline.
    */
   maxFileSize?: string;
   /** Override worker sub-batch idle timeout in seconds. */
@@ -686,10 +686,10 @@ export const analyzeCommand = async (inputPath?: string, options?: AnalyzeOption
 
   // npm-11 npx-crash nudge (#1939). Runs here, after the heap re-exec guard,
   // so it fires once in the working process and never on the lazy-startup path
-  // of other commands (e.g. `gitnexus mcp`).
+  // of other commands (e.g. `yummygraph mcp`).
   warnIfNpm11NpxRisk();
 
-  // Snapshot the GITNEXUS_* env vars that the impl writes for downstream
+  // Snapshot the YUMMYGRAPH_* env vars that the impl writes for downstream
   // consumption, so they don't leak across `analyzeCommand` invocations in
   // programmatic callers (tests, long-running hosts). `process.exit(0)` on
   // the success path bypasses `finally` — intentional: when the process is
@@ -708,10 +708,10 @@ const analyzeCommandImpl = async (
   inputPath?: string,
   cliOptions?: AnalyzeOptions,
 ): Promise<void> => {
-  console.log('\n  GitNexus Analyzer\n');
+  console.log('\n  YummyGraph Analyzer\n');
 
   // ── Resolve the target repo root ──────────────────────────────────
-  // Resolved FIRST because `.gitnexusrc` is read from the repo root (not the
+  // Resolved FIRST because `.yummygraphrc` is read from the repo root (not the
   // caller's cwd), and config can set defaults that the validation below
   // consumes. `--skip-git` is a CLI-only flag (never a config key), so the raw
   // CLI options are authoritative for repo-root resolution.
@@ -749,7 +749,7 @@ const analyzeCommandImpl = async (
 
   // Validate an explicit `--default-branch` up front so its errors are
   // attributed to the flag (with a CLI-specific recovery hint) rather than to
-  // `.gitnexusrc`, which the user may not even have (#1996 tri-review).
+  // `.yummygraphrc`, which the user may not even have (#1996 tri-review).
   if (cliOptions?.defaultBranch !== undefined) {
     try {
       validateBranchName(cliOptions.defaultBranch, '--default-branch');
@@ -762,7 +762,7 @@ const analyzeCommandImpl = async (
     }
   }
 
-  // ── Load .gitnexusrc and merge: CLI flags override config (#243) ───
+  // ── Load .yummygraphrc and merge: CLI flags override config (#243) ───
   // Parse/validate before the progress bar so a malformed config produces an
   // actionable error and exits before any expensive analysis starts.
   let options: AnalyzeOptions;
@@ -772,7 +772,7 @@ const analyzeCommandImpl = async (
     options = mergeAnalyzeOptions(cliOptions ?? {}, fileConfig);
 
     // Resolve the default branch threaded into generated context:
-    //   CLI --default-branch > .gitnexusrc defaultBranch/branch
+    //   CLI --default-branch > .yummygraphrc defaultBranch/branch
     //     > auto-detected origin/HEAD > "main".
     // Only shell out to git when no branch was configured AND the generated
     // context will actually use it, keeping the common path free of an extra
@@ -797,20 +797,20 @@ const analyzeCommandImpl = async (
     resolvedDefaultBranch = resolveDefaultBranch({ cliBranch, configBranch, detectedBranch });
   } catch (err) {
     const msg =
-      err instanceof GitNexusRcError
+      err instanceof YummyGraphRcError
         ? err.message
-        : `Invalid .gitnexusrc: ${err instanceof Error ? err.message : String(err)}`;
-    cliError(`  ${msg}\n`, { recoveryHint: 'gitnexusrc-invalid' });
+        : `Invalid .yummygraphrc: ${err instanceof Error ? err.message : String(err)}`;
+    cliError(`  ${msg}\n`, { recoveryHint: 'yummygraphrc-invalid' });
     process.exitCode = 1;
     return;
   }
 
   if (options.verbose) {
-    process.env.GITNEXUS_VERBOSE = '1';
+    process.env.YUMMYGRAPH_VERBOSE = '1';
   }
 
   if (options.maxFileSize) {
-    process.env.GITNEXUS_MAX_FILE_SIZE = options.maxFileSize;
+    process.env.YUMMYGRAPH_MAX_FILE_SIZE = options.maxFileSize;
   }
 
   if (options.workerTimeout) {
@@ -820,7 +820,7 @@ const analyzeCommandImpl = async (
       process.exitCode = 1;
       return;
     }
-    process.env.GITNEXUS_WORKER_SUB_BATCH_TIMEOUT_MS = String(
+    process.env.YUMMYGRAPH_WORKER_SUB_BATCH_TIMEOUT_MS = String(
       Math.round(workerTimeoutSeconds * 1000),
     );
   }
@@ -832,11 +832,11 @@ const analyzeCommandImpl = async (
       process.exitCode = 1;
       return;
     }
-    process.env.GITNEXUS_WAL_CHECKPOINT_THRESHOLD = String(parsed);
+    process.env.YUMMYGRAPH_WAL_CHECKPOINT_THRESHOLD = String(parsed);
   }
 
   // `--workers` is threaded through `runFullAnalysis` options → PipelineOptions
-  // → createWorkerPool, intentionally bypassing the GITNEXUS_WORKER_POOL_SIZE
+  // → createWorkerPool, intentionally bypassing the YUMMYGRAPH_WORKER_POOL_SIZE
   // env channel so this CLI surface never mutates `process.env` for pool size.
   // Tests can therefore re-invoke analyzeCommand with different --workers
   // values back-to-back and observe the value they passed, not whatever the
@@ -847,7 +847,7 @@ const analyzeCommandImpl = async (
     if (!Number.isInteger(parsedWorkers) || parsedWorkers < 1) {
       cliError(
         '  --workers must be a positive integer (>= 1). ' +
-          'GitNexus parses through a worker pool only — there is no sequential ' +
+          'YummyGraph parses through a worker pool only — there is no sequential ' +
           'mode, so 0 is not allowed. Omit --workers for an auto-sized pool.\n',
       );
       process.exitCode = 1;
@@ -894,17 +894,17 @@ const analyzeCommandImpl = async (
   if (
     !setPositiveEnv(
       '--embedding-threads',
-      'GITNEXUS_EMBEDDING_THREADS',
+      'YUMMYGRAPH_EMBEDDING_THREADS',
       options.embeddingThreads,
     ) ||
     !setPositiveEnv(
       '--embedding-batch-size',
-      'GITNEXUS_EMBEDDING_BATCH_SIZE',
+      'YUMMYGRAPH_EMBEDDING_BATCH_SIZE',
       options.embeddingBatchSize,
     ) ||
     !setPositiveEnv(
       '--embedding-sub-batch-size',
-      'GITNEXUS_EMBEDDING_SUB_BATCH_SIZE',
+      'YUMMYGRAPH_EMBEDDING_SUB_BATCH_SIZE',
       options.embeddingSubBatchSize,
     )
   ) {
@@ -918,7 +918,7 @@ const analyzeCommandImpl = async (
       process.exitCode = 1;
       return;
     }
-    process.env.GITNEXUS_EMBEDDING_DEVICE = options.embeddingDevice;
+    process.env.YUMMYGRAPH_EMBEDDING_DEVICE = options.embeddingDevice;
   }
 
   if (options.repairFts && options.force) {
@@ -969,9 +969,9 @@ const analyzeCommandImpl = async (
   // KuzuDB migration cleanup is handled by runFullAnalysis internally.
   // Note: --skills is handled after runFullAnalysis using the returned pipelineResult.
 
-  if (process.env.GITNEXUS_NO_GITIGNORE) {
+  if (process.env.YUMMYGRAPH_NO_GITIGNORE) {
     console.log(
-      '  GITNEXUS_NO_GITIGNORE is set — skipping .gitignore (still reading .gitnexusignore)\n',
+      '  YUMMYGRAPH_NO_GITIGNORE is set — skipping .gitignore (still reading .yummygraphignore)\n',
     );
   }
 
@@ -1005,7 +1005,7 @@ const analyzeCommandImpl = async (
 
   // Graceful SIGINT handling. Pino's default destination is `sync: false`
   // (buffered) — flush before exit so in-flight records reach stderr.
-  // See `gitnexus/src/core/logger.ts:flushLoggerSync`.
+  // See `yummygraph/src/core/logger.ts:flushLoggerSync`.
   let aborted = false;
   const sigintHandler = () => {
     if (aborted) process.exit(1);
@@ -1043,7 +1043,7 @@ const analyzeCommandImpl = async (
   console.warn = barLog;
   // eslint-disable-next-line no-console -- intentional console-routing for progress bar UX
   console.error = barLog;
-  process.env.GITNEXUS_ANALYZE_PROGRESS_ACTIVE = '1';
+  process.env.YUMMYGRAPH_ANALYZE_PROGRESS_ACTIVE = '1';
 
   // Track elapsed time per phase
   let lastPhaseLabel = 'Initializing...';
@@ -1089,7 +1089,7 @@ const analyzeCommandImpl = async (
         skipGit: options.skipGit,
         skipAgentsMd,
         skipSkills,
-        // Resolved default branch (CLI > .gitnexusrc > auto-detect > "main")
+        // Resolved default branch (CLI > .yummygraphrc > auto-detect > "main")
         // threaded into the generated regression-compare example (#243).
         defaultBranch: resolvedDefaultBranch,
         // commander.js `.option('--no-stats', …)` registers the flag as
@@ -1105,7 +1105,7 @@ const analyzeCommandImpl = async (
         // cost of a full pipeline re-index. See #829 review round 2.
         allowDuplicateName: options.allowDuplicateName,
         // Worker pool size threaded from --workers, replacing the previous
-        // GITNEXUS_WORKER_POOL_SIZE env mutation. `undefined` defers to the
+        // YUMMYGRAPH_WORKER_POOL_SIZE env mutation. `undefined` defers to the
         // env / auto-formula fallback inside the pipeline.
         workerPoolSize,
       },
@@ -1123,7 +1123,7 @@ const analyzeCommandImpl = async (
       // that half-finalized state, runFullAnalysis returns alreadyUpToDate
       // on the next invocation unless we check the registry here too.
       await assertAnalysisFinalized(repoPath);
-      // The fast path skips context regeneration, but a changed `.gitnexusrc`
+      // The fast path skips context regeneration, but a changed `.yummygraphrc`
       // defaultBranch / `--default-branch` must still take effect. Surgically
       // refresh just the `base_ref` line in AGENTS.md/CLAUDE.md in place,
       // preserving the rest of the block (incl. --skills community rows). No-op
@@ -1268,15 +1268,15 @@ const analyzeCommandImpl = async (
     if (result.ftsSkipped) {
       console.log(
         `\n  Warning: full-text/BM25 search is disabled — the LadybugDB FTS extension was unavailable.\n` +
-          `  Install it once with network access (GITNEXUS_LBUG_EXTENSION_INSTALL=auto) then rerun, or\n` +
-          `  run \`gitnexus analyze --repair-fts\` when connected. Run \`gitnexus doctor\` for details.`,
+          `  Install it once with network access (YUMMYGRAPH_LBUG_EXTENSION_INSTALL=auto) then rerun, or\n` +
+          `  run \`yummygraph analyze --repair-fts\` when connected. Run \`yummygraph doctor\` for details.`,
       );
     }
 
     try {
       await fs.access(getGlobalRegistryPath());
     } catch {
-      console.log('\n  Tip: Run `gitnexus setup` to configure MCP for your editor.');
+      console.log('\n  Tip: Run `yummygraph setup` to configure MCP for your editor.');
     }
 
     console.log('');
@@ -1299,8 +1299,8 @@ const analyzeCommandImpl = async (
         `\n  Registry name collision:\n` +
           `    "${err.registryName}" is already used by "${err.existingPath}".\n\n` +
           `  Options:\n` +
-          `    • Pick a different alias:  gitnexus analyze --name <alias>\n` +
-          `    • Allow the duplicate:     gitnexus analyze --allow-duplicate-name  (leaves "-r ${err.registryName}" ambiguous)\n`,
+          `    • Pick a different alias:  yummygraph analyze --name <alias>\n` +
+          `    • Allow the duplicate:     yummygraph analyze --allow-duplicate-name  (leaves "-r ${err.registryName}" ambiguous)\n`,
         { registryName: err.registryName, existingPath: err.existingPath },
       );
       process.exitCode = 1;
@@ -1314,10 +1314,10 @@ const analyzeCommandImpl = async (
       writeFatalToStderr('Analysis did not finalize', err);
       realStderrWrite(
         `\n  Diagnostic checklist:\n` +
-          `    1. Re-run "gitnexus analyze" - transient native errors often clear on retry.\n` +
+          `    1. Re-run "yummygraph analyze" - transient native errors often clear on retry.\n` +
           `    2. Inspect ${err.storagePath} - a leftover lbug.wal indicates an aborted write.\n` +
           `    3. If the failure persists, run with NODE_OPTIONS="--max-old-space-size=8192 --trace-exit"\n` +
-          `       and attach the trace to the GitNexus issue tracker.\n\n`,
+          `       and attach the trace to the YummyGraph issue tracker.\n\n`,
       );
       process.exitCode = 1;
       return;
@@ -1328,7 +1328,7 @@ const analyzeCommandImpl = async (
     // is enough signal).
     if (isWalCorruptionError(err) || msg.includes('LadybugDB WAL corruption')) {
       cliError(
-        `  The GitNexus index has a corrupted WAL file.\n` +
+        `  The YummyGraph index has a corrupted WAL file.\n` +
           `  This usually happens when a previous analysis was interrupted mid-write.\n` +
           `  ${WAL_RECOVERY_SUGGESTION}\n`,
         { recoveryHint: 'wal-corruption' },
@@ -1342,8 +1342,8 @@ const analyzeCommandImpl = async (
         `  LadybugDB failed while rotating/removing WAL checkpoint files.\n` +
           `  This can happen when auto-checkpoint runs at the default threshold (~16MB).\n` +
           `  Retry with a larger checkpoint threshold to reduce checkpoint frequency:\n` +
-          `    gitnexus analyze --wal-checkpoint-threshold ${RECOMMENDED_WAL_CHECKPOINT_THRESHOLD}\n` +
-          `    (or set GITNEXUS_WAL_CHECKPOINT_THRESHOLD=${RECOMMENDED_WAL_CHECKPOINT_THRESHOLD})\n` +
+          `    yummygraph analyze --wal-checkpoint-threshold ${RECOMMENDED_WAL_CHECKPOINT_THRESHOLD}\n` +
+          `    (or set YUMMYGRAPH_WAL_CHECKPOINT_THRESHOLD=${RECOMMENDED_WAL_CHECKPOINT_THRESHOLD})\n` +
           `    (Try 33554432 = 32 MiB on small-disk / CI runners.)\n`,
         { recoveryHint: 'wal-checkpoint-threshold' },
       );
@@ -1353,7 +1353,7 @@ const analyzeCommandImpl = async (
 
     // Local embedding runtime unsupported on this platform (macOS Intel ships no
     // darwin/x64 ONNX native binding, #1515). The guard threw before importing
-    // transformers.js, so this is a clean, actionable GitNexus message. Checked
+    // transformers.js, so this is a clean, actionable YummyGraph message. Checked
     // before the network-heuristic isHfDownloadFailure branch below (and before
     // the generic module-not-found "installation may be corrupt" hint) so the
     // explicit platform message always takes priority.
@@ -1375,8 +1375,8 @@ const analyzeCommandImpl = async (
           `  (e.g. behind a corporate proxy or a regional firewall).\n` +
           `  Suggestions:\n` +
           `    1. Set HF_ENDPOINT to a mirror and retry:\n` +
-          `         HF_ENDPOINT=https://hf-mirror.com npx gitnexus analyze --embeddings\n` +
-          `         (Windows: set HF_ENDPOINT=https://hf-mirror.com && npx gitnexus analyze --embeddings)\n` +
+          `         HF_ENDPOINT=https://hf-mirror.com npx yummygraph analyze --embeddings\n` +
+          `         (Windows: set HF_ENDPOINT=https://hf-mirror.com && npx yummygraph analyze --embeddings)\n` +
           `    2. Check your proxy / VPN settings.\n` +
           `    3. Once downloaded the model is cached — future runs work offline.\n`,
         { recoveryHint: 'hf-endpoint-unreachable' },
@@ -1407,14 +1407,14 @@ const analyzeCommandImpl = async (
       cliError(
         `  This error typically occurs on very large repositories.\n` +
           `  Suggestions:\n` +
-          `    1. Add large vendored/generated directories to .gitnexusignore\n` +
+          `    1. Add large vendored/generated directories to .yummygraphignore\n` +
           `    2. Increase Node.js heap: NODE_OPTIONS="--max-old-space-size=16384"\n` +
           `    3. Increase stack size: NODE_OPTIONS="--stack-size=4096"\n`,
         { recoveryHint: 'large-repo' },
       );
     } else if (msg.includes('ERESOLVE') || msg.includes('Could not resolve dependency')) {
       // Note: the original arborist "Cannot destructure property 'package' of
-      // 'node.target'" crash happens inside npm *before* gitnexus code runs,
+      // 'node.target'" crash happens inside npm *before* yummygraph code runs,
       // so it can't be caught here.  This branch handles dependency-resolution
       // errors that surface at runtime (e.g. dynamic require failures).
       cliError(
@@ -1422,8 +1422,8 @@ const analyzeCommandImpl = async (
           `  Suggestions:\n` +
           `    1. Clear the npm cache:    npm cache clean --force\n` +
           `    2. Update npm:             npm install -g npm@latest\n` +
-          `    3. Reinstall gitnexus:     npm install -g gitnexus@latest\n` +
-          `    4. Or try npx directly:    npx gitnexus@latest analyze\n`,
+          `    3. Reinstall yummygraph:     npm install -g yummygraph@latest\n` +
+          `    4. Or try npx directly:    npx yummygraph@latest analyze\n`,
         { recoveryHint: 'npm-resolution' },
       );
     } else if (
@@ -1434,8 +1434,8 @@ const analyzeCommandImpl = async (
       cliError(
         `  A required module could not be loaded. The installation may be corrupt.\n` +
           `  Suggestions:\n` +
-          `    1. Reinstall:   npm install -g gitnexus@latest\n` +
-          `    2. Clear cache: npm cache clean --force && npx gitnexus@latest analyze\n`,
+          `    1. Reinstall:   npm install -g yummygraph@latest\n` +
+          `    2. Clear cache: npm cache clean --force && npx yummygraph@latest analyze\n`,
         { recoveryHint: 'module-not-found' },
       );
     }

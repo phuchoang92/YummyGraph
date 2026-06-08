@@ -22,8 +22,8 @@ describe('run-analyze module', () => {
     expect(mod.PHASE_LABELS.parsing).toBe('Parsing code');
   });
 
-  it('creates .gitnexus/.gitignore on the already-up-to-date fast path (#1233)', async () => {
-    const tmpRepo = await createTempDir('gitnexus-run-analyze-fast-path-');
+  it('creates .yummygraph/.gitignore on the already-up-to-date fast path (#1233)', async () => {
+    const tmpRepo = await createTempDir('yummygraph-run-analyze-fast-path-');
     try {
       execSync('git init', { cwd: tmpRepo.dbPath, stdio: 'pipe' });
       execSync('git -c user.name=test -c user.email=test@test commit --allow-empty -m init', {
@@ -53,7 +53,7 @@ describe('run-analyze module', () => {
 
       expect(result.alreadyUpToDate).toBe(true);
       await expect(
-        fs.readFile(path.join(tmpRepo.dbPath, '.gitnexus', '.gitignore'), 'utf-8'),
+        fs.readFile(path.join(tmpRepo.dbPath, '.yummygraph', '.gitignore'), 'utf-8'),
       ).resolves.toBe('*\n');
     } finally {
       await tmpRepo.cleanup();

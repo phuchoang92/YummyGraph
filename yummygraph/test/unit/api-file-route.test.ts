@@ -29,7 +29,7 @@ import { handleFileRequest } from '../../src/server/api.js';
 let tmpRoot: string;
 
 beforeAll(async () => {
-  tmpRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'gitnexus-api-file-test-'));
+  tmpRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'yummygraph-api-file-test-'));
   await fs.writeFile(path.join(tmpRoot, 'hello.txt'), 'hello world\n', 'utf-8');
   await fs.mkdir(path.join(tmpRoot, 'sub'), { recursive: true });
   await fs.writeFile(path.join(tmpRoot, 'sub', 'nested.txt'), 'nested\n', 'utf-8');

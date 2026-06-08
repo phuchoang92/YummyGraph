@@ -1,4 +1,4 @@
-// gitnexus/src/core/ingestion/call-types.ts
+// yummygraph/src/core/ingestion/call-types.ts
 
 /**
  * Types for the language-agnostic call extraction pipeline.
@@ -7,7 +7,7 @@
  * consumed by createCallExtractor() and the per-language configs.
  */
 
-import type { SupportedLanguages } from 'gitnexus-shared';
+import type { SupportedLanguages } from 'yummygraph-shared';
 import type { SyntaxNode } from './utils/ast-helpers.js';
 import type { MixedChainStep } from './utils/call-analysis.js';
 

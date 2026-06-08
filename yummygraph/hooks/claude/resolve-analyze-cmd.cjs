@@ -1,8 +1,8 @@
 /**
- * Single source of truth for how docs, hooks, and warnings invoke gitnexus.
+ * Single source of truth for how docs, hooks, and warnings invoke yummygraph.
  *
  * Automatically selects a working invocation path:
- * 1. Global `gitnexus` on PATH (best — no install step)
+ * 1. Global `yummygraph` on PATH (best — no install step)
  * 2. npm 11+ with pnpm on PATH → `pnpm --allow-build=… dlx` (avoids the npx
  *    arborist crash *and* pnpm 10+ ignored-build-script failures, #1939)
  * 3. npm < 11 with npm on PATH → `npx` (works; simpler than pnpm dlx)
@@ -19,9 +19,9 @@
  * available. The CLI reuses this module from src/cli/resolve-invocation.ts via
  * createRequire rather than re-implementing it. Two committed copies must stay
  * byte-identical (enforced by resolve-invocation.test.ts) — edit both together:
- * gitnexus/hooks/claude/ (the canonical copy the CLI and `gitnexus setup` read)
- * and gitnexus-claude-plugin/hooks/. A THIRD copy is written at runtime to
- * `<repo>/.gitnexus/run.cjs` by `gitnexus analyze` (ai-context.ts) so docs can
+ * yummygraph/hooks/claude/ (the canonical copy the CLI and `yummygraph setup` read)
+ * and yummygraph-claude-plugin/hooks/. A THIRD copy is written at runtime to
+ * `<repo>/.yummygraph/run.cjs` by `yummygraph analyze` (ai-context.ts) so docs can
  * reference it directly via the `require.main === module` exec tail below; that
  * copy is gitignored and refreshed on every analyze, so it cannot drift for long.
  */
@@ -30,10 +30,10 @@ const { execFileSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-const NPX_REF = 'gitnexus@latest';
+const NPX_REF = 'yummygraph@latest';
 
 // Native packages whose postinstall must run under pnpm 10+ (blocked by default).
-const PNPM_ALLOW_BUILD_BASE = ['@ladybugdb/core', 'gitnexus', 'tree-sitter'];
+const PNPM_ALLOW_BUILD_BASE = ['@ladybugdb/core', 'yummygraph', 'tree-sitter'];
 const PNPM_ALLOW_BUILD_EMBEDDINGS = ['onnxruntime-node'];
 
 // Version-probe timeout, kept under Claude Code's 10s hook budget. PATH presence
@@ -169,24 +169,24 @@ function formatPnpmAllowBuildArgs(options = {}, deps = {}) {
 }
 
 /** Fixed install-free command for committed AGENTS.md / SKILL.md (pnpm >= 10.2). */
-function formatDocumentationDlxCommand(gitnexusArgs, options = {}) {
+function formatDocumentationDlxCommand(yummygraphArgs, options = {}) {
   const flags = formatPnpmAllowBuildArgs({ ...options, alwaysAllowBuild: true }).join(' ');
   const prefix = flags ? `${flags} ` : '';
-  return `pnpm ${prefix}dlx ${NPX_REF} ${gitnexusArgs}`;
+  return `pnpm ${prefix}dlx ${NPX_REF} ${yummygraphArgs}`;
 }
 
 /**
- * Resolve `gitnexus` | `pnpm` | `npx`. `GITNEXUS_INVOCATION` forces a mode
+ * Resolve `yummygraph` | `pnpm` | `npx`. `YUMMYGRAPH_INVOCATION` forces a mode
  * (test/escape hatch). `probe` is injectable so the preference order can be
  * unit-tested without spawning; it defaults to the real PATH probe. `deps` can
  * inject `{ npmMajor, pnpmMajor }` for tests.
  */
 function resolveInvocationMode(probe = resolveOnPath, deps = {}) {
-  const forced = process.env.GITNEXUS_INVOCATION?.trim().toLowerCase();
-  if (forced === 'gitnexus' || forced === 'pnpm' || forced === 'npx') {
+  const forced = process.env.YUMMYGRAPH_INVOCATION?.trim().toLowerCase();
+  if (forced === 'yummygraph' || forced === 'pnpm' || forced === 'npx') {
     return forced;
   }
-  if (probe('gitnexus', true)) return 'gitnexus';
+  if (probe('yummygraph', true)) return 'yummygraph';
 
   const npmMajor = getNpmMajorVersion(deps);
   // pnpm presence: prefer an explicit `pnpmPresent` flag (set by
@@ -212,34 +212,34 @@ function resolveInvocationMode(probe = resolveOnPath, deps = {}) {
   return 'npx';
 }
 
-function formatPnpmDlxCommand(gitnexusArgs, options = {}, deps = {}) {
+function formatPnpmDlxCommand(yummygraphArgs, options = {}, deps = {}) {
   const flags = formatPnpmAllowBuildArgs(options, deps).join(' ');
   const prefix = flags ? `${flags} ` : '';
-  return `pnpm ${prefix}dlx ${NPX_REF} ${gitnexusArgs}`;
+  return `pnpm ${prefix}dlx ${NPX_REF} ${yummygraphArgs}`;
 }
 
 function formatAnalyzeCommand(options = {}, deps = {}) {
   const suffix = options.embeddings ? ' --embeddings' : '';
   // Keep the stale-index hook budget tight by querying each tool at most once.
   // The memoized `probe` is a spawn-free PATH scan (resolveOnPath) shared with
-  // resolveInvocationMode, so `gitnexus` is scanned only once and no subprocess
+  // resolveInvocationMode, so `yummygraph` is scanned only once and no subprocess
   // is spawned for presence. pnpm's *version* is still captured by a single
   // `pnpm --version` (the allow-build gate needs the number), which also proves
   // presence; the memoized scan only re-checks pnpm when that version is
   // unreadable. Injected deps (tests) and forced/global modes skip the pnpm probe.
   const cache = new Map();
-  const probe = (command, gitnexusWrapper) => {
-    const key = `${command}:${gitnexusWrapper ? 1 : 0}`;
-    if (!cache.has(key)) cache.set(key, resolveOnPath(command, gitnexusWrapper));
+  const probe = (command, yummygraphWrapper) => {
+    const key = `${command}:${yummygraphWrapper ? 1 : 0}`;
+    if (!cache.has(key)) cache.set(key, resolveOnPath(command, yummygraphWrapper));
     return cache.get(key);
   };
   let resolved = deps;
   if (!('pnpmMajor' in deps)) {
-    const forced = process.env.GITNEXUS_INVOCATION?.trim().toLowerCase();
+    const forced = process.env.YUMMYGRAPH_INVOCATION?.trim().toLowerCase();
     // pnpm is only consulted when no non-pnpm mode is already certain: forced
-    // gitnexus/npx never use pnpm, and a present global gitnexus wins outright.
-    const mightUsePnpm = forced === 'pnpm' || (forced !== 'gitnexus' && forced !== 'npx');
-    if (mightUsePnpm && (forced === 'pnpm' || !probe('gitnexus', true))) {
+    // yummygraph/npx never use pnpm, and a present global yummygraph wins outright.
+    const mightUsePnpm = forced === 'pnpm' || (forced !== 'yummygraph' && forced !== 'npx');
+    if (mightUsePnpm && (forced === 'pnpm' || !probe('yummygraph', true))) {
       const { major, minor } = probeVersion('pnpm');
       // Carry presence separately from version: when the version probe fails
       // (timeout, Corepack banner) but pnpm is on PATH, still treat it as
@@ -250,31 +250,31 @@ function formatAnalyzeCommand(options = {}, deps = {}) {
     }
   }
   const mode = resolveInvocationMode(probe, resolved);
-  if (mode === 'gitnexus') return `gitnexus analyze${suffix}`;
+  if (mode === 'yummygraph') return `yummygraph analyze${suffix}`;
   if (mode === 'pnpm') return `${formatPnpmDlxCommand(`analyze${suffix}`, options, resolved)}`;
   return `npx ${NPX_REF} analyze${suffix}`;
 }
 
 /**
- * Resolve `mode` into a concrete { program, args } pair for a set of gitnexus
+ * Resolve `mode` into a concrete { program, args } pair for a set of yummygraph
  * subcommand arguments. Shared by the direct-exec entrypoint below; pure (no
  * spawn) so it is unit-testable. `--embeddings` widens the pnpm allow-build set.
  */
-function buildRunnerArgv(mode, gitnexusArgs, deps = {}) {
+function buildRunnerArgv(mode, yummygraphArgs, deps = {}) {
   // Match both the space form (`--embeddings`) and the equals form
   // (`--embeddings=5000`) Commander accepts, so the pnpm allow-build set still
   // widens to onnxruntime-node when a user hand-types the equals form.
-  const embeddings = gitnexusArgs.some(
+  const embeddings = yummygraphArgs.some(
     (a) => a === '--embeddings' || a.startsWith('--embeddings='),
   );
-  if (mode === 'gitnexus') return { program: 'gitnexus', args: [...gitnexusArgs] };
+  if (mode === 'yummygraph') return { program: 'yummygraph', args: [...yummygraphArgs] };
   if (mode === 'pnpm') {
     return {
       program: 'pnpm',
-      args: [...formatPnpmAllowBuildArgs({ embeddings }, deps), 'dlx', NPX_REF, ...gitnexusArgs],
+      args: [...formatPnpmAllowBuildArgs({ embeddings }, deps), 'dlx', NPX_REF, ...yummygraphArgs],
     };
   }
-  return { program: 'npx', args: [NPX_REF, ...gitnexusArgs] };
+  return { program: 'npx', args: [NPX_REF, ...yummygraphArgs] };
 }
 
 module.exports = {
@@ -290,22 +290,22 @@ module.exports = {
   PNPM_ALLOW_BUILD_BASE,
 };
 
-// Direct-exec entrypoint (#1945): `node run.cjs <gitnexus args…>` resolves the
-// best available runner (global `gitnexus` → `pnpm dlx` → `npx`) at call time and
+// Direct-exec entrypoint (#1945): `node run.cjs <yummygraph args…>` resolves the
+// best available runner (global `yummygraph` → `pnpm dlx` → `npx`) at call time and
 // runs it, inheriting stdio and propagating the child's exit code. This lets the
 // committed skills and generated AGENTS.md/CLAUDE.md reference ONE stable,
-// CLI-neutral command without baking in a package-manager assumption. `gitnexus
-// analyze` drops a copy of this file at `.gitnexus/run.cjs`. Skipped on require()
+// CLI-neutral command without baking in a package-manager assumption. `yummygraph
+// analyze` drops a copy of this file at `.yummygraph/run.cjs`. Skipped on require()
 // (the CLI and tests reuse the exports above), so it runs only when invoked as a
 // script.
 if (require.main === module) {
-  const gitnexusArgs = process.argv.slice(2);
-  const { program, args } = buildRunnerArgv(resolveInvocationMode(), gitnexusArgs);
+  const yummygraphArgs = process.argv.slice(2);
+  const { program, args } = buildRunnerArgv(resolveInvocationMode(), yummygraphArgs);
   try {
     execFileSync(program, args, {
       stdio: 'inherit',
       windowsHide: true,
-      // On Windows, `npx`/`pnpm`/`gitnexus` resolve to `.cmd`/`.ps1`/`.exe`
+      // On Windows, `npx`/`pnpm`/`yummygraph` resolve to `.cmd`/`.ps1`/`.exe`
       // shims (npm, Volta, Corepack, scoop). execFileSync does not do PATHEXT
       // resolution and Node refuses to spawn `.cmd`/`.bat` without a shell
       // (CVE-2024-27980), so a bare program name ENOENTs. A shell lets the OS
@@ -316,7 +316,7 @@ if (require.main === module) {
     // Make spawn failures (resolved program absent from PATH) self-explanatory
     // instead of a silent exit 1, then propagate the runner's own exit code.
     if (typeof err.status !== 'number') {
-      process.stderr.write(`gitnexus runner: could not launch \`${program}\` — ${err.message}\n`);
+      process.stderr.write(`yummygraph runner: could not launch \`${program}\` — ${err.message}\n`);
     }
     process.exit(typeof err.status === 'number' ? err.status : 1);
   }

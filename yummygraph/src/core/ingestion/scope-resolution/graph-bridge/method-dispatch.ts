@@ -16,7 +16,7 @@
  * can extend the return shape without breaking existing consumers.
  */
 
-import type { MethodDispatchIndex } from 'gitnexus-shared';
+import type { MethodDispatchIndex } from 'yummygraph-shared';
 
 const EMPTY_DEFS: readonly string[] = Object.freeze([]);
 

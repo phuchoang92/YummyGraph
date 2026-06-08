@@ -51,7 +51,7 @@ const alreadyAvailable = (message: string): boolean =>
   message.includes('already exists');
 
 const resolvePolicyFromEnv = (): ExtensionInstallPolicy => {
-  const raw = process.env.GITNEXUS_LBUG_EXTENSION_INSTALL;
+  const raw = process.env.YUMMYGRAPH_LBUG_EXTENSION_INSTALL;
   if (raw === 'load-only' || raw === 'never' || raw === 'auto') return raw;
   return 'load-only';
 };
@@ -67,19 +67,19 @@ export const getExtensionInstallPolicy = (): ExtensionInstallPolicy => resolvePo
  * defaults to `auto` — LOAD the extension if present, otherwise attempt one
  * bounded out-of-process INSTALL. This keeps FTS symmetric with the
  * VECTOR/embeddings path (which already defaults to `auto`) and matches the
- * #726 contract. An explicit `GITNEXUS_LBUG_EXTENSION_INSTALL` value still
+ * #726 contract. An explicit `YUMMYGRAPH_LBUG_EXTENSION_INSTALL` value still
  * wins, so operators can force `load-only`/`never` for fully offline analyze;
  * `auto` LOADs-first, so offline machines still degrade gracefully when the
  * INSTALL cannot reach the network.
  */
 export const resolveAnalyzeInstallPolicy = (): ExtensionInstallPolicy => {
-  const raw = process.env.GITNEXUS_LBUG_EXTENSION_INSTALL;
+  const raw = process.env.YUMMYGRAPH_LBUG_EXTENSION_INSTALL;
   if (raw === 'load-only' || raw === 'never' || raw === 'auto') return raw;
   return 'auto';
 };
 
 export const getExtensionInstallTimeoutMs = (): number => {
-  const raw = process.env.GITNEXUS_LBUG_EXTENSION_INSTALL_TIMEOUT_MS;
+  const raw = process.env.YUMMYGRAPH_LBUG_EXTENSION_INSTALL_TIMEOUT_MS;
   const parsed = raw ? Number(raw) : NaN;
   return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_EXTENSION_INSTALL_TIMEOUT_MS;
 };
@@ -112,7 +112,7 @@ export const installDuckDbExtensionOutOfProcess = async (
     const child = spawn(process.execPath, getExtensionInstallChildProcessArgs(extensionName), {
       env: {
         ...process.env,
-        GITNEXUS_LBUG_EXTENSION_NAME: extensionName,
+        YUMMYGRAPH_LBUG_EXTENSION_NAME: extensionName,
       },
       stdio: ['ignore', 'ignore', 'pipe'],
       windowsHide: true,
@@ -274,7 +274,7 @@ export class ExtensionManager {
     if (this.warnedKeys.has(key)) return;
     this.warnedKeys.add(key);
     warn(
-      `GitNexus: ${label} extension unavailable; continuing without ${label} features. ${reason}`,
+      `YummyGraph: ${label} extension unavailable; continuing without ${label} features. ${reason}`,
     );
   }
 }

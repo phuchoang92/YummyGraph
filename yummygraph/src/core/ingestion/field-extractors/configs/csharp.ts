@@ -1,6 +1,6 @@
-// gitnexus/src/core/ingestion/field-extractors/configs/csharp.ts
+// yummygraph/src/core/ingestion/field-extractors/configs/csharp.ts
 
-import { SupportedLanguages } from 'gitnexus-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 import type { FieldExtractionConfig } from '../generic.js';
 import { findVisibility, hasKeyword, hasModifier, collectModifierTexts } from './helpers.js';
 import { extractSimpleTypeName } from '../../type-extractors/shared.js';

@@ -12,7 +12,7 @@
  * filters on reason.
  */
 
-import type { ImportEdge, ScopeId } from 'gitnexus-shared';
+import type { ImportEdge, ScopeId } from 'yummygraph-shared';
 import type { KnowledgeGraph } from '../../../graph/types.js';
 import type { ScopeResolutionIndexes } from '../../model/scope-resolution-indexes.js';
 import { generateId } from '../../../../lib/utils.js';

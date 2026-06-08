@@ -52,8 +52,8 @@ const isDev = process.env.NODE_ENV === 'development';
 const vectorUnavailableMessage =
   'VECTOR extension unavailable; semantic embeddings fall back to exact scan. ' +
   'To enable vector search, install it once with network access ' +
-  '(GITNEXUS_LBUG_EXTENSION_INSTALL=auto), or pre-install it for offline use. ' +
-  'Set GITNEXUS_LBUG_EXTENSION_INSTALL=never to skip installs and silence this.';
+  '(YUMMYGRAPH_LBUG_EXTENSION_INSTALL=auto), or pre-install it for offline use. ' +
+  'Set YUMMYGRAPH_LBUG_EXTENSION_INSTALL=never to skip installs and silence this.';
 
 /**
  * Resolve the extension-install policy for the embedding WRITE path (analyze).
@@ -62,13 +62,13 @@ const vectorUnavailableMessage =
  * VECTOR extension, so when the operator has NOT pinned a policy we default to
  * `auto` (one bounded, out-of-process INSTALL) — matching the documented
  * "auto = default for analyze" intent in extension-loader.ts. An explicit
- * GITNEXUS_LBUG_EXTENSION_INSTALL=load-only|never|auto always wins, so an
+ * YUMMYGRAPH_LBUG_EXTENSION_INSTALL=load-only|never|auto always wins, so an
  * offline or locked-down operator is never silently forced onto the network
  * (the #1153 regression caused by hard-coding `auto` here). Read on every call
  * (not memoized) so test env stubbing works.
  */
 export const resolveEmbeddingInstallPolicy = (): ExtensionInstallPolicy => {
-  const raw = process.env.GITNEXUS_LBUG_EXTENSION_INSTALL;
+  const raw = process.env.YUMMYGRAPH_LBUG_EXTENSION_INSTALL;
   if (raw === 'load-only' || raw === 'never' || raw === 'auto') return raw;
   return 'auto';
 };

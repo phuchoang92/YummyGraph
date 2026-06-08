@@ -32,7 +32,7 @@ describe('isEvalServerBindRestriction', () => {
       ["Error: EACCES: permission denied, open '/etc/shadow'"],
       ['Error: ENOENT: no such file or directory'],
       ['sandbox blocked: operation not permitted'],
-      ['GITNEXUS_EVAL_SERVER_READY:127.0.0.1:5173'],
+      ['YUMMYGRAPH_EVAL_SERVER_READY:127.0.0.1:5173'],
       [''],
       ['unknown option --host'],
     ])('does not match %p', (stderr) => {

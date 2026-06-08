@@ -1,4 +1,4 @@
-import type { Callsite, SymbolDefinition } from 'gitnexus-shared';
+import type { Callsite, SymbolDefinition } from 'yummygraph-shared';
 
 /**
  * C arity compatibility: no overloading. Variadic functions detected

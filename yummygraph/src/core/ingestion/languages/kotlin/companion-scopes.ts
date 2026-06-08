@@ -1,4 +1,4 @@
-import type { ScopeId } from 'gitnexus-shared';
+import type { ScopeId } from 'yummygraph-shared';
 
 /**
  * Per-file set of `ScopeId`s that came from a `companion_object` AST node

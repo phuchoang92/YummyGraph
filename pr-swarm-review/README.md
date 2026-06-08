@@ -1,6 +1,6 @@
-# GitNexus PR Reviewer Swarm (cross-CLI)
+# YummyGraph PR Reviewer Swarm (cross-CLI)
 
-A coordinated, **read-only** production-readiness PR review for GitNexus, runnable from any
+A coordinated, **read-only** production-readiness PR review for YummyGraph, runnable from any
 AI coding CLI. Seven specialized review personas produce one structured, evidence-grounded
 review.
 
@@ -30,21 +30,21 @@ same lanes sequentially in one agent (**Solo mode**) with an identical output co
 
 | CLI | How to invoke | Adapter file |
 |-----|---------------|--------------|
-| **Claude Code** | `/gitnexus-pr-swarm-review <PR>` (Swarm mode; dispatches the 7 `gitnexus-*` subagents) | `.claude/skills/gitnexus-pr-swarm-review/SKILL.md` + `.claude/agents/gitnexus-*.md` |
-| **Gemini CLI** | `/gitnexus-pr-swarm-review <PR>` | `.gemini/commands/gitnexus-pr-swarm-review.toml` |
-| **GitHub Copilot** | `/gitnexus-pr-swarm-review` (then paste the PR) | `.github/prompts/gitnexus-pr-swarm-review.prompt.md` |
-| **Cursor** | `/gitnexus-pr-swarm-review` (then paste the PR) | `.cursor/commands/gitnexus-pr-swarm-review.md` |
-| **Codex CLI** | Ask: "run the GitNexus PR swarm review for <PR>" (Codex reads `AGENTS.md`) — or install the user-level prompt below | `AGENTS.md` § PR Swarm Review |
+| **Claude Code** | `/yummygraph-pr-swarm-review <PR>` (Swarm mode; dispatches the 7 `yummygraph-*` subagents) | `.claude/skills/yummygraph-pr-swarm-review/SKILL.md` + `.claude/agents/yummygraph-*.md` |
+| **Gemini CLI** | `/yummygraph-pr-swarm-review <PR>` | `.gemini/commands/yummygraph-pr-swarm-review.toml` |
+| **GitHub Copilot** | `/yummygraph-pr-swarm-review` (then paste the PR) | `.github/prompts/yummygraph-pr-swarm-review.prompt.md` |
+| **Cursor** | `/yummygraph-pr-swarm-review` (then paste the PR) | `.cursor/commands/yummygraph-pr-swarm-review.md` |
+| **Codex CLI** | Ask: "run the YummyGraph PR swarm review for <PR>" (Codex reads `AGENTS.md`) — or install the user-level prompt below | `AGENTS.md` § PR Swarm Review |
 | **Any AGENTS.md-aware agent** | Ask it to "follow `pr-swarm-review/orchestration.md` for <PR>" | `AGENTS.md` § PR Swarm Review |
 
 ### Codex (optional user-level slash command)
 
-Codex prompts are user-level only (not repo-shareable). To get a `/gitnexus-pr-swarm-review`
-slash command, create `~/.codex/prompts/gitnexus-pr-swarm-review.md`:
+Codex prompts are user-level only (not repo-shareable). To get a `/yummygraph-pr-swarm-review`
+slash command, create `~/.codex/prompts/yummygraph-pr-swarm-review.md`:
 
 ```markdown
 ---
-description: GitNexus production-readiness PR swarm review (Solo mode)
+description: YummyGraph production-readiness PR swarm review (Solo mode)
 argument-hint: <PR URL or number>
 ---
 Read `pr-swarm-review/orchestration.md` in this repo and run it in **Solo mode** for $ARGUMENTS.
@@ -68,5 +68,5 @@ subagents, else Solo mode)*. Do not copy the persona/orchestration text into the
 
 ## Relationship to the existing review skill
 
-This coexists with `/gitnexus-pr-review` (a single-agent linear checklist using GitNexus MCP
+This coexists with `/yummygraph-pr-review` (a single-agent linear checklist using YummyGraph MCP
 tools). This swarm is a multi-agent / multi-persona deep production-readiness review.

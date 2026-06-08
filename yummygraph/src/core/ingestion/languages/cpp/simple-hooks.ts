@@ -5,7 +5,7 @@ import type {
   ScopeId,
   ScopeTree,
   TypeRef,
-} from 'gitnexus-shared';
+} from 'yummygraph-shared';
 
 /**
  * C++ binding scope: default auto-hoist (null) for most declarations.

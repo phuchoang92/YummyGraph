@@ -38,7 +38,7 @@ test.beforeAll(async () => {
       backendRes.status === 'rejected' ||
       (backendRes.status === 'fulfilled' && !backendRes.value.ok)
     ) {
-      test.skip(true, 'gitnexus serve not available');
+      test.skip(true, 'yummygraph serve not available');
       return;
     }
     if (

@@ -8,7 +8,7 @@ describe('GoWorkspaceExtractor', () => {
   let tmpDir: string;
 
   beforeEach(async () => {
-    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'gitnexus-go-ws-'));
+    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'yummygraph-go-ws-'));
   });
 
   afterEach(async () => {

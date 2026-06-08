@@ -43,7 +43,7 @@ import {
   type ExportedTypeMap,
 } from '../call-processor.js';
 import { createSemanticModel, type MutableSemanticModel } from '../model/index.js';
-import { type PipelineProgress, getLanguageFromFilename } from 'gitnexus-shared';
+import { type PipelineProgress, getLanguageFromFilename } from 'yummygraph-shared';
 import { readFileContents } from '../filesystem-walker.js';
 import { isLanguageAvailable } from '../../tree-sitter/parser-loader.js';
 import {
@@ -92,13 +92,13 @@ import { logger } from '../../logger.js';
  * the parse cache. A single file change invalidates only its enclosing
  * chunk, so smaller budgets → finer-grained invalidation.
  *
- * Override via GITNEXUS_CHUNK_BYTE_BUDGET (bytes) — the default of 2MB
+ * Override via YUMMYGRAPH_CHUNK_BYTE_BUDGET (bytes) — the default of 2MB
  * gives a useful invalidation floor (~1/N chunks on a multi-MB repo)
  * while keeping worker dispatch overhead under 5% on cold runs.
  */
 /**
  * Built-in chunk byte budget when neither `PipelineOptions.chunkByteBudget`
- * nor `GITNEXUS_CHUNK_BYTE_BUDGET` is set. Tuned to give a useful
+ * nor `YUMMYGRAPH_CHUNK_BYTE_BUDGET` is set. Tuned to give a useful
  * cache-invalidation floor (~1/N chunks on a multi-MB repo) while keeping
  * worker dispatch overhead under 5% on cold runs. Resolution happens at
  * call time inside `runChunkedParseAndResolve` (U14 from PR #1693 review)
@@ -133,7 +133,7 @@ const MIN_SUB_BATCH_BYTES = 256 * 1024;
 function resolveChunkByteBudget(options?: PipelineOptions, effectivePoolSize = 1): number {
   const opt = options?.chunkByteBudget;
   if (typeof opt === 'number' && Number.isFinite(opt) && opt > 0) return opt;
-  const env = Number(process.env.GITNEXUS_CHUNK_BYTE_BUDGET);
+  const env = Number(process.env.YUMMYGRAPH_CHUNK_BYTE_BUDGET);
   if (Number.isFinite(env) && env > 0) return env;
   // Auto: size each chunk so a dispatch can fan across the whole pool. A
   // single-worker (tiny-repo) run keeps the original 2 MB invalidation floor.
@@ -156,7 +156,7 @@ type ProgressFn = (progress: PipelineProgress) => void;
  * There is no sequential parser to silently degrade to — that fallback was
  * removed (and it had masked a worker-startup regression as a 2-hour "stuck"
  * run in #1741, rc99: a dropped `logger.warn` plus an unbounded sequential
- * grind). GitNexus surfaces the real crash and aborts so the operator fixes the
+ * grind). YummyGraph surfaces the real crash and aborts so the operator fixes the
  * worker startup (commonly a missing build). The pool's own crash
  * classification (`crashClass` on WorkerPoolInitializationError) sharpens the
  * message.
@@ -205,7 +205,7 @@ export function handleWorkerStartupFailure(err: Error): never {
 
   throw new Error(
     `Worker pool failed to start: ${cause}${failureDetail}\n\n` +
-      `The worker pool is GitNexus's only parse path — there is no sequential ` +
+      `The worker pool is YummyGraph's only parse path — there is no sequential ` +
       `fallback to hide this crash behind (silently degrading masked a ` +
       `worker-startup regression as a 2-hour "stuck" run in #1741). Fix:\n` +
       `  • ${fixHint}`,
@@ -255,7 +255,7 @@ export async function runChunkedParseAndResolve(
    *  Threaded into scope-resolution as a re-extract cache so the warm-
    *  cache analyze run can skip the dominant `extractParsedFile` cost
    *  (otherwise ~58s on a 1000-file repo). */
-  parsedFiles: import('gitnexus-shared').ParsedFile[];
+  parsedFiles: import('yummygraph-shared').ParsedFile[];
 }> {
   const model = createSemanticModel();
   const symbolTable = model.symbols;
@@ -317,9 +317,9 @@ export async function runChunkedParseAndResolve(
         ? '`skipWorkers: true` was passed'
         : requestedPoolSize === 0
           ? '`--workers 0` (workerPoolSize=0) was requested'
-          : '`GITNEXUS_WORKER_POOL_SIZE=0` is set';
+          : '`YUMMYGRAPH_WORKER_POOL_SIZE=0` is set';
       throw new WorkerPoolDisabledError(
-        `Worker-pool parsing cannot be disabled (${reason}). GitNexus no longer ` +
+        `Worker-pool parsing cannot be disabled (${reason}). YummyGraph no longer ` +
           `has a sequential parser — the worker pool self-heals via quarantine + ` +
           `respawn, so there is no slower path to fall back to. Pass ` +
           `\`--workers <N>\` with N>=1, or omit it for an auto-sized pool.`,
@@ -352,8 +352,8 @@ export async function runChunkedParseAndResolve(
   const chunkByteBudget = resolveChunkByteBudget(options, effectivePoolSize);
   // Sub-batch size so each chunk fans into ~`TARGET_JOBS_PER_WORKER` jobs per
   // worker, giving the pool's idle-slot assignment room to load-balance. An
-  // explicit `GITNEXUS_WORKER_SUB_BATCH_MAX_BYTES` operator override wins.
-  const subBatchEnv = Number(process.env.GITNEXUS_WORKER_SUB_BATCH_MAX_BYTES);
+  // explicit `YUMMYGRAPH_WORKER_SUB_BATCH_MAX_BYTES` operator override wins.
+  const subBatchEnv = Number(process.env.YUMMYGRAPH_WORKER_SUB_BATCH_MAX_BYTES);
   const dispatchSubBatchMaxBytes =
     Number.isFinite(subBatchEnv) && subBatchEnv > 0
       ? subBatchEnv
@@ -481,12 +481,12 @@ export async function runChunkedParseAndResolve(
   // phase so it can SKIP its own re-extraction on cache hits — this is
   // the second-half of the parse-cache speedup since scope-resolution's
   // re-parse otherwise dominates the warm-cache wall-clock time.
-  const allParsedFiles: import('gitnexus-shared').ParsedFile[] = [];
+  const allParsedFiles: import('yummygraph-shared').ParsedFile[] = [];
 
   // Incremental parse cache (Option B): chunk-level content-addressed.
   // When the chunk's (filePath, content-hash) signature matches a prior
   // run's, replay the cached ParseWorkerResult[] instead of dispatching
-  // to workers. See gitnexus/src/storage/parse-cache.ts.
+  // to workers. See yummygraph/src/storage/parse-cache.ts.
   const parseCache = options?.parseCache;
   // Disk-backed ParsedFile store (#1983): when a storage path is available we
   // flush worker-produced ParsedFiles to disk per chunk (instead of retaining
@@ -526,12 +526,12 @@ export async function runChunkedParseAndResolve(
     // in chunkIdx order (the for-loop below iterates sequentially), so
     // cross-chunk processors see deterministic input regardless of
     // file-read completion order. Honors options.parseChunkConcurrency
-    // (threaded from the CLI), then GITNEXUS_PARSE_CHUNK_CONCURRENCY env
+    // (threaded from the CLI), then YUMMYGRAPH_PARSE_CHUNK_CONCURRENCY env
     // (default 2 — matches the help text the CLI advertises).
     const parseChunkConcurrency = ((): number => {
       const opt = options?.parseChunkConcurrency;
       if (typeof opt === 'number' && Number.isInteger(opt) && opt >= 1) return opt;
-      const env = Number(process.env.GITNEXUS_PARSE_CHUNK_CONCURRENCY);
+      const env = Number(process.env.YUMMYGRAPH_PARSE_CHUNK_CONCURRENCY);
       if (Number.isInteger(env) && env >= 1) return env;
       return 2;
     })();
@@ -544,7 +544,7 @@ export async function runChunkedParseAndResolve(
       startChunkPrefetch(i);
     }
 
-    // Hoisted loop-invariant: GITNEXUS_VERBOSE / NODE_ENV are read once
+    // Hoisted loop-invariant: YUMMYGRAPH_VERBOSE / NODE_ENV are read once
     // (not on every chunk). Previously evaluated at the top of the loop
     // body, which re-read process.env on every iteration even though
     // the env can't change mid-run.
@@ -699,8 +699,8 @@ export async function runChunkedParseAndResolve(
       // of this iteration. The gate is computed once above; here we just
       // sample the clock if the gate is on. Computed when either
       // NODE_ENV=development OR the operator passed `--verbose`
-      // (GITNEXUS_VERBOSE) — the previous `isDev`-only gate meant
-      // operators running `gitnexus analyze --verbose` in production
+      // (YUMMYGRAPH_VERBOSE) — the previous `isDev`-only gate meant
+      // operators running `yummygraph analyze --verbose` in production
       // never saw the log (M3 from PR #1693 review).
       const chunkStartMs: number | null = verboseThroughputLog ? Date.now() : null;
 

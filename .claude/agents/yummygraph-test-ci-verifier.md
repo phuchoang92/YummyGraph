@@ -1,6 +1,6 @@
 ---
-name: gitnexus-test-ci-verifier
-description: "GitNexus test and CI reviewer. Use to verify whether changed behavior is covered by targeted tests, whether CI actually runs those tests, and whether workflow changes weaken validation."
+name: yummygraph-test-ci-verifier
+description: "YummyGraph test and CI reviewer. Use to verify whether changed behavior is covered by targeted tests, whether CI actually runs those tests, and whether workflow changes weaken validation."
 tools:
   - Read
   - Grep
@@ -10,7 +10,7 @@ model: claude-haiku-4-5-20251001
 maxTurns: 35
 ---
 
-# GitNexus Test & CI Verifier
+# YummyGraph Test & CI Verifier
 
 Your complete operating spec — role, what to inspect, classifications, and the required output sections — lives in the canonical, CLI-neutral persona file:
 

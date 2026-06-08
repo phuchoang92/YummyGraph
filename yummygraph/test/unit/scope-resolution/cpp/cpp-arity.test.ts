@@ -11,7 +11,7 @@ import {
 } from '../../../../src/core/ingestion/languages/cpp/arity-metadata.js';
 import { getCppParser } from '../../../../src/core/ingestion/languages/cpp/query.js';
 import type { SyntaxNode } from '../../../../src/core/ingestion/utils/ast-helpers.js';
-import type { SymbolDefinition, Callsite } from 'gitnexus-shared';
+import type { SymbolDefinition, Callsite } from 'yummygraph-shared';
 
 function parseFuncDef(src: string): SyntaxNode | null {
   const tree = getCppParser().parse(src);

@@ -210,7 +210,7 @@ const DB_LOCK_RETRY_DELAY_MS = 500;
  * a read-only LadybugDB connection. The MCP query pool opens DBs read-only,
  * so any path that calls a `CREATE_*` procedure there will surface this
  * (e.g. defensive `ensureFTSIndex` calls). Owners of the writable analyze
- * path should ignore this error — index creation is owned by `gitnexus
+ * path should ignore this error — index creation is owned by `yummygraph
  * analyze` and either already happened or will happen on the next run.
  */
 export const isReadOnlyDbError = (err: unknown): boolean => {
@@ -298,7 +298,7 @@ const tryBreakStaleLock = async (lockPath: string): Promise<boolean> => {
     // PID is gone or lock exceeded INIT_LOCK_STALE_MS — reclaim it.
     await fs.unlink(lockPath);
     logger.warn(
-      `GitNexus: removed stale init lock (pid=${parsed.pid ?? '?'}, age=${typeof parsed.ts === 'number' ? `${Date.now() - parsed.ts}ms` : '?'})`,
+      `YummyGraph: removed stale init lock (pid=${parsed.pid ?? '?'}, age=${typeof parsed.ts === 'number' ? `${Date.now() - parsed.ts}ms` : '?'})`,
     );
     return true;
   } catch (err) {
@@ -308,7 +308,7 @@ const tryBreakStaleLock = async (lockPath: string): Promise<boolean> => {
     // Permission error or corrupt content — log and let caller retry.
     const code = extractErrnoCode(err);
     logger.warn(
-      `GitNexus: unable to inspect init lock (${code ?? 'UNKNOWN'}): ${summarizeError(err)}`,
+      `YummyGraph: unable to inspect init lock (${code ?? 'UNKNOWN'}): ${summarizeError(err)}`,
     );
     return false;
   }
@@ -329,7 +329,7 @@ export const acquireInitLock = async (dbPath: string): Promise<() => Promise<voi
   const payload = JSON.stringify({ pid: process.pid, ts: Date.now() });
 
   // Ensure the parent directory exists before creating the lock file.
-  // On a fresh repo the `.gitnexus/` directory may not exist yet, and
+  // On a fresh repo the `.yummygraph/` directory may not exist yet, and
   // fs.open with O_CREAT | O_EXCL would fail with ENOENT.
   await fs.mkdir(path.dirname(lockPath), { recursive: true });
 
@@ -350,7 +350,7 @@ export const acquireInitLock = async (dbPath: string): Promise<() => Promise<voi
           if (!isMissingFileError(err)) {
             const code = extractErrnoCode(err);
             logger.warn(
-              `GitNexus: failed to release init lock (${code ?? 'UNKNOWN'}): ${summarizeError(err)}`,
+              `YummyGraph: failed to release init lock (${code ?? 'UNKNOWN'}): ${summarizeError(err)}`,
             );
           }
         }
@@ -368,8 +368,8 @@ export const acquireInitLock = async (dbPath: string): Promise<() => Promise<voi
 
       if (attempt === INIT_LOCK_MAX_ATTEMPTS) {
         throw new Error(
-          `GitNexus: unable to acquire init lock after ${INIT_LOCK_MAX_ATTEMPTS} attempts — ` +
-            `another gitnexus process may be initializing the same database (${lockPath})`,
+          `YummyGraph: unable to acquire init lock after ${INIT_LOCK_MAX_ATTEMPTS} attempts — ` +
+            `another yummygraph process may be initializing the same database (${lockPath})`,
         );
       }
 
@@ -379,7 +379,7 @@ export const acquireInitLock = async (dbPath: string): Promise<() => Promise<voi
   }
 
   // Unreachable — loop always throws or returns
-  throw new Error('GitNexus: init lock acquisition failed unexpectedly');
+  throw new Error('YummyGraph: init lock acquisition failed unexpectedly');
 };
 
 /** Exported for testing — returns the lock file path for a given dbPath. */
@@ -481,8 +481,8 @@ const refuseLargeWalQuarantine = async (
   const state = await inspectLbugSidecars(dbPath);
   if (state.kind === 'orphan-wal') {
     logger.warn(
-      `GitNexus: refusing to quarantine large WAL (${state.walBytes} bytes) at ${dbPath}.wal during ${mode} recovery; ` +
-        'manual recovery required — run `gitnexus analyze --force <repo-path> --index-only`.',
+      `YummyGraph: refusing to quarantine large WAL (${state.walBytes} bytes) at ${dbPath}.wal during ${mode} recovery; ` +
+        'manual recovery required — run `yummygraph analyze --force <repo-path> --index-only`.',
     );
     throw new Error(shadowSidecarRecoveryMessage(dbPath, triggeringErr));
   }
@@ -565,7 +565,7 @@ const ensureReadOnlyConnectionUsable = async (
       throw new Error(
         shadowSidecarRecoveryMessage(dbPath, shadowReplayErr) +
           '\n  The workspace appears to be read-only — mount it read-write to perform shadow replay recovery,' +
-          ' or re-run `gitnexus analyze` on a writable filesystem to rebuild the index.',
+          ' or re-run `yummygraph analyze` on a writable filesystem to rebuild the index.',
       );
     }
     throw openErr;
@@ -658,7 +658,7 @@ export const initLbug = async (dbPath: string) => {
  * While the callback runs, no other request can switch the active DB.
  *
  * Automatically retries up to DB_LOCK_RETRY_ATTEMPTS times when the
- * database is busy (e.g. `gitnexus analyze` holds the write lock).
+ * database is busy (e.g. `yummygraph analyze` holds the write lock).
  * Each retry waits DB_LOCK_RETRY_DELAY_MS * attempt milliseconds.
  */
 export const withLbugDb = async <T>(
@@ -789,7 +789,7 @@ const doInitLbug = async (dbPath: string, readOnly: boolean = false) => {
             try {
               await fs.unlink(sidecar);
               logger.warn(
-                `GitNexus: removed orphan sidecar ${path.basename(sidecar)} (no main DB file present)`,
+                `YummyGraph: removed orphan sidecar ${path.basename(sidecar)} (no main DB file present)`,
               );
             } catch (err) {
               if (isMissingFileError(err)) {
@@ -797,14 +797,14 @@ const doInitLbug = async (dbPath: string, readOnly: boolean = false) => {
               }
               const code = extractErrnoCode(err);
               logger.warn(
-                `GitNexus: failed to remove orphan sidecar ${path.basename(sidecar)} (${code ?? 'UNKNOWN'}) while main DB file is missing; LadybugDB open may still fail: ${summarizeError(err)}`,
+                `YummyGraph: failed to remove orphan sidecar ${path.basename(sidecar)} (${code ?? 'UNKNOWN'}) while main DB file is missing; LadybugDB open may still fail: ${summarizeError(err)}`,
               );
             }
           }
         } else {
           const code = extractErrnoCode(err);
           logger.warn(
-            `GitNexus: unable to verify main DB file before orphan sidecar cleanup (${code ?? 'UNKNOWN'}); skipping cleanup: ${summarizeError(err)}`,
+            `YummyGraph: unable to verify main DB file before orphan sidecar cleanup (${code ?? 'UNKNOWN'}); skipping cleanup: ${summarizeError(err)}`,
           );
         }
       }
@@ -872,7 +872,7 @@ export const loadGraphToLbug = async (
   let csvDir: string;
   if (process.platform === 'win32' && /[^\x00-\x7F]/.test(storagePath)) {
     const hash = crypto.createHash('sha256').update(storagePath).digest('hex').slice(0, 16);
-    csvDir = toNativeSafePath(path.join(os.tmpdir(), `gitnexus-csv-${hash}`));
+    csvDir = toNativeSafePath(path.join(os.tmpdir(), `yummygraph-csv-${hash}`));
   } else {
     csvDir = path.join(storagePath, 'csv');
   }
@@ -1574,7 +1574,7 @@ export const flushWAL = async (): Promise<void> => {
     await drainQueryResult(checkpointResult);
   } catch (err) {
     logger.debug(
-      `GitNexus: LadybugDB CHECKPOINT skipped/failed during WAL flush: ${summarizeError(err)}`,
+      `YummyGraph: LadybugDB CHECKPOINT skipped/failed during WAL flush: ${summarizeError(err)}`,
     );
   }
 };
@@ -1647,7 +1647,7 @@ export const safeClose = async (): Promise<void> => {
       // Defender holding the file far past the 250ms budget).
       logger.warn(
         { dbPath: closingDbPath },
-        '⚠️ LadybugDB file handle still locked after close (Windows). If this repeats, check antivirus/Defender exclusions for the GitNexus storage directory.',
+        '⚠️ LadybugDB file handle still locked after close (Windows). If this repeats, check antivirus/Defender exclusions for the YummyGraph storage directory.',
       );
     }
   }
@@ -1909,7 +1909,7 @@ export const createFTSIndex = async (
   if (!(await loadFTSExtension())) {
     throw new Error(
       `FTS extension unavailable - cannot create FTS index ${tableName}.${indexName}. ` +
-        'Run `gitnexus doctor` and ensure the LadybugDB FTS extension is installed and loadable on this machine.',
+        'Run `yummygraph doctor` and ensure the LadybugDB FTS extension is installed and loadable on this machine.',
     );
   }
 
@@ -1942,7 +1942,7 @@ export const createFTSIndex = async (
  * pool adapter), `CREATE_FTS_INDEX` will fail with "Cannot execute write
  * operations in a read-only database". Treat that as a no-op and cache
  * the key so callers don't loop on a path that can never succeed here —
- * the index is owned by `gitnexus analyze` (writable) and either already
+ * the index is owned by `yummygraph analyze` (writable) and either already
  * exists or will be created on the next analyze.
  */
 export const ensureFTSIndex = async (

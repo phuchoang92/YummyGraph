@@ -17,18 +17,18 @@ const warnOnce = (key: string, message: string): void => {
 
 /**
  * Resolve the effective file-size skip threshold (bytes) for the walker.
- * Reads `GITNEXUS_MAX_FILE_SIZE` (KB). Invalid values fall back to the default
+ * Reads `YUMMYGRAPH_MAX_FILE_SIZE` (KB). Invalid values fall back to the default
  * and emit a one-time warning. Values above the tree-sitter ceiling are clamped.
  */
 export const getMaxFileSizeBytes = (): number => {
-  const raw = process.env.GITNEXUS_MAX_FILE_SIZE;
+  const raw = process.env.YUMMYGRAPH_MAX_FILE_SIZE;
   if (!raw) return DEFAULT_MAX_FILE_SIZE_BYTES;
 
   const parsed = Number(raw);
   if (!Number.isFinite(parsed) || parsed <= 0 || !Number.isInteger(parsed)) {
     warnOnce(
       `invalid:${raw}`,
-      `  GITNEXUS_MAX_FILE_SIZE must be a positive integer (KB), got "${raw}" — using default ${DEFAULT_MAX_FILE_SIZE_BYTES / 1024}KB`,
+      `  YUMMYGRAPH_MAX_FILE_SIZE must be a positive integer (KB), got "${raw}" — using default ${DEFAULT_MAX_FILE_SIZE_BYTES / 1024}KB`,
     );
     return DEFAULT_MAX_FILE_SIZE_BYTES;
   }
@@ -37,7 +37,7 @@ export const getMaxFileSizeBytes = (): number => {
   if (bytes > MAX_FILE_SIZE_UPPER_BOUND_BYTES) {
     warnOnce(
       `clamp:${raw}`,
-      `  GITNEXUS_MAX_FILE_SIZE=${parsed}KB exceeds tree-sitter ceiling (${MAX_FILE_SIZE_UPPER_BOUND_BYTES / 1024}KB) — clamping`,
+      `  YUMMYGRAPH_MAX_FILE_SIZE=${parsed}KB exceeds tree-sitter ceiling (${MAX_FILE_SIZE_UPPER_BOUND_BYTES / 1024}KB) — clamping`,
     );
     return MAX_FILE_SIZE_UPPER_BOUND_BYTES;
   }
@@ -56,7 +56,7 @@ export const getMaxFileSizeBannerMessage = (): string | null => {
   if (effectiveBytes === DEFAULT_MAX_FILE_SIZE_BYTES) return null;
   const effectiveKb = effectiveBytes / 1024;
   const defaultKb = DEFAULT_MAX_FILE_SIZE_BYTES / 1024;
-  return `  GITNEXUS_MAX_FILE_SIZE: effective threshold ${effectiveKb}KB (default ${defaultKb}KB)`;
+  return `  YUMMYGRAPH_MAX_FILE_SIZE: effective threshold ${effectiveKb}KB (default ${defaultKb}KB)`;
 };
 
 /** Test-only: reset the warn-once cache so repeated test runs can re-observe warnings. */

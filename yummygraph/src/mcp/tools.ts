@@ -1,7 +1,7 @@
 /**
  * MCP Tool Definitions
  *
- * Defines the tools that GitNexus exposes to external AI agents.
+ * Defines the tools that YummyGraph exposes to external AI agents.
  * All tools support an optional `repo` parameter for multi-repo setups.
  */
 
@@ -51,15 +51,15 @@ const DESTRUCTIVE_TOOL_ANNOTATIONS: ToolAnnotations = {
   openWorldHint: false,
 };
 
-export const GITNEXUS_TOOLS: ToolDefinition[] = [
+export const YUMMYGRAPH_TOOLS: ToolDefinition[] = [
   {
     name: 'list_repos',
-    description: `List all indexed repositories available to GitNexus.
+    description: `List all indexed repositories available to YummyGraph.
 
 Returns each repo's name, path, indexed date, last commit, and stats.
 
 WHEN TO USE: First step when multiple repos are indexed, or to discover available repos.
-AFTER THIS: READ gitnexus://repo/{name}/context for the repo you want to work with.
+AFTER THIS: READ yummygraph://repo/{name}/context for the repo you want to work with.
 
 When multiple repos are indexed, you MUST specify the "repo" parameter
 on other tools (query, context, impact, etc.) to target the correct one.`,
@@ -140,7 +140,7 @@ SERVICE: optional monorepo path prefix (POSIX-style, case-sensitive segments). W
     name: 'cypher',
     description: `Execute Cypher query against the code knowledge graph.
 
-WHEN TO USE: Complex structural queries that search/explore can't answer. READ gitnexus://repo/{name}/schema first for the full schema.
+WHEN TO USE: Complex structural queries that search/explore can't answer. READ yummygraph://repo/{name}/schema first for the full schema.
 AFTER THIS: Use context() on result symbols for deeper context.
 
 SCHEMA:
@@ -206,7 +206,7 @@ TIPS:
 Shows categorized incoming/outgoing references (calls, imports, extends, implements, methods, properties, overrides), process participation, and file location.
 
 WHEN TO USE: After query() to understand a specific symbol in depth. When you need to know all callers, callees, and what execution flows a symbol participates in.
-AFTER THIS: Use impact() if planning changes, or READ gitnexus://repo/{name}/process/{processName} for full execution trace.
+AFTER THIS: Use impact() if planning changes, or READ yummygraph://repo/{name}/process/{processName} for full execution trace.
 
 Handles disambiguation: if multiple symbols share the same name, returns ranked candidates (each with a relevance score) for you to pick from. Use uid for zero-ambiguity lookup, or narrow the search with file_path and/or kind hints.
 
@@ -256,9 +256,9 @@ SERVICE: optional monorepo path prefix (case-sensitive path segments). When "rep
 Maps git diff hunks to indexed symbols, then traces which processes are impacted.
 
 WHEN TO USE: Before committing — to understand what your changes affect. Pre-commit review, PR preparation.
-AFTER THIS: Review affected processes. Use context() on high-risk symbols. READ gitnexus://repo/{name}/process/{name} for full traces.
+AFTER THIS: Review affected processes. Use context() on high-risk symbols. READ yummygraph://repo/{name}/process/{name} for full traces.
 
-GIT WORKTREE SUPPORT: GitNexus automatically detects when the MCP server was launched from inside a linked git worktree and runs git diff against that worktree — no extra parameters needed in the common case. Pass "worktree" explicitly only when the server was started from a different directory than the worktree you are editing (e.g., the server runs from the canonical root but your changes are in a linked worktree at a different path).
+GIT WORKTREE SUPPORT: YummyGraph automatically detects when the MCP server was launched from inside a linked git worktree and runs git diff against that worktree — no extra parameters needed in the common case. Pass "worktree" explicitly only when the server was started from a different directory than the worktree you are editing (e.g., the server runs from the canonical root but your changes are in a linked worktree at a different path).
 
 Returns: changed symbols, affected processes, and a risk summary.`,
     annotations: READ_ONLY_TOOL_ANNOTATIONS,
@@ -278,7 +278,7 @@ Returns: changed symbols, affected processes, and a risk summary.`,
         worktree: {
           type: 'string',
           description:
-            'Absolute path to a linked git worktree. Pass this when your changes are in a worktree (the .git entry at that path is a file, not a directory). GitNexus will run git diff from that worktree so staged/unstaged changes are correctly detected.',
+            'Absolute path to a linked git worktree. Pass this when your changes are in a worktree (the .git entry at that path is a file, not a directory). YummyGraph will run git diff from that worktree so staged/unstaged changes are correctly detected.',
         },
         repo: {
           type: 'string',

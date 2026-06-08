@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { computeBackoffMs, withRetry, type RetryOptions } from 'gitnexus-shared';
+import { computeBackoffMs, withRetry, type RetryOptions } from 'yummygraph-shared';
 
 describe('computeBackoffMs', () => {
   it('returns afterMs (capped) when caller supplies it', () => {

@@ -9,7 +9,7 @@
   "missingFolderPath": "请输入文件夹路径。",
   "backend": {
     "reconnecting": "服务器连接已断开，正在重连…",
-    "network": "无法连接 GitNexus 服务器，请确认 `gitnexus serve` 正在运行。",
+    "network": "无法连接 YummyGraph 服务器，请确认 `yummygraph serve` 正在运行。",
     "timeout": "服务器响应超时，请稍后重试。",
     "rateLimited": "请求过于频繁，请在 {{seconds}} 秒后重试。",
     "notFound": "未找到请求的仓库或资源。",

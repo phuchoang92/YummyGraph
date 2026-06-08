@@ -1,12 +1,12 @@
 /**
  * Regression Tests: Cursor postToolUse Hook
  *
- * Tests the hook script at gitnexus-cursor-integration/hooks/gitnexus-hook.cjs
+ * Tests the hook script at yummygraph-cursor-integration/hooks/yummygraph-hook.cjs
  * which runs as a Cursor 2.4 postToolUse hook.
  *
  * Covers:
  * - extractPattern: pattern extraction from Grep/Read/Shell tool inputs
- * - findGitNexusDir: .gitnexus directory discovery (shared with Claude hook)
+ * - findYummyGraphDir: .yummygraph directory discovery (shared with Claude hook)
  * - cwd validation: rejects relative paths
  * - shell injection: verifies no `shell: true` in spawnSync calls
  * - cross-platform: Windows .cmd extension handling
@@ -15,7 +15,7 @@
  *
  * Cursor hooks reach the augment CLI only when cwd is inside an indexed
  * repo, so behavior tests stick to early-exit paths to avoid spawning
- * `npx gitnexus`.
+ * `npx yummygraph`.
  */
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { spawnSync } from 'child_process';
@@ -31,16 +31,16 @@ const CURSOR_HOOK = path.resolve(
   '..',
   '..',
   '..',
-  'gitnexus-cursor-integration',
+  'yummygraph-cursor-integration',
   'hooks',
-  'gitnexus-hook.cjs',
+  'yummygraph-hook.cjs',
 );
 const CURSOR_HOOK_LOCK = path.resolve(
   __dirname,
   '..',
   '..',
   '..',
-  'gitnexus-cursor-integration',
+  'yummygraph-cursor-integration',
   'hooks',
   'hook-lock.cjs',
 );
@@ -49,7 +49,7 @@ const CURSOR_HOOKS_JSON = path.resolve(
   '..',
   '..',
   '..',
-  'gitnexus-cursor-integration',
+  'yummygraph-cursor-integration',
   'hooks',
   'hooks.json',
 );
@@ -70,20 +70,20 @@ function parseCursorOutput(stdout: string): { additional_context?: string } | nu
 
 let tmpDir: string;
 // Separate fixture for the concurrency guard tests: this one has a real
-// `.gitnexus/` so the hook reaches acquireHookSlot. The base tmpDir above
-// deliberately has no .gitnexus so unrelated early-exit tests stay cheap.
+// `.yummygraph/` so the hook reaches acquireHookSlot. The base tmpDir above
+// deliberately has no .yummygraph so unrelated early-exit tests stay cheap.
 let guardTmpDir: string;
-let guardGitNexusDir: string;
+let guardYummyGraphDir: string;
 
 beforeAll(() => {
-  tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-cursor-hook-test-'));
+  tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-cursor-hook-test-'));
   spawnSync('git', ['init'], { cwd: tmpDir, stdio: 'pipe' });
   spawnSync('git', ['config', 'user.email', 'test@test.com'], { cwd: tmpDir, stdio: 'pipe' });
   spawnSync('git', ['config', 'user.name', 'Test'], { cwd: tmpDir, stdio: 'pipe' });
 
-  guardTmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-cursor-hook-guard-'));
-  guardGitNexusDir = path.join(guardTmpDir, '.gitnexus');
-  fs.mkdirSync(guardGitNexusDir, { recursive: true });
+  guardTmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-cursor-hook-guard-'));
+  guardYummyGraphDir = path.join(guardTmpDir, '.yummygraph');
+  fs.mkdirSync(guardYummyGraphDir, { recursive: true });
   spawnSync('git', ['init'], { cwd: guardTmpDir, stdio: 'pipe' });
   spawnSync('git', ['config', 'user.email', 'test@test.com'], {
     cwd: guardTmpDir,
@@ -117,7 +117,7 @@ describe('Cursor integration files', () => {
       '..',
       '..',
       '..',
-      'gitnexus-cursor-integration',
+      'yummygraph-cursor-integration',
       'hooks',
       'augment-shell.sh',
     );
@@ -149,7 +149,7 @@ describe('hooks.json wiring', () => {
 
   it('points command at the new Node hook', () => {
     const command: string = manifest.hooks.postToolUse[0].command;
-    expect(command).toContain('gitnexus-hook.cjs');
+    expect(command).toContain('yummygraph-hook.cjs');
     expect(command).not.toContain('augment-shell.sh');
   });
 
@@ -204,12 +204,12 @@ describe('Cursor hook source regressions', () => {
 
   it('passes pattern after end-of-options marker (--)', () => {
     // Regression for #200 — augment patterns starting with `-` would
-    // otherwise be parsed as CLI flags by the gitnexus CLI.
+    // otherwise be parsed as CLI flags by the yummygraph CLI.
     expect(source).toMatch(/'augment',\s*'--',\s*pattern/);
   });
 
-  it('gates on a non-global .gitnexus directory before invoking the CLI', () => {
-    expect(source).toContain('findGitNexusDir');
+  it('gates on a non-global .yummygraph directory before invoking the CLI', () => {
+    expect(source).toContain('findYummyGraphDir');
     expect(source).toContain('isGlobalRegistryDir');
   });
 
@@ -250,9 +250,9 @@ describe('Cursor hook extractPattern coverage', () => {
     expect(source).toMatch(/\\brg\\b\|\\bgrep\\b/);
   });
 
-  it('logs raw payload to stderr when GITNEXUS_DEBUG is set (for contract diagnostics)', () => {
-    expect(source).toContain('GITNEXUS_DEBUG');
-    expect(source).toContain('GitNexus Cursor hook stdin:');
+  it('logs raw payload to stderr when YUMMYGRAPH_DEBUG is set (for contract diagnostics)', () => {
+    expect(source).toContain('YUMMYGRAPH_DEBUG');
+    expect(source).toContain('YummyGraph Cursor hook stdin:');
   });
 });
 
@@ -291,7 +291,7 @@ describe('Cursor hook behavior — early-exit paths', () => {
     expect(result.status).toBe(0);
   });
 
-  it('produces no output when cwd has no .gitnexus dir', () => {
+  it('produces no output when cwd has no .yummygraph dir', () => {
     const result = runHook(CURSOR_HOOK, {
       tool_name: 'Grep',
       tool_input: { query: 'validateUser' },
@@ -353,7 +353,7 @@ describe('Cursor hook behavior — early-exit paths', () => {
 
   it('treats tool_name case-insensitively (Grep vs grep)', () => {
     // Both should reach the same handler — and both should early-exit silently
-    // because tmpDir has no .gitnexus.
+    // because tmpDir has no .yummygraph.
     for (const toolName of ['Grep', 'grep', 'GREP']) {
       const result = runHook(CURSOR_HOOK, {
         tool_name: toolName,
@@ -366,38 +366,38 @@ describe('Cursor hook behavior — early-exit paths', () => {
   });
 });
 
-// ─── Behavior: GITNEXUS_DEBUG payload logging ────────────────────────
+// ─── Behavior: YUMMYGRAPH_DEBUG payload logging ────────────────────────
 
 describe('Cursor hook debug logging', () => {
-  it('echoes the payload to stderr only when GITNEXUS_DEBUG is set', () => {
+  it('echoes the payload to stderr only when YUMMYGRAPH_DEBUG is set', () => {
     const payload = {
       tool_name: 'Grep',
       tool_input: { query: 'validateUser' },
       cwd: tmpDir,
     };
 
-    // GITNEXUS_DEBUG unset → stderr quiet.
+    // YUMMYGRAPH_DEBUG unset → stderr quiet.
     const quiet = spawnSync(process.execPath, [CURSOR_HOOK], {
       input: JSON.stringify(payload),
       encoding: 'utf-8',
       timeout: 10000,
       stdio: ['pipe', 'pipe', 'pipe'],
-      env: { ...process.env, GITNEXUS_DEBUG: '' },
+      env: { ...process.env, YUMMYGRAPH_DEBUG: '' },
     });
     expect(quiet.status).toBe(0);
-    expect(quiet.stderr).not.toContain('GitNexus Cursor hook stdin');
+    expect(quiet.stderr).not.toContain('YummyGraph Cursor hook stdin');
 
-    // GITNEXUS_DEBUG=1 → payload echoed to stderr (stdout still empty for
+    // YUMMYGRAPH_DEBUG=1 → payload echoed to stderr (stdout still empty for
     // unindexed cwd, so the hook output contract is preserved).
     const verbose = spawnSync(process.execPath, [CURSOR_HOOK], {
       input: JSON.stringify(payload),
       encoding: 'utf-8',
       timeout: 10000,
       stdio: ['pipe', 'pipe', 'pipe'],
-      env: { ...process.env, GITNEXUS_DEBUG: '1' },
+      env: { ...process.env, YUMMYGRAPH_DEBUG: '1' },
     });
     expect(verbose.status).toBe(0);
-    expect(verbose.stderr).toContain('GitNexus Cursor hook stdin');
+    expect(verbose.stderr).toContain('YummyGraph Cursor hook stdin');
     expect(verbose.stderr).toContain('"tool_name":"Grep"');
     expect(verbose.stdout.trim()).toBe('');
   });
@@ -439,7 +439,7 @@ describe('Cursor hook concurrency guard', () => {
   it('fails closed when lock dir cannot be created', () => {
     // Regression: see hooks.test.ts. The mkdirSync catch must return null
     // (skip augment) rather than `() => {}` (proceed unguarded), so that
-    // a read-only or cross-user `.gitnexus/` cannot reintroduce #1486.
+    // a read-only or cross-user `.yummygraph/` cannot reintroduce #1486.
     const slotFn = lockSource.slice(
       lockSource.indexOf('function acquireHookSlot'),
       lockSource.indexOf('function', lockSource.indexOf('function acquireHookSlot') + 1),
@@ -465,7 +465,7 @@ describe('Cursor hook concurrency guard', () => {
 describe('Cursor hook concurrency guard (integration)', () => {
   it('exits silently when all MAX_INFLIGHT slots hold live pids', async () => {
     const { spawn } = await import('child_process');
-    const lockDir = path.join(guardGitNexusDir, '.hook-locks');
+    const lockDir = path.join(guardYummyGraphDir, '.hook-locks');
     fs.mkdirSync(lockDir, { recursive: true });
 
     const sleepers = [0, 1, 2].map(() =>
@@ -518,7 +518,7 @@ describe('Cursor hook concurrency guard (integration)', () => {
   });
 
   it('reclaims a slot held by a dead pid', () => {
-    const lockDir = path.join(guardGitNexusDir, '.hook-locks');
+    const lockDir = path.join(guardYummyGraphDir, '.hook-locks');
     fs.mkdirSync(lockDir, { recursive: true });
     const deadPid = 2_147_483_640;
     const stalePath = path.join(lockDir, 'slot-0.lock');
@@ -569,7 +569,7 @@ describe('Shell quoted-pattern parser limitations (documented)', () => {
     const result = runHook(CURSOR_HOOK, {
       tool_name: 'Shell',
       tool_input: { command: 'rg "User Service" src/' },
-      cwd: tmpDir, // no .gitnexus → exits early after extract
+      cwd: tmpDir, // no .yummygraph → exits early after extract
     });
     expect(result.status).toBe(0);
     expect(result.stdout.trim()).toBe('');
@@ -594,7 +594,7 @@ describe('Cursor integration install docs', () => {
     '..',
     '..',
     '..',
-    'gitnexus-cursor-integration',
+    'yummygraph-cursor-integration',
     'README.md',
   );
 
@@ -605,14 +605,14 @@ describe('Cursor integration install docs', () => {
   it('install README documents the hook install path', () => {
     const body = fs.readFileSync(integrationReadme, 'utf-8');
     expect(body).toContain('.cursor/hooks.json');
-    expect(body).toContain('hooks/gitnexus-hook.cjs');
+    expect(body).toContain('hooks/yummygraph-hook.cjs');
     expect(body).toContain('hooks/hook-lock.cjs');
     expect(body).toContain('Hook install');
   });
 
-  it('install README documents GITNEXUS_DEBUG for payload diagnostics', () => {
+  it('install README documents YUMMYGRAPH_DEBUG for payload diagnostics', () => {
     const body = fs.readFileSync(integrationReadme, 'utf-8');
-    expect(body).toContain('GITNEXUS_DEBUG');
+    expect(body).toContain('YUMMYGRAPH_DEBUG');
   });
 });
 

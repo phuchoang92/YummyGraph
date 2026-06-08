@@ -1,7 +1,7 @@
 /**
  * Graph Queries for Wiki Generation
  *
- * Encapsulated Cypher queries against the GitNexus knowledge graph.
+ * Encapsulated Cypher queries against the YummyGraph knowledge graph.
  * Uses the MCP-style pooled lbug-adapter for connection management.
  */
 

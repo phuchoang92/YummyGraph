@@ -16,7 +16,7 @@
  */
 
 import { createKnowledgeGraph } from '../graph/graph.js';
-import { type PipelineProgress } from 'gitnexus-shared';
+import { type PipelineProgress } from 'yummygraph-shared';
 import { PipelineResult } from '../../types/pipeline.js';
 import {
   runPipeline,
@@ -77,7 +77,7 @@ export interface PipelineOptions {
    * The caller (`run-analyze.ts`) is responsible for loading the cache
    * before the pipeline runs and persisting it after. Cache survives
    * `--force` because keys are content-addressed.
-   * See `gitnexus/src/storage/parse-cache.ts`.
+   * See `yummygraph/src/storage/parse-cache.ts`.
    */
   parseCache?: import('../../storage/parse-cache.js').ParseCache;
   /**
@@ -85,7 +85,7 @@ export interface PipelineOptions {
    * via `AnalyzeOptions`. When set, parse-impl passes this directly to
    * `createWorkerPool` so the pool sizing bypasses the env-var fallback
    * in `resolveAutoPoolSize`. The env-var channel
-   * (`GITNEXUS_WORKER_POOL_SIZE`) remains as a back-compat fallback when
+   * (`YUMMYGRAPH_WORKER_POOL_SIZE`) remains as a back-compat fallback when
    * this field is undefined. Must be a positive integer — `0` hard-errors
    * (sequential parsing was removed; equivalent to `skipWorkers`), expressed
    * in the same units as `--workers <N>` so long-running hosts (eval-server,
@@ -103,13 +103,13 @@ export interface PipelineOptions {
    * would race on the shared per-slot busy/in-flight state).
    *
    * `1` matches today's pure-serial behavior; `2` is the documented
-   * default (`GITNEXUS_PARSE_CHUNK_CONCURRENCY`). Falls back to the
+   * default (`YUMMYGRAPH_PARSE_CHUNK_CONCURRENCY`). Falls back to the
    * env var when undefined; defaults to 2 when neither is set.
    */
   parseChunkConcurrency?: number;
   /**
    * Byte budget per parse chunk (in bytes). When set, parse-impl uses
-   * this instead of the `GITNEXUS_CHUNK_BYTE_BUDGET` env var or the
+   * this instead of the `YUMMYGRAPH_CHUNK_BYTE_BUDGET` env var or the
    * built-in 2 MB default. Smaller values produce more chunks (finer
    * cache-hit granularity, more worker dispatches); larger values
    * batch more files per dispatch.
@@ -123,7 +123,7 @@ export interface PipelineOptions {
   /**
    * Keep inert block-local value symbols (Const/Variable/Static) that the
    * `pruneLocalSymbols` phase would otherwise drop. Mirrors the
-   * `GITNEXUS_KEEP_LOCAL_VALUE_SYMBOLS` env var, but threaded per-call so
+   * `YUMMYGRAPH_KEEP_LOCAL_VALUE_SYMBOLS` env var, but threaded per-call so
    * long-running hosts (eval-server, MCP daemon) can opt out without leaking
    * `process.env` state across invocations. When undefined, the env var decides.
    */

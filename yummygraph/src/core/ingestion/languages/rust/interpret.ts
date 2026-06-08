@@ -1,4 +1,4 @@
-import type { CaptureMatch, ParsedImport, ParsedTypeBinding, TypeRef } from 'gitnexus-shared';
+import type { CaptureMatch, ParsedImport, ParsedTypeBinding, TypeRef } from 'yummygraph-shared';
 
 const REF_PREFIX_RE = /^&\s*(mut\s+)?/;
 const PTR_PREFIX_RE = /^\*\s*(const|mut)?\s*/;

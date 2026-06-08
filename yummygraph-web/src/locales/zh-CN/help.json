@@ -43,14 +43,14 @@
     "explained": "状态栏说明"
   },
   "tryAsking": "可以尝试问：",
-  "footer": "GitNexus — 图谱浏览器",
+  "footer": "YummyGraph — 图谱浏览器",
   "title": "帮助与参考",
-  "footerLong": "GitNexus — 开源代码库图谱浏览器",
+  "footerLong": "YummyGraph — 开源代码库图谱浏览器",
   "docsGithub": "文档与 GitHub ↗",
   "overview": {
     "gettingStarted": "开始使用",
-    "whatIsTitle": "GitNexus 是什么？",
-    "whatIsDescription": "GitNexus 是代码库的交互式图谱浏览器。每个文件、函数和导入关系都会变成可探索、可查询、可视化导航的节点。",
+    "whatIsTitle": "YummyGraph 是什么？",
+    "whatIsDescription": "YummyGraph 是代码库的交互式图谱浏览器。每个文件、函数和导入关系都会变成可探索、可查询、可视化导航的节点。",
     "currentRepoTitle": "当前仓库",
     "loadedCounts": "已加载：{{nodeCount}} 个节点 · {{edgeCount}} 条边",
     "threeWaysTitle": "三种探索方式",

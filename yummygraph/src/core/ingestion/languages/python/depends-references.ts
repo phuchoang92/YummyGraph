@@ -11,7 +11,7 @@
  * reference captures in code, mirroring the receiver-binding pattern.
  */
 
-import type { CaptureMatch } from 'gitnexus-shared';
+import type { CaptureMatch } from 'yummygraph-shared';
 import { nodeToCapture, type SyntaxNode } from '../../utils/ast-helpers.js';
 
 /**

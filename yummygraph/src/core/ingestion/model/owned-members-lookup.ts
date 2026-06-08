@@ -7,7 +7,7 @@
  * compatibility scan inside `lookupCore.collectOwnedMembers`.
  */
 
-import type { DefId, SymbolDefinition } from 'gitnexus-shared';
+import type { DefId, SymbolDefinition } from 'yummygraph-shared';
 import type { SemanticModel } from './semantic-model.js';
 
 const EMPTY: readonly SymbolDefinition[] = Object.freeze([]);

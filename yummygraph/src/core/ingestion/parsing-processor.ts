@@ -1,11 +1,11 @@
-import type { NodeLabel } from 'gitnexus-shared';
+import type { NodeLabel } from 'yummygraph-shared';
 import { KnowledgeGraph } from '../graph/types.js';
 import type { SymbolTableWriter } from './model/index.js';
-import { getLanguageFromFilename } from 'gitnexus-shared';
+import { getLanguageFromFilename } from 'yummygraph-shared';
 
 import { accumulateExportedTypesFromParsedNode, type ExportedTypeMap } from './call-processor.js';
 
-import type { ParsedFile } from 'gitnexus-shared';
+import type { ParsedFile } from 'yummygraph-shared';
 import { WorkerPool } from './workers/worker-pool.js';
 import { logger } from '../logger.js';
 import type {
@@ -221,7 +221,7 @@ export const processParsing = async (
   /**
    * Optional out-parameter for the incremental parse cache. When provided,
    * populated with the raw `ParseWorkerResult[]` from the workers (pre-merge).
-   * See `gitnexus/src/storage/parse-cache.ts`.
+   * See `yummygraph/src/storage/parse-cache.ts`.
    */
   outRawResults?: ParseWorkerResult[],
   exportedTypeMap?: ExportedTypeMap,

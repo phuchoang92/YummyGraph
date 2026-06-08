@@ -77,7 +77,7 @@ let workerUrl: URL;
 
 beforeEach(() => {
   nextActions.length = 0;
-  tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-worker-error-stack-'));
+  tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-worker-error-stack-'));
   const workerPath = path.join(tempDir, 'fake-worker.js');
   fs.writeFileSync(workerPath, '// fake');
   workerUrl = pathToFileURL(workerPath) as URL;

@@ -1,4 +1,4 @@
-import { SupportedLanguages, type ParsedFile } from 'gitnexus-shared';
+import { SupportedLanguages, type ParsedFile } from 'yummygraph-shared';
 import type { KnowledgeGraph } from '../../../graph/types.js';
 import { buildMro, defaultLinearize } from '../../scope-resolution/passes/mro.js';
 import type { ScopeResolver } from '../../scope-resolution/contract/scope-resolver.js';

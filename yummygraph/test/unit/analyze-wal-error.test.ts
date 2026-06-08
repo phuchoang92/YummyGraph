@@ -3,7 +3,7 @@
  *
  * Before this fix, a WAL corruption error surfaced as a raw stack-trace dump.
  * After the fix, it is caught before the generic error path and rendered as
- * a clean, actionable message telling the user to run `gitnexus analyze --force`.
+ * a clean, actionable message telling the user to run `yummygraph analyze --force`.
  *
  * Mirrors the test shape of analyze-worker-timeout.test.ts:
  *   - vi.mock the heavy dependencies so no real DB / git is touched
@@ -23,7 +23,7 @@ vi.mock('../../src/core/lbug/lbug-adapter.js', () => ({
 }));
 
 vi.mock('../../src/storage/repo-manager.js', () => ({
-  getStoragePaths: vi.fn(() => ({ storagePath: '.gitnexus', lbugPath: '.gitnexus/lbug' })),
+  getStoragePaths: vi.fn(() => ({ storagePath: '.yummygraph', lbugPath: '.yummygraph/lbug' })),
   getGlobalRegistryPath: vi.fn(() => 'registry.json'),
   RegistryNameCollisionError: class RegistryNameCollisionError extends Error {},
   AnalysisNotFinalizedError: class AnalysisNotFinalizedError extends Error {},
@@ -40,7 +40,7 @@ vi.mock('../../src/core/ingestion/utils/max-file-size.js', () => ({
 }));
 
 // analyze.ts imports isHfDownloadFailure from hf-env.js, which in turn imports
-// from gitnexus-shared (not linked in dev). Mock the module to break the chain.
+// from yummygraph-shared (not linked in dev). Mock the module to break the chain.
 vi.mock('../../src/core/embeddings/hf-env.js', () => ({
   isHfDownloadFailure: vi.fn(() => false),
 }));
@@ -60,8 +60,8 @@ describe('analyzeCommand WAL corruption error handling', () => {
     // This error shape is what lbug-adapter throws after detecting WAL corruption
     // in doInitLbug and re-wrapping it with the recovery suggestion.
     const walError = new Error(
-      'LadybugDB WAL corruption detected at /repo/.gitnexus/lbug. ' +
-        'Run `gitnexus analyze` to rebuild the index.\n' +
+      'LadybugDB WAL corruption detected at /repo/.yummygraph/lbug. ' +
+        'Run `yummygraph analyze` to rebuild the index.\n' +
         '  Original error: Runtime exception: Corrupted wal file.',
     );
     runFullAnalysisMock.mockRejectedValue(walError);
@@ -76,7 +76,7 @@ describe('analyzeCommand WAL corruption error handling', () => {
 
     const records = cap.records();
     const walRecord = records.find(
-      (r) => typeof r.msg === 'string' && r.msg.includes('gitnexus analyze --force'),
+      (r) => typeof r.msg === 'string' && r.msg.includes('yummygraph analyze --force'),
     );
     expect(walRecord).toBeDefined();
 
@@ -106,7 +106,7 @@ describe('analyzeCommand WAL corruption error handling', () => {
 
     const records = cap.records();
     const walRecord = records.find(
-      (r) => typeof r.msg === 'string' && r.msg.includes('gitnexus analyze --force'),
+      (r) => typeof r.msg === 'string' && r.msg.includes('yummygraph analyze --force'),
     );
     expect(walRecord).toBeDefined();
 
@@ -128,7 +128,7 @@ describe('analyzeCommand WAL corruption error handling', () => {
     // The WAL recovery message must NOT appear for unrelated errors
     const records = cap.records();
     const walRecord = records.find(
-      (r) => typeof r.msg === 'string' && r.msg.includes('gitnexus analyze --force'),
+      (r) => typeof r.msg === 'string' && r.msg.includes('yummygraph analyze --force'),
     );
     expect(walRecord).toBeUndefined();
 
@@ -138,7 +138,7 @@ describe('analyzeCommand WAL corruption error handling', () => {
   it('recommends --wal-checkpoint-threshold on Ladybug checkpoint I/O failures', async () => {
     runFullAnalysisMock.mockRejectedValue(
       new Error(
-        'Runtime exception: IO exception: Error renaming file /repo/.gitnexus/lbug.wal to /repo/.gitnexus/lbug.wal.checkpoint. ErrorMessage: Permission denied',
+        'Runtime exception: IO exception: Error renaming file /repo/.yummygraph/lbug.wal to /repo/.yummygraph/lbug.wal.checkpoint. ErrorMessage: Permission denied',
       ),
     );
 
@@ -154,7 +154,7 @@ describe('analyzeCommand WAL corruption error handling', () => {
       records.some(
         (r) =>
           typeof r.msg === 'string' &&
-          r.msg.includes('gitnexus analyze --wal-checkpoint-threshold'),
+          r.msg.includes('yummygraph analyze --wal-checkpoint-threshold'),
       ),
     ).toBe(true);
 
@@ -164,7 +164,7 @@ describe('analyzeCommand WAL corruption error handling', () => {
   it('also recommends threshold on .wal.checkpoint remove failures', async () => {
     runFullAnalysisMock.mockRejectedValue(
       new Error(
-        'Runtime exception: IO exception: Error removing directory or file /repo/.gitnexus/lbug.wal.checkpoint.  Error Message: Permission denied',
+        'Runtime exception: IO exception: Error removing directory or file /repo/.yummygraph/lbug.wal.checkpoint.  Error Message: Permission denied',
       ),
     );
 
@@ -180,7 +180,7 @@ describe('analyzeCommand WAL corruption error handling', () => {
       records.some(
         (r) =>
           typeof r.msg === 'string' &&
-          r.msg.includes('gitnexus analyze --wal-checkpoint-threshold'),
+          r.msg.includes('yummygraph analyze --wal-checkpoint-threshold'),
       ),
     ).toBe(true);
 
@@ -190,7 +190,7 @@ describe('analyzeCommand WAL corruption error handling', () => {
   it('does not recommend threshold for non-checkpoint IO exceptions', async () => {
     runFullAnalysisMock.mockRejectedValue(
       new Error(
-        'Runtime exception: IO exception: Error renaming file /repo/.gitnexus/data.tmp to /repo/.gitnexus/data.tmp.bak. ErrorMessage: Permission denied',
+        'Runtime exception: IO exception: Error renaming file /repo/.yummygraph/data.tmp to /repo/.yummygraph/data.tmp.bak. ErrorMessage: Permission denied',
       ),
     );
 
@@ -206,7 +206,7 @@ describe('analyzeCommand WAL corruption error handling', () => {
       records.some(
         (r) =>
           typeof r.msg === 'string' &&
-          r.msg.includes('gitnexus analyze --wal-checkpoint-threshold'),
+          r.msg.includes('yummygraph analyze --wal-checkpoint-threshold'),
       ),
     ).toBe(false);
 

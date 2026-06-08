@@ -11,7 +11,7 @@ import { writeContractRegistry } from '../../../src/core/group/storage.js';
 import type { ContractRegistry, StoredContract, CrossLink } from '../../../src/core/group/types.js';
 
 function makeTmpGroup(): { tmpDir: string; groupDir: string; cleanup: () => void } {
-  const tmpDir = path.join(os.tmpdir(), `gitnexus-svc-${Date.now()}`);
+  const tmpDir = path.join(os.tmpdir(), `yummygraph-svc-${Date.now()}`);
   const groupDir = path.join(tmpDir, 'groups', 'test-group');
   fs.mkdirSync(groupDir, { recursive: true });
 
@@ -38,7 +38,7 @@ function makePort(overrides: Partial<GroupToolPort> = {}): GroupToolPort {
         id: name || 'test',
         name: name || 'test',
         repoPath: '/tmp/repo',
-        storagePath: '/tmp/repo/.gitnexus',
+        storagePath: '/tmp/repo/.yummygraph',
       }),
     ),
     impact: vi.fn(async () => ({ symbols: [] })),
@@ -82,7 +82,7 @@ describe('GroupService', () => {
     it('test_groupList_without_name_returns_group_names', async () => {
       const { groupDir, cleanup, tmpDir } = makeTmpGroup();
       try {
-        vi.stubEnv('GITNEXUS_HOME', tmpDir);
+        vi.stubEnv('YUMMYGRAPH_HOME', tmpDir);
         const svc = new GroupService(makePort());
         const result = (await svc.groupList({})) as { groups: string[] };
         expect(result.groups).toContain('test-group');
@@ -95,7 +95,7 @@ describe('GroupService', () => {
     it('test_groupList_with_name_returns_config_details', async () => {
       const { cleanup, tmpDir } = makeTmpGroup();
       try {
-        vi.stubEnv('GITNEXUS_HOME', tmpDir);
+        vi.stubEnv('YUMMYGRAPH_HOME', tmpDir);
         const svc = new GroupService(makePort());
         const result = (await svc.groupList({ name: 'test-group' })) as {
           name: string;
@@ -120,7 +120,7 @@ describe('GroupService', () => {
     it('test_groupContracts_returns_error_when_no_registry', async () => {
       const { cleanup, tmpDir } = makeTmpGroup();
       try {
-        vi.stubEnv('GITNEXUS_HOME', tmpDir);
+        vi.stubEnv('YUMMYGRAPH_HOME', tmpDir);
         const svc = new GroupService(makePort());
         const result = (await svc.groupContracts({ name: 'test-group' })) as { error: string };
         expect(result.error).toContain('No contracts.json');
@@ -133,7 +133,7 @@ describe('GroupService', () => {
     it('test_groupContracts_returns_all_contracts', async () => {
       const { groupDir, cleanup, tmpDir } = makeTmpGroup();
       try {
-        vi.stubEnv('GITNEXUS_HOME', tmpDir);
+        vi.stubEnv('YUMMYGRAPH_HOME', tmpDir);
         const contracts = [
           makeContract('http::GET::/api/users', 'provider', 'app/backend'),
           makeContract('http::GET::/api/users', 'consumer', 'app/frontend'),
@@ -154,7 +154,7 @@ describe('GroupService', () => {
     it('test_groupContracts_filters_by_type', async () => {
       const { groupDir, cleanup, tmpDir } = makeTmpGroup();
       try {
-        vi.stubEnv('GITNEXUS_HOME', tmpDir);
+        vi.stubEnv('YUMMYGRAPH_HOME', tmpDir);
         const contracts = [
           makeContract('http::GET::/api/users', 'provider', 'app/backend'),
           {
@@ -179,7 +179,7 @@ describe('GroupService', () => {
     it('test_groupContracts_filters_by_repo', async () => {
       const { groupDir, cleanup, tmpDir } = makeTmpGroup();
       try {
-        vi.stubEnv('GITNEXUS_HOME', tmpDir);
+        vi.stubEnv('YUMMYGRAPH_HOME', tmpDir);
         const contracts = [
           makeContract('http::GET::/api/users', 'provider', 'app/backend'),
           makeContract('http::GET::/api/users', 'consumer', 'app/frontend'),
@@ -201,7 +201,7 @@ describe('GroupService', () => {
     it('test_groupContracts_unmatchedOnly_filters_matched', async () => {
       const { groupDir, cleanup, tmpDir } = makeTmpGroup();
       try {
-        vi.stubEnv('GITNEXUS_HOME', tmpDir);
+        vi.stubEnv('YUMMYGRAPH_HOME', tmpDir);
         const provider = makeContract('http::GET::/api/users', 'provider', 'app/backend');
         const consumer = makeContract('http::GET::/api/users', 'consumer', 'app/frontend');
         const orphan = makeContract('http::GET::/api/health', 'provider', 'app/backend');
@@ -241,7 +241,7 @@ describe('GroupService', () => {
     it('test_groupContracts_skips_corrupt_contract_rows', async () => {
       const { groupDir, cleanup, tmpDir } = makeTmpGroup();
       try {
-        vi.stubEnv('GITNEXUS_HOME', tmpDir);
+        vi.stubEnv('YUMMYGRAPH_HOME', tmpDir);
         const badJson = `{
           "version": 1,
           "generatedAt": "2026-01-01T00:00:00.000Z",
@@ -297,7 +297,7 @@ describe('GroupService', () => {
     it('test_groupQuery_merges_results_across_repos', async () => {
       const { cleanup, tmpDir } = makeTmpGroup();
       try {
-        vi.stubEnv('GITNEXUS_HOME', tmpDir);
+        vi.stubEnv('YUMMYGRAPH_HOME', tmpDir);
 
         const port = makePort({
           query: vi.fn(async () => ({
@@ -326,12 +326,12 @@ describe('GroupService', () => {
     it('test_groupQuery_handles_failing_repo_gracefully', async () => {
       const { cleanup, tmpDir } = makeTmpGroup();
       try {
-        vi.stubEnv('GITNEXUS_HOME', tmpDir);
+        vi.stubEnv('YUMMYGRAPH_HOME', tmpDir);
 
         const port = makePort({
           resolveRepo: vi.fn(async (name?: string) => {
             if (name === 'test-backend') throw new Error('not indexed');
-            return { id: 'fe', name: 'fe', repoPath: '/tmp', storagePath: '/tmp/.gitnexus' };
+            return { id: 'fe', name: 'fe', repoPath: '/tmp', storagePath: '/tmp/.yummygraph' };
           }),
           query: vi.fn(async () => ({ processes: [{ name: 'p1' }] })),
         });
@@ -352,7 +352,7 @@ describe('GroupService', () => {
     it('test_groupQuery_respects_subgroup_filter', async () => {
       const { cleanup, tmpDir } = makeTmpGroup();
       try {
-        vi.stubEnv('GITNEXUS_HOME', tmpDir);
+        vi.stubEnv('YUMMYGRAPH_HOME', tmpDir);
 
         const port = makePort({
           query: vi.fn(async () => ({ processes: [{ name: 'p1' }] })),
@@ -374,7 +374,7 @@ describe('GroupService', () => {
     });
 
     it('test_groupQuery_subgroupExact_skips_descendant_member_paths', async () => {
-      const tmpDir = path.join(os.tmpdir(), `gitnexus-svc-nest-${Date.now()}`);
+      const tmpDir = path.join(os.tmpdir(), `yummygraph-svc-nest-${Date.now()}`);
       const groupDir = path.join(tmpDir, 'groups', 'nest-group');
       fs.mkdirSync(groupDir, { recursive: true });
       fs.writeFileSync(
@@ -388,7 +388,7 @@ repos:
 `,
       );
       try {
-        vi.stubEnv('GITNEXUS_HOME', tmpDir);
+        vi.stubEnv('YUMMYGRAPH_HOME', tmpDir);
         const query = vi.fn(async () => ({ processes: [{ name: 'p1' }] }));
         const port = makePort({ query });
         const svc = new GroupService(port);
@@ -436,7 +436,7 @@ repos:
     it('test_groupContext_iterates_repos', async () => {
       const { cleanup, tmpDir } = makeTmpGroup();
       try {
-        vi.stubEnv('GITNEXUS_HOME', tmpDir);
+        vi.stubEnv('YUMMYGRAPH_HOME', tmpDir);
         const port = makePort();
         const svc = new GroupService(port);
         const r = await svc.groupContext({ name: 'test-group', target: 'MySym' });
@@ -450,7 +450,7 @@ repos:
     });
 
     it('test_groupContext_subgroupExact_skips_descendant_member_paths', async () => {
-      const tmpDir = path.join(os.tmpdir(), `gitnexus-ctx-nest-${Date.now()}`);
+      const tmpDir = path.join(os.tmpdir(), `yummygraph-ctx-nest-${Date.now()}`);
       const groupDir = path.join(tmpDir, 'groups', 'nest-group');
       fs.mkdirSync(groupDir, { recursive: true });
       fs.writeFileSync(
@@ -463,7 +463,7 @@ repos:
 `,
       );
       try {
-        vi.stubEnv('GITNEXUS_HOME', tmpDir);
+        vi.stubEnv('YUMMYGRAPH_HOME', tmpDir);
         const port = makePort();
         const svc = new GroupService(port);
         await svc.groupContext({
@@ -482,7 +482,7 @@ repos:
     it('test_groupContext_service_prefix_filters_payload', async () => {
       const { cleanup, tmpDir } = makeTmpGroup();
       try {
-        vi.stubEnv('GITNEXUS_HOME', tmpDir);
+        vi.stubEnv('YUMMYGRAPH_HOME', tmpDir);
         const port = makePort({
           context: vi.fn(async () => ({
             status: 'found',
@@ -513,7 +513,7 @@ repos:
     it('test_groupStatus_marks_unresolvable_repos_as_missing', async () => {
       const { cleanup, tmpDir } = makeTmpGroup();
       try {
-        vi.stubEnv('GITNEXUS_HOME', tmpDir);
+        vi.stubEnv('YUMMYGRAPH_HOME', tmpDir);
 
         const port = makePort({
           resolveRepo: vi.fn(async () => {

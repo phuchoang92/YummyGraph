@@ -135,7 +135,7 @@ describe('git utilities', () => {
 
   describe('findGitRootByDotGit', () => {
     it('finds an ancestor .git directory without spawning git', () => {
-      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-dotgit-'));
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-dotgit-'));
       try {
         fs.mkdirSync(path.join(tmpDir, '.git'));
         const nested = path.join(tmpDir, 'packages', 'app');
@@ -149,7 +149,7 @@ describe('git utilities', () => {
     });
 
     it('returns null outside a git worktree without spawning git', () => {
-      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-nonrepo-'));
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-nonrepo-'));
       try {
         expect(findGitRootByDotGit(tmpDir)).toBeNull();
         expect(mockExecSync).not.toHaveBeenCalled();
@@ -162,7 +162,7 @@ describe('git utilities', () => {
     // points at the real gitdir. statSync succeeds for both, so the ancestor
     // walk should treat such roots identically to ordinary repos.
     it('treats a .git file (linked worktree) as a valid root', () => {
-      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-worktree-'));
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-worktree-'));
       try {
         fs.writeFileSync(path.join(tmpDir, '.git'), 'gitdir: /fake/worktrees/wt\n');
         const nested = path.join(tmpDir, 'src', 'pkg');
@@ -176,13 +176,13 @@ describe('git utilities', () => {
     });
 
     it('returns null when the input path does not exist', () => {
-      const missing = path.join(os.tmpdir(), `gitnexus-missing-${Date.now()}-${Math.random()}`);
+      const missing = path.join(os.tmpdir(), `yummygraph-missing-${Date.now()}-${Math.random()}`);
       expect(findGitRootByDotGit(missing)).toBeNull();
       expect(mockExecSync).not.toHaveBeenCalled();
     });
 
     it('walks from a file input by starting at its parent directory', () => {
-      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-fileinput-'));
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-fileinput-'));
       try {
         fs.mkdirSync(path.join(tmpDir, '.git'));
         const filePath = path.join(tmpDir, 'pkg', 'index.ts');

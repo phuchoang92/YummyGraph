@@ -12,7 +12,7 @@ describe('ServiceBoundaryDetector', () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = path.join(os.tmpdir(), `gitnexus-sbd-${Date.now()}`);
+    tmpDir = path.join(os.tmpdir(), `yummygraph-sbd-${Date.now()}`);
     fs.mkdirSync(tmpDir, { recursive: true });
   });
 

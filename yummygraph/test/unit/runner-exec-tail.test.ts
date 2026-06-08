@@ -8,8 +8,8 @@ import path from 'node:path';
 // (#1945) end-to-end: the pure `buildRunnerArgv` is covered in
 // resolve-invocation.test.ts, but the spawn + exit-code propagation + missing-
 // runner diagnostic only live in the exec tail. We spawn a real child `node`
-// against the canonical run.cjs with GITNEXUS_INVOCATION forcing a mode (so no
-// live PATH probe) and a fake `gitnexus` on PATH.
+// against the canonical run.cjs with YUMMYGRAPH_INVOCATION forcing a mode (so no
+// live PATH probe) and a fake `yummygraph` on PATH.
 //
 // The POSIX cases stage a shebang shell script; the Windows case below stages a
 // `.cmd` shim to exercise the Windows-specific branch (shell:true so cmd.exe
@@ -31,22 +31,22 @@ describe('run.cjs direct-exec entrypoint (#1945)', () => {
     'execs the resolved runner, passes args through, and propagates its exit code',
     () => {
       const dir = mkdtempSync(path.join(os.tmpdir(), 'gn-runner-'));
-      const fake = path.join(dir, 'gitnexus');
-      // Fake global `gitnexus` that echoes its argv and exits 42.
-      writeFileSync(fake, '#!/bin/sh\necho "fake-gitnexus $@"\nexit 42\n');
+      const fake = path.join(dir, 'yummygraph');
+      // Fake global `yummygraph` that echoes its argv and exits 42.
+      writeFileSync(fake, '#!/bin/sh\necho "fake-yummygraph $@"\nexit 42\n');
       chmodSync(fake, 0o755);
 
       const res = spawnSync(process.execPath, [CANONICAL_CJS, 'analyze', '--foo'], {
         env: {
           ...process.env,
-          GITNEXUS_INVOCATION: 'gitnexus',
+          YUMMYGRAPH_INVOCATION: 'yummygraph',
           PATH: `${dir}:${process.env.PATH}`,
         },
         encoding: 'utf-8',
       });
 
       expect(res.status).toBe(42); // exit code propagated, not swallowed
-      expect(res.stdout).toContain('fake-gitnexus analyze --foo'); // args passthrough + inherited stdio
+      expect(res.stdout).toContain('fake-yummygraph analyze --foo'); // args passthrough + inherited stdio
     },
   );
 
@@ -55,8 +55,8 @@ describe('run.cjs direct-exec entrypoint (#1945)', () => {
     () => {
       const dir = mkdtempSync(path.join(os.tmpdir(), 'gn-runner-empty-'));
       const res = spawnSync(process.execPath, [CANONICAL_CJS, 'analyze'], {
-        // Force gitnexus mode but give an empty PATH so the spawn ENOENTs.
-        env: { ...process.env, GITNEXUS_INVOCATION: 'gitnexus', PATH: dir },
+        // Force yummygraph mode but give an empty PATH so the spawn ENOENTs.
+        env: { ...process.env, YUMMYGRAPH_INVOCATION: 'yummygraph', PATH: dir },
         encoding: 'utf-8',
       });
 
@@ -69,23 +69,23 @@ describe('run.cjs direct-exec entrypoint (#1945)', () => {
     'resolves a .cmd shim via the Windows shell branch, passing args and exit code',
     () => {
       const dir = mkdtempSync(path.join(os.tmpdir(), 'gn-runner-win-'));
-      const fake = path.join(dir, 'gitnexus.cmd');
-      // Fake global `gitnexus` .cmd shim: echoes its argv and exits 42. The exec
+      const fake = path.join(dir, 'yummygraph.cmd');
+      // Fake global `yummygraph` .cmd shim: echoes its argv and exits 42. The exec
       // tail's `shell: process.platform === 'win32'` routes through cmd.exe,
-      // which resolves bare `gitnexus` → `gitnexus.cmd` via PATHEXT.
-      writeFileSync(fake, '@echo off\r\necho fake-gitnexus %*\r\nexit /b 42\r\n');
+      // which resolves bare `yummygraph` → `yummygraph.cmd` via PATHEXT.
+      writeFileSync(fake, '@echo off\r\necho fake-yummygraph %*\r\nexit /b 42\r\n');
 
       const res = spawnSync(process.execPath, [CANONICAL_CJS, 'analyze', '--foo'], {
         env: {
           ...process.env,
-          GITNEXUS_INVOCATION: 'gitnexus',
+          YUMMYGRAPH_INVOCATION: 'yummygraph',
           PATH: `${dir};${process.env.PATH}`,
         },
         encoding: 'utf-8',
       });
 
       expect(res.status).toBe(42); // exit code propagated through the shell
-      expect(res.stdout).toContain('fake-gitnexus analyze --foo'); // args passthrough
+      expect(res.stdout).toContain('fake-yummygraph analyze --foo'); // args passthrough
     },
   );
 });

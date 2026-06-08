@@ -29,7 +29,7 @@ import { makeContract } from './fixtures.js';
  * portion of the file"). This blocks the close-then-reopen pattern that
  * `writeBridge → openBridgeDbReadOnly` relies on.
  *
- * Production code paths are unaffected: `gitnexus analyze`, `serve`, and
+ * Production code paths are unaffected: `yummygraph analyze`, `serve`, and
  * `mcp` each open the database exactly once per process and close it at
  * exit. The pattern only manifests in tests and in worker pool reuse.
  *

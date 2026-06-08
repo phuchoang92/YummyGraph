@@ -2,7 +2,7 @@
  * C++ inline namespace support (U5 of plan 2026-05-13-001).
  *
  * `inline namespace v1 { void foo(); }` has two ISO C++ semantics that
- * GitNexus must model:
+ * YummyGraph must model:
  *
  *   1. **Transitive unqualified visibility.** Names declared in an inline
  *      namespace are reachable by unqualified lookup from the enclosing
@@ -27,7 +27,7 @@
  * declaration transparently.
  */
 
-import type { Callsite, ParsedFile, ScopeId, SymbolDefinition } from 'gitnexus-shared';
+import type { Callsite, ParsedFile, ScopeId, SymbolDefinition } from 'yummygraph-shared';
 import type { ScopeResolutionIndexes } from '../../model/scope-resolution-indexes.js';
 import {
   isOverloadAmbiguousAfterNormalization,

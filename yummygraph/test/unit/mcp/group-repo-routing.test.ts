@@ -50,7 +50,7 @@ describe('LocalBackend @group repo routing', () => {
   let groupSpyContext: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-atgrp-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-atgrp-'));
     const groupDir = path.join(tmpDir, 'groups', 'g1');
     fs.mkdirSync(groupDir, { recursive: true });
     fs.writeFileSync(
@@ -62,7 +62,7 @@ repos:
   app/frontend: test-frontend
 `,
     );
-    vi.stubEnv('GITNEXUS_HOME', tmpDir);
+    vi.stubEnv('YUMMYGRAPH_HOME', tmpDir);
     groupSpyQuery = vi
       .spyOn(GroupService.prototype, 'groupQuery')
       .mockResolvedValue({ via: 'query' });

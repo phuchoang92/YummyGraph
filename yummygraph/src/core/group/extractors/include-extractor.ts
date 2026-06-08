@@ -337,9 +337,9 @@ export class IncludeExtractor implements ContractExtractor {
   /**
    * Discover repo-relative file paths using exactly the same rules the
    * ingestion pipeline uses (`walkRepositoryPaths` in
-   * `gitnexus/src/core/ingestion/filesystem-walker.ts`):
-   *   - `createIgnoreFilter` honors `.gitignore`, `.gitnexusignore`, the
-   *     hardcoded ignore list, and `.gitnexusignore` last-match-wins
+   * `yummygraph/src/core/ingestion/filesystem-walker.ts`):
+   *   - `createIgnoreFilter` honors `.gitignore`, `.yummygraphignore`, the
+   *     hardcoded ignore list, and `.yummygraphignore` last-match-wins
    *     negation.
    *   - `getMaxFileSizeBytes()` drops files larger than the cap so we
    *     never emit `File:<rel>` UIDs for files ingestion would skip.
@@ -417,7 +417,7 @@ export class IncludeExtractor implements ContractExtractor {
          WHERE f.filePath =~ '.*\\\\.(h|hpp|hxx|hh)$'
          RETURN f.filePath AS filePath, f.id AS fileId`,
       );
-      // gitnexus analyze stores absolute paths in the File.filePath column.
+      // yummygraph analyze stores absolute paths in the File.filePath column.
       // Provider contract IDs MUST be repo-relative — otherwise the consumer
       // emits `include::map/base/view.h` and the provider emits
       // `include::/abs/path/to/repo/map/base/view.h`, which never match

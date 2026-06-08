@@ -5,7 +5,7 @@ const mockAccess = vi.fn();
 const mockGetStoragePaths = vi.fn();
 const mockLoadMeta = vi.fn();
 const mockRegisterRepo = vi.fn();
-const mockEnsureGitNexusIgnored = vi.fn();
+const mockEnsureYummyGraphIgnored = vi.fn();
 const mockGetGitRoot = vi.fn();
 const mockIsGitRepo = vi.fn();
 
@@ -19,14 +19,14 @@ vi.mock('../../src/storage/repo-manager.js', () => ({
   getStoragePaths: mockGetStoragePaths,
   loadMeta: mockLoadMeta,
   registerRepo: mockRegisterRepo,
-  ensureGitNexusIgnored: mockEnsureGitNexusIgnored,
+  ensureYummyGraphIgnored: mockEnsureYummyGraphIgnored,
 }));
 
 vi.mock('../../src/storage/git.js', () => ({
   getGitRoot: mockGetGitRoot,
   isGitRepo: mockIsGitRepo,
   // `index-repo.ts` calls `getRemoteUrl` to backfill `remoteUrl` on
-  // older `.gitnexus/meta.json` files. The unit tests don't care
+  // older `.yummygraph/meta.json` files. The unit tests don't care
   // about the remote URL, so a static `undefined` keeps behaviour
   // identical to the pre-feature path.
   getRemoteUrl: vi.fn().mockReturnValue(undefined),
@@ -42,9 +42,9 @@ describe('indexCommand', () => {
     process.exitCode = undefined;
 
     mockGetStoragePaths.mockImplementation((repoPath: string) => ({
-      storagePath: `${repoPath}/.gitnexus`,
-      lbugPath: `${repoPath}/.gitnexus/lbug`,
-      metaPath: `${repoPath}/.gitnexus/meta.json`,
+      storagePath: `${repoPath}/.yummygraph`,
+      lbugPath: `${repoPath}/.yummygraph/lbug`,
+      metaPath: `${repoPath}/.yummygraph/meta.json`,
     }));
     mockLoadMeta.mockResolvedValue({
       repoPath: resolvedRepo,
@@ -53,7 +53,7 @@ describe('indexCommand', () => {
       stats: { nodes: 10, edges: 20 },
     });
     mockAccess.mockResolvedValue(undefined);
-    mockEnsureGitNexusIgnored.mockResolvedValue(undefined);
+    mockEnsureYummyGraphIgnored.mockResolvedValue(undefined);
     mockGetGitRoot.mockReturnValue(resolvedRepo);
     mockIsGitRepo.mockReturnValue(true);
   });
@@ -70,9 +70,9 @@ describe('indexCommand', () => {
     expect(logSpy).toHaveBeenCalledWith(`  Not a git repository: ${resolvedOutside}`);
   });
 
-  it('fails when .gitnexus folder does not exist', async () => {
+  it('fails when .yummygraph folder does not exist', async () => {
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-    mockAccess.mockRejectedValueOnce(new Error('missing .gitnexus'));
+    mockAccess.mockRejectedValueOnce(new Error('missing .yummygraph'));
 
     const { indexCommand } = await import('../../src/cli/index-repo.js');
     await indexCommand(['/repo']);
@@ -80,7 +80,7 @@ describe('indexCommand', () => {
     expect(mockRegisterRepo).not.toHaveBeenCalled();
     expect(process.exitCode).toBe(1);
     expect(logSpy).toHaveBeenCalledWith(
-      `  No .gitnexus/ folder found at: ${resolvedRepo}/.gitnexus`,
+      `  No .yummygraph/ folder found at: ${resolvedRepo}/.yummygraph`,
     );
   });
 
@@ -94,7 +94,7 @@ describe('indexCommand', () => {
     expect(mockRegisterRepo).not.toHaveBeenCalled();
     expect(process.exitCode).toBe(1);
     expect(logSpy).toHaveBeenCalledWith(
-      '  .gitnexus/ folder exists but contains no LadybugDB index.',
+      '  .yummygraph/ folder exists but contains no LadybugDB index.',
     );
   });
 
@@ -134,8 +134,8 @@ describe('indexCommand', () => {
       resolvedRepo,
       expect.objectContaining({ repoPath: resolvedRepo }),
     );
-    expect(mockEnsureGitNexusIgnored).toHaveBeenCalledTimes(1);
-    expect(mockEnsureGitNexusIgnored).toHaveBeenCalledWith(resolvedRepo);
+    expect(mockEnsureYummyGraphIgnored).toHaveBeenCalledTimes(1);
+    expect(mockEnsureYummyGraphIgnored).toHaveBeenCalledWith(resolvedRepo);
     expect(process.exitCode).toBeUndefined();
   });
 
@@ -170,7 +170,7 @@ describe('indexCommand', () => {
       resolvedRepo,
       expect.objectContaining({ repoPath: resolvedRepo }),
     );
-    expect(mockEnsureGitNexusIgnored).toHaveBeenCalledWith(resolvedRepo);
+    expect(mockEnsureYummyGraphIgnored).toHaveBeenCalledWith(resolvedRepo);
     expect(process.exitCode).toBeUndefined();
   });
 
@@ -189,7 +189,7 @@ describe('indexCommand', () => {
     await indexCommand(['/repo', '/other']);
 
     expect(mockRegisterRepo).not.toHaveBeenCalled();
-    expect(mockEnsureGitNexusIgnored).not.toHaveBeenCalled();
+    expect(mockEnsureYummyGraphIgnored).not.toHaveBeenCalled();
     expect(process.exitCode).toBe(1);
     expect(logSpy).toHaveBeenCalledWith('  The `index` command accepts a single path only.');
   });

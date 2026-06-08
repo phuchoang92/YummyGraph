@@ -17,12 +17,12 @@ const tmpSuffix = (): string => randomBytes(8).toString('hex');
 
 const CONTRACTS_FILE = 'contracts.json';
 
-export function getDefaultGitnexusDir(): string {
-  return process.env.GITNEXUS_HOME || path.join(os.homedir(), '.gitnexus');
+export function getDefaultYummygraphDir(): string {
+  return process.env.YUMMYGRAPH_HOME || path.join(os.homedir(), '.yummygraph');
 }
 
-export function getGroupsBaseDir(gitnexusDir?: string): string {
-  return path.join(gitnexusDir || getDefaultGitnexusDir(), 'groups');
+export function getGroupsBaseDir(yummygraphDir?: string): string {
+  return path.join(yummygraphDir || getDefaultYummygraphDir(), 'groups');
 }
 
 const GROUP_NAME_RE = /^[a-zA-Z0-9][a-zA-Z0-9_-]*$/;
@@ -35,9 +35,9 @@ export function validateGroupName(name: string): void {
   }
 }
 
-export function getGroupDir(gitnexusDir: string, groupName: string): string {
+export function getGroupDir(yummygraphDir: string, groupName: string): string {
   validateGroupName(groupName);
-  return path.join(gitnexusDir, 'groups', groupName);
+  return path.join(yummygraphDir, 'groups', groupName);
 }
 
 export async function writeContractRegistry(
@@ -80,8 +80,8 @@ export async function readContractRegistry(groupDir: string): Promise<ContractRe
   }
 }
 
-export async function listGroups(gitnexusDir?: string): Promise<string[]> {
-  const groupsDir = getGroupsBaseDir(gitnexusDir);
+export async function listGroups(yummygraphDir?: string): Promise<string[]> {
+  const groupsDir = getGroupsBaseDir(yummygraphDir);
   try {
     const entries = await fsp.readdir(groupsDir, { withFileTypes: true });
     const names: string[] = [];
@@ -101,11 +101,11 @@ export async function listGroups(gitnexusDir?: string): Promise<string[]> {
 }
 
 export async function createGroupDir(
-  gitnexusDir: string,
+  yummygraphDir: string,
   groupName: string,
   force: boolean = false,
 ): Promise<string> {
-  const groupDir = getGroupDir(gitnexusDir, groupName);
+  const groupDir = getGroupDir(yummygraphDir, groupName);
   if (fs.existsSync(path.join(groupDir, 'group.yaml')) && !force) {
     throw new Error(`Group "${groupName}" already exists. Use --force to overwrite.`);
   }
@@ -157,8 +157,8 @@ matching:
     }
   }
   // `'wx'` rejects a pre-planted symlink at the path; `0o600` is
-  // user-only (no group/world bits) — gitnexus storage is per-user
-  // (`~/.gitnexus/...`), so any "other user wants to read this" case is
+  // user-only (no group/world bits) — yummygraph storage is per-user
+  // (`~/.yummygraph/...`), so any "other user wants to read this" case is
   // a misconfiguration, not a feature. Keeping the file user-only also
   // satisfies CodeQL's `isSecureMode` predicate (low 6 bits == 0) and
   // closes the js/insecure-temporary-file alert at this site.

@@ -67,7 +67,7 @@ withTestLbugDB(
         const result = await augment('login', handle.dbPath);
 
         expect(result.length).toBeGreaterThan(0);
-        expect(result).toContain('[GitNexus]');
+        expect(result).toContain('[YummyGraph]');
         expect(result).toContain('login');
       });
 
@@ -168,7 +168,7 @@ withTestLbugDB(
         const result = await augmentNoFts('login', handle.dbPath);
 
         expect(result.length).toBeGreaterThan(0);
-        expect(result).toContain('[GitNexus]');
+        expect(result).toContain('[YummyGraph]');
       });
 
       it("returns empty string for whitespace-only pattern (CONTAINS '' guard)", async () => {

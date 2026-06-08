@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * GitNexus Antigravity / Gemini CLI Hook Adapter
+ * YummyGraph Antigravity / Gemini CLI Hook Adapter
  *
  * Bridges the Gemini CLI hooks contract (also used by Antigravity 2.0 — see
  * https://geminicli.com/docs/hooks/reference/) to the same graph-aware
@@ -24,7 +24,7 @@ const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
 const { acquireHookSlot } = require('./hook-lock.cjs');
-const { hasGitNexusDbLockedByGitNexusServer } = require('./hook-db-lock-probe.cjs');
+const { hasYummyGraphDbLockedByYummyGraphServer } = require('./hook-db-lock-probe.cjs');
 const { formatAnalyzeCommand } = require('./resolve-analyze-cmd.cjs');
 
 function readInput() {
@@ -44,10 +44,10 @@ function isGlobalRegistryDir(candidate) {
   );
 }
 
-function walkForGitNexusDir(startDir) {
+function walkForYummyGraphDir(startDir) {
   let dir = startDir;
   for (let i = 0; i < 5; i++) {
-    const candidate = path.join(dir, '.gitnexus');
+    const candidate = path.join(dir, '.yummygraph');
     if (fs.existsSync(candidate)) {
       if (!isGlobalRegistryDir(candidate)) return candidate;
     }
@@ -76,25 +76,25 @@ function findCanonicalRepoRoot(cwd) {
   }
 }
 
-function findGitNexusDir(startDir) {
+function findYummyGraphDir(startDir) {
   const cwd = startDir || process.cwd();
-  const fromCwd = walkForGitNexusDir(cwd);
+  const fromCwd = walkForYummyGraphDir(cwd);
   if (fromCwd) return fromCwd;
   const canonicalRoot = findCanonicalRepoRoot(cwd);
   if (canonicalRoot && canonicalRoot !== cwd) {
-    return walkForGitNexusDir(canonicalRoot);
+    return walkForYummyGraphDir(canonicalRoot);
   }
   return null;
 }
 
-function hasGitNexusServerOwner(gitNexusDir) {
-  return hasGitNexusDbLockedByGitNexusServer(path.join(gitNexusDir, 'lbug'), process.pid);
+function hasYummyGraphServerOwner(yummyGraphDir) {
+  return hasYummyGraphDbLockedByYummyGraphServer(path.join(yummyGraphDir, 'lbug'), process.pid);
 }
 
 function extractAugmentContext(stderr) {
   const output = (stderr || '').trim();
-  const marker = output.indexOf('[GitNexus]');
-  const debug = process.env.GITNEXUS_DEBUG === '1' || process.env.GITNEXUS_DEBUG === 'true';
+  const marker = output.indexOf('[YummyGraph]');
+  const debug = process.env.YUMMYGRAPH_DEBUG === '1' || process.env.YUMMYGRAPH_DEBUG === 'true';
   if (debug && output.length > 0) {
     // Emit the FULL discarded prefix (everything before the marker, or all of
     // it when no marker is present) so suppressed diagnostics — LadybugDB lock
@@ -102,7 +102,7 @@ function extractAugmentContext(stderr) {
     // stderr. Mirrors the Claude adapter's debug behavior.
     const discarded = marker === -1 ? output : output.slice(0, marker).trim();
     if (discarded.length > 0) {
-      process.stderr.write(`[GitNexus hook] augment stderr discarded prefix:\n${discarded}\n`);
+      process.stderr.write(`[YummyGraph hook] augment stderr discarded prefix:\n${discarded}\n`);
     }
   }
   return marker === -1 ? '' : output.slice(marker).trim();
@@ -173,14 +173,14 @@ function extractPattern(toolName, toolInput) {
 }
 
 function resolveCliPath() {
-  const fromEnv = process.env.GITNEXUS_HOOK_CLI_PATH;
+  const fromEnv = process.env.YUMMYGRAPH_HOOK_CLI_PATH;
   if (fromEnv !== undefined && String(fromEnv).trim() && fs.existsSync(String(fromEnv))) {
     return String(fromEnv);
   }
   let cliPath = path.resolve(__dirname, '..', '..', 'dist', 'cli', 'index.js');
   if (!fs.existsSync(cliPath)) {
     try {
-      cliPath = require.resolve('gitnexus/dist/cli/index.js');
+      cliPath = require.resolve('yummygraph/dist/cli/index.js');
     } catch {
       cliPath = '';
     }
@@ -188,7 +188,7 @@ function resolveCliPath() {
   return cliPath;
 }
 
-function runGitNexusCli(cliPath, args, cwd, timeout) {
+function runYummyGraphCli(cliPath, args, cwd, timeout) {
   const isWin = process.platform === 'win32';
   if (cliPath) {
     return spawnSync(process.execPath, [cliPath, ...args], {
@@ -199,7 +199,7 @@ function runGitNexusCli(cliPath, args, cwd, timeout) {
       windowsHide: true,
     });
   }
-  return spawnSync(isWin ? 'npx.cmd' : 'npx', ['-y', 'gitnexus', ...args], {
+  return spawnSync(isWin ? 'npx.cmd' : 'npx', ['-y', 'yummygraph', ...args], {
     encoding: 'utf-8',
     timeout: timeout + 5000,
     cwd,
@@ -237,8 +237,8 @@ function toolSucceeded(toolResponse) {
 function buildAfterToolContext(input) {
   const cwd = input.cwd || process.cwd();
   if (!path.isAbsolute(cwd)) return null;
-  const gitNexusDir = findGitNexusDir(cwd);
-  if (!gitNexusDir) return null;
+  const yummyGraphDir = findYummyGraphDir(cwd);
+  if (!yummyGraphDir) return null;
 
   const toolName = input.tool_name || '';
   const toolInput = input.tool_input || {};
@@ -248,7 +248,7 @@ function buildAfterToolContext(input) {
   if (toolSucceeded(toolResponse)) {
     const pattern = extractPattern(toolName, toolInput);
     if (pattern) {
-      const augmentText = runAugment(gitNexusDir, cwd, pattern);
+      const augmentText = runAugment(yummyGraphDir, cwd, pattern);
       if (augmentText) parts.push(augmentText);
     }
   }
@@ -256,7 +256,7 @@ function buildAfterToolContext(input) {
   if (toolName === 'run_shell_command' && toolSucceeded(toolResponse)) {
     const command = toolInput.command || '';
     if (/\bgit\s+(commit|merge|rebase|cherry-pick|pull)(\s|$)/.test(command)) {
-      const hint = buildStaleIndexHint(gitNexusDir, cwd);
+      const hint = buildStaleIndexHint(yummyGraphDir, cwd);
       if (hint) {
         process.stderr.write(`${hint}\n`);
         parts.push(hint);
@@ -267,16 +267,16 @@ function buildAfterToolContext(input) {
   return parts.length > 0 ? parts.join('\n\n') : null;
 }
 
-function runAugment(gitNexusDir, cwd, pattern) {
-  if (hasGitNexusServerOwner(gitNexusDir)) {
-    process.stderr.write('[GitNexus] augment skipped: MCP server owns DB\n');
+function runAugment(yummyGraphDir, cwd, pattern) {
+  if (hasYummyGraphServerOwner(yummyGraphDir)) {
+    process.stderr.write('[YummyGraph] augment skipped: MCP server owns DB\n');
     return '';
   }
-  const release = acquireHookSlot(gitNexusDir);
+  const release = acquireHookSlot(yummyGraphDir);
   if (!release) return '';
   const cliPath = resolveCliPath();
   try {
-    const child = runGitNexusCli(cliPath, ['augment', '--', pattern], cwd, 7000);
+    const child = runYummyGraphCli(cliPath, ['augment', '--', pattern], cwd, 7000);
     if (!child.error && child.status === 0) {
       return extractAugmentContext(child.stderr || '');
     }
@@ -288,7 +288,7 @@ function runAugment(gitNexusDir, cwd, pattern) {
   return '';
 }
 
-function buildStaleIndexHint(gitNexusDir, cwd) {
+function buildStaleIndexHint(yummyGraphDir, cwd) {
   let currentHead = '';
   try {
     const headResult = spawnSync('git', ['rev-parse', 'HEAD'], {
@@ -307,7 +307,7 @@ function buildStaleIndexHint(gitNexusDir, cwd) {
   let lastCommit = '';
   let hadEmbeddings = false;
   try {
-    const meta = JSON.parse(fs.readFileSync(path.join(gitNexusDir, 'meta.json'), 'utf-8'));
+    const meta = JSON.parse(fs.readFileSync(path.join(yummyGraphDir, 'meta.json'), 'utf-8'));
     lastCommit = meta.lastCommit || '';
     hadEmbeddings = meta.stats && meta.stats.embeddings > 0;
   } catch {
@@ -318,7 +318,7 @@ function buildStaleIndexHint(gitNexusDir, cwd) {
 
   const analyzeCmd = formatAnalyzeCommand({ embeddings: hadEmbeddings });
   return (
-    `[GitNexus] index is stale (last indexed: ${lastCommit ? lastCommit.slice(0, 7) : 'never'}). ` +
+    `[YummyGraph] index is stale (last indexed: ${lastCommit ? lastCommit.slice(0, 7) : 'never'}). ` +
     `Run \`${analyzeCmd}\` to refresh the knowledge graph.`
   );
 }
@@ -338,8 +338,8 @@ function main() {
     const handler = handlers[input.hook_event_name || ''];
     if (handler) handler(input);
   } catch (err) {
-    if (process.env.GITNEXUS_DEBUG) {
-      console.error('GitNexus antigravity hook error:', (err.message || '').slice(0, 200));
+    if (process.env.YUMMYGRAPH_DEBUG) {
+      console.error('YummyGraph antigravity hook error:', (err.message || '').slice(0, 200));
     }
   }
 }

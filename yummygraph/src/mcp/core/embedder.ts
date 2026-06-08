@@ -75,7 +75,7 @@ export const initEmbedder = async (): Promise<FeatureExtractionPipeline> => {
       applyHfEnvOverrides(env);
       const embeddingConfig = resolveEmbeddingConfig();
 
-      logger.info('GitNexus: Loading embedding model (first search may take a moment)...');
+      logger.info('YummyGraph: Loading embedding model (first search may take a moment)...');
 
       const devicesToTry: Array<'dml' | 'cuda' | 'cpu'> =
         embeddingConfig.device === 'dml' || embeddingConfig.device === 'cuda'
@@ -108,7 +108,7 @@ export const initEmbedder = async (): Promise<FeatureExtractionPipeline> => {
             restoreStdout();
             process.stderr.write = realStderrWrite;
           }
-          logger.info({ device }, 'GitNexus: Embedding model loaded');
+          logger.info({ device }, 'YummyGraph: Embedding model loaded');
           return embedderInstance!;
         } catch (deviceError) {
           // Network errors and circuit-open errors are not device-specific —
@@ -121,8 +121,8 @@ export const initEmbedder = async (): Promise<FeatureExtractionPipeline> => {
               ? `The configured endpoint (${process.env.HF_ENDPOINT}) may be unreachable.`
               : `huggingface.co may be unreachable from your network.\n` +
                 `  Set HF_ENDPOINT to a mirror and retry:\n` +
-                `    HF_ENDPOINT=https://hf-mirror.com npx gitnexus analyze --embeddings\n` +
-                `    (Windows: set HF_ENDPOINT=https://hf-mirror.com && npx gitnexus analyze --embeddings)`;
+                `    HF_ENDPOINT=https://hf-mirror.com npx yummygraph analyze --embeddings\n` +
+                `    (Windows: set HF_ENDPOINT=https://hf-mirror.com && npx yummygraph analyze --embeddings)`;
             throw new Error(`Failed to download embedding model: ${errMsg}\n  ${endpointHint}`);
           }
           if (device === 'cpu') throw new Error('Failed to load embedding model');

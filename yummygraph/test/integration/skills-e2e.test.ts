@@ -1,7 +1,7 @@
 /**
  * E2E Integration Tests: --skills Flag
  *
- * Tests `gitnexus analyze --skills` across 11 supported languages plus
+ * Tests `yummygraph analyze --skills` across 11 supported languages plus
  * mixed-language and idempotency scenarios. Each language fixture creates
  * a self-contained git repo with 2 clusters of files containing cross-file
  * function calls, then runs the full CLI pipeline and verifies SKILL.md
@@ -79,7 +79,7 @@ function createFixtureRepo(prefix: string, files: Record<string, string>): strin
 /**
  * Assert standard skill file properties:
  * 1. CLI exits 0
- * 2. .gitnexus/ exists
+ * 2. .yummygraph/ exists
  * 3. >= minSkills SKILL.md files under .claude/skills/generated/
  * 4. YAML frontmatter valid
  * 5. ## Key Files section present
@@ -107,7 +107,7 @@ function assertSkillFiles(
     ].join('\n'),
   ).toBe(0);
 
-  expect(fs.existsSync(path.join(tmpDir, '.gitnexus'))).toBe(true);
+  expect(fs.existsSync(path.join(tmpDir, '.yummygraph'))).toBe(true);
 
   const generatedDir = path.join(tmpDir, '.claude', 'skills', 'generated');
   if (!fs.existsSync(generatedDir)) {

@@ -12,7 +12,7 @@ import type {
   ScopeId,
   ScopeTree,
   TypeRef,
-} from 'gitnexus-shared';
+} from 'yummygraph-shared';
 
 // ─── bindingScopeFor ──────────────────────────────────────────────────────
 

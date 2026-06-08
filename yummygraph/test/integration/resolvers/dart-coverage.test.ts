@@ -25,7 +25,7 @@ import {
   loadLanguage,
 } from '../../../src/core/tree-sitter/parser-loader.js';
 import { SupportedLanguages } from '../../../src/config/supported-languages.js';
-import type { CaptureMatch } from 'gitnexus-shared';
+import type { CaptureMatch } from 'yummygraph-shared';
 
 let dartAvailable = isLanguageAvailable(SupportedLanguages.Dart);
 if (dartAvailable) {

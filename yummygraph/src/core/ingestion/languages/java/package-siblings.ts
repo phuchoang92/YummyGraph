@@ -8,7 +8,7 @@
  * files — the Java equivalent of C#'s `populateNamespaceSiblings`.
  */
 
-import type { BindingRef, ParsedFile, ScopeId, TypeRef } from 'gitnexus-shared';
+import type { BindingRef, ParsedFile, ScopeId, TypeRef } from 'yummygraph-shared';
 import type { ScopeResolutionIndexes } from '../../model/scope-resolution-indexes.js';
 import { isClassLike } from '../../scope-resolution/scope/walkers.js';
 import { getJavaParser } from './query.js';

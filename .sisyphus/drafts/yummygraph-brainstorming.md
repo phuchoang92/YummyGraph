@@ -1,15 +1,15 @@
-# Draft: Gitnexus Brainstorming - Clustering & Process Maps
+# Draft: Yummygraph Brainstorming - Clustering & Process Maps
 
 ## Initial Context
-- Project: **GitnexusV2**
+- Project: **YummygraphV2**
 - Structure: 
-    - `gitnexus/` (Likely the core application)
-    - `gitnexus-mcp/` (Likely a Model Context Protocol server)
+    - `yummygraph/` (Likely the core application)
+    - `yummygraph-mcp/` (Likely a Model Context Protocol server)
 - Goal: Make it accurate and usable for smaller/dumber models.
 - Current Focus: Implementing **Clustering** and **Process Maps**.
 
 ## Findings
-- **Clustering**: Found `gitnexus/src/core/ingestion/cluster-enricher.ts`.
+- **Clustering**: Found `yummygraph/src/core/ingestion/cluster-enricher.ts`.
 - **Process Maps**: No files matched `*process*map*` yet. Searching content next.
 
 ## Open Questions

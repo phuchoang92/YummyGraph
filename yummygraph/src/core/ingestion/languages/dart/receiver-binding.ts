@@ -16,7 +16,7 @@
  */
 
 import { nodeToCapture, syntheticCapture, type SyntaxNode } from '../../utils/ast-helpers.js';
-import type { CaptureMatch } from 'gitnexus-shared';
+import type { CaptureMatch } from 'yummygraph-shared';
 import { dartMethodConfig } from '../../method-extractors/configs/dart.js';
 
 const TYPE_DECL_TYPES = new Set([

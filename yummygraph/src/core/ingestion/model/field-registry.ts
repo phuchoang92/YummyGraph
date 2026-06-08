@@ -8,7 +8,7 @@
  * scope-resolution Variable reconciliation entry.
  */
 
-import type { SymbolDefinition } from 'gitnexus-shared';
+import type { SymbolDefinition } from 'yummygraph-shared';
 
 const EMPTY: readonly SymbolDefinition[] = Object.freeze([]);
 

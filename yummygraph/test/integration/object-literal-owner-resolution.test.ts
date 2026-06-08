@@ -12,7 +12,7 @@
  *   - `Const:fooService` ── HAS_METHOD ─► `Method:getUser`
  *   - `Function:caller`   ── CALLS      ─► `Method:getUser`
  *
- * The CALLS edge is the canonical proof: `gitnexus_impact` upstream traversal
+ * The CALLS edge is the canonical proof: `yummygraph_impact` upstream traversal
  * is a graph walk over CALLS, so if the edge exists, impact returns the
  * caller. Asserting the edge directly avoids wiring an entire `withTestLbugDB`
  * fixture for what is effectively a graph-shape assertion.

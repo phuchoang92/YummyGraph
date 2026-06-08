@@ -1,6 +1,6 @@
 /**
  * BindingAccumulator — read-append-only accumulator that collects TypeEnv
- * bindings across files in the GitNexus analyzer pipeline.
+ * bindings across files in the YummyGraph analyzer pipeline.
  *
  * **Current behavior (both execution paths):** The accumulator carries only
  * file-scope (`scope = ''`) entries. Function-scope bindings are stripped

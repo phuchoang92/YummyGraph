@@ -13,7 +13,7 @@ import {
 } from '../../../src/core/group/service.js';
 
 function makeTmpGroup(): { tmpDir: string; cleanup: () => void } {
-  const tmpDir = path.join(os.tmpdir(), `gitnexus-gmode-${Date.now()}`);
+  const tmpDir = path.join(os.tmpdir(), `yummygraph-gmode-${Date.now()}`);
   const groupDir = path.join(tmpDir, 'groups', 'test-group');
   fs.mkdirSync(groupDir, { recursive: true });
   fs.writeFileSync(
@@ -35,7 +35,7 @@ function makePort(overrides: Partial<GroupToolPort> = {}): GroupToolPort {
         id: name || 'test',
         name: name || 'test',
         repoPath: '/tmp/repo',
-        storagePath: '/tmp/repo/.gitnexus',
+        storagePath: '/tmp/repo/.yummygraph',
       }),
     ),
     impact: vi.fn(async () => ({ target: {}, byDepth: {} })),
@@ -58,7 +58,7 @@ function makePort(overrides: Partial<GroupToolPort> = {}): GroupToolPort {
 describe('GroupService group-mode API surface', () => {
   it('groupQuery uses name (never @-repo) and optional service filters processes', async () => {
     const { tmpDir, cleanup } = makeTmpGroup();
-    vi.stubEnv('GITNEXUS_HOME', tmpDir);
+    vi.stubEnv('YUMMYGRAPH_HOME', tmpDir);
     try {
       const query = vi.fn(async () => ({
         processes: [{ id: 'p1' }],
@@ -83,7 +83,7 @@ describe('GroupService group-mode API surface', () => {
 
   it('groupQuery rejects empty service string', async () => {
     const { tmpDir, cleanup } = makeTmpGroup();
-    vi.stubEnv('GITNEXUS_HOME', tmpDir);
+    vi.stubEnv('YUMMYGRAPH_HOME', tmpDir);
     try {
       const svc = new GroupService(makePort());
       const r = await svc.groupQuery({ name: 'test-group', query: 'x', service: '  ' });
@@ -96,7 +96,7 @@ describe('GroupService group-mode API surface', () => {
 
   it('groupContext uses name + target (MCP maps @group to name)', async () => {
     const { tmpDir, cleanup } = makeTmpGroup();
-    vi.stubEnv('GITNEXUS_HOME', tmpDir);
+    vi.stubEnv('YUMMYGRAPH_HOME', tmpDir);
     try {
       const svc = new GroupService(makePort());
       const r = await svc.groupContext({ name: 'test-group', target: 'MySym' });
@@ -110,7 +110,7 @@ describe('GroupService group-mode API surface', () => {
 
   it('groupImpact with mock port returns structured result without @ in params', async () => {
     const { tmpDir, cleanup } = makeTmpGroup();
-    vi.stubEnv('GITNEXUS_HOME', tmpDir);
+    vi.stubEnv('YUMMYGRAPH_HOME', tmpDir);
     try {
       const svc = new GroupService(makePort());
       const r = (await svc.groupImpact({

@@ -10,7 +10,7 @@ export interface RuntimeFingerprint {
   platform: NodeJS.Platform;
   arch: string;
   node: string;
-  gitnexus: string;
+  yummygraph: string;
   ladybugdb?: string;
   onnxruntime?: string;
 }
@@ -32,7 +32,7 @@ const packageVersion = (name: string): string | undefined => {
   }
 };
 
-const gitnexusVersion = (): string => {
+const yummygraphVersion = (): string => {
   try {
     return require('../../../package.json').version;
   } catch {
@@ -49,13 +49,13 @@ const parsePositiveInt = (value: string | undefined, fallback: number): number =
 export const DEFAULT_EXACT_SCAN_LIMIT = 10_000;
 
 export const getExactScanLimit = (): number =>
-  parsePositiveInt(process.env.GITNEXUS_SEMANTIC_EXACT_SCAN_LIMIT, DEFAULT_EXACT_SCAN_LIMIT);
+  parsePositiveInt(process.env.YUMMYGRAPH_SEMANTIC_EXACT_SCAN_LIMIT, DEFAULT_EXACT_SCAN_LIMIT);
 
 export const getRuntimeFingerprint = (): RuntimeFingerprint => ({
   platform: process.platform,
   arch: process.arch,
   node: process.version,
-  gitnexus: gitnexusVersion(),
+  yummygraph: yummygraphVersion(),
   ladybugdb: packageVersion('@ladybugdb/core'),
   onnxruntime: packageVersion('onnxruntime-node'),
 });

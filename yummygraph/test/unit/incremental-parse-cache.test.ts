@@ -101,8 +101,8 @@ describe('fileContentHash', () => {
 });
 
 describe('PARSE_CACHE_VERSION', () => {
-  it('embeds the gitnexus package version (so upgrades invalidate the cache)', () => {
-    // Looks like "1+1.6.4" — schema bump prefix + actual gitnexus version
+  it('embeds the yummygraph package version (so upgrades invalidate the cache)', () => {
+    // Looks like "1+1.6.4" — schema bump prefix + actual yummygraph version
     expect(PARSE_CACHE_VERSION).toMatch(/^\d+\+\d+\.\d+\.\d+/);
   });
 });

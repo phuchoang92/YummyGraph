@@ -51,8 +51,8 @@
  * as resolved without requiring an import edge.
  */
 
-import type { ParsedFile } from 'gitnexus-shared';
-import { SupportedLanguages, getLanguageFromFilename } from 'gitnexus-shared';
+import type { ParsedFile } from 'yummygraph-shared';
+import { SupportedLanguages, getLanguageFromFilename } from 'yummygraph-shared';
 import { generateId } from '../../../../lib/utils.js';
 import { buildMro, defaultLinearize } from '../../scope-resolution/passes/mro.js';
 import { populateClassOwnedMembers } from '../../scope-resolution/scope/walkers.js';

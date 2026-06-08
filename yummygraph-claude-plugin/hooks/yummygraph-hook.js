@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * GitNexus Claude Code Plugin Hook
+ * YummyGraph Claude Code Plugin Hook
  *
  * PreToolUse  — intercepts Grep/Glob/Bash searches and augments
- *               with graph context from the GitNexus index.
+ *               with graph context from the YummyGraph index.
  * PostToolUse — detects stale index after git mutations and notifies
  *               the agent to reindex.
  *
@@ -15,7 +15,7 @@ const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
 const { acquireHookSlot } = require('./hook-lock.js');
-const { hasGitNexusDbLockedByGitNexusServer } = require('./hook-db-lock-probe.cjs');
+const { hasYummyGraphDbLockedByYummyGraphServer } = require('./hook-db-lock-probe.cjs');
 const { formatAnalyzeCommand } = require('./resolve-analyze-cmd.cjs');
 
 /**
@@ -31,8 +31,8 @@ function readInput() {
 }
 
 /**
- * Find the .gitnexus directory by walking up from startDir.
- * Returns the path to .gitnexus/ or null if not found.
+ * Find the .yummygraph directory by walking up from startDir.
+ * Returns the path to .yummygraph/ or null if not found.
  */
 function isGlobalRegistryDir(candidate) {
   if (fs.existsSync(path.join(candidate, 'meta.json'))) return false;
@@ -43,13 +43,13 @@ function isGlobalRegistryDir(candidate) {
 }
 
 /**
- * Walk up from `startDir` looking for a non-registry `.gitnexus/` folder.
- * Returns the path to `.gitnexus/` or null if not found within 5 levels.
+ * Walk up from `startDir` looking for a non-registry `.yummygraph/` folder.
+ * Returns the path to `.yummygraph/` or null if not found within 5 levels.
  */
-function walkForGitNexusDir(startDir) {
+function walkForYummyGraphDir(startDir) {
   let dir = startDir;
   for (let i = 0; i < 5; i++) {
-    const candidate = path.join(dir, '.gitnexus');
+    const candidate = path.join(dir, '.yummygraph');
     if (fs.existsSync(candidate)) {
       if (!isGlobalRegistryDir(candidate)) return candidate;
     }
@@ -63,7 +63,7 @@ function walkForGitNexusDir(startDir) {
 /**
  * Resolve the canonical (main) worktree root for `cwd`, when `cwd` is inside
  * any git working tree — including a *linked* worktree created via
- * `git worktree add`. Linked worktrees never contain `.gitnexus/`, so the
+ * `git worktree add`. Linked worktrees never contain `.yummygraph/`, so the
  * upward walk from cwd alone misses the index. Returns null when `cwd` is
  * not inside a git repo or `git` is not available.
  *
@@ -89,31 +89,31 @@ function findCanonicalRepoRoot(cwd) {
   }
 }
 
-function findGitNexusDir(startDir) {
+function findYummyGraphDir(startDir) {
   const cwd = startDir || process.cwd();
 
   // Fast path: the cwd is inside the canonical repo (most common case).
-  const fromCwd = walkForGitNexusDir(cwd);
+  const fromCwd = walkForYummyGraphDir(cwd);
   if (fromCwd) return fromCwd;
 
-  // Fallback: cwd may be inside a linked git worktree whose `.gitnexus/`
+  // Fallback: cwd may be inside a linked git worktree whose `.yummygraph/`
   // only lives in the canonical repo root. Resolve the shared git dir
   // and retry from there.
   const canonicalRoot = findCanonicalRepoRoot(cwd);
   if (canonicalRoot && canonicalRoot !== cwd) {
-    return walkForGitNexusDir(canonicalRoot);
+    return walkForYummyGraphDir(canonicalRoot);
   }
   return null;
 }
 
-function hasGitNexusServerOwner(gitNexusDir) {
-  return hasGitNexusDbLockedByGitNexusServer(path.join(gitNexusDir, 'lbug'), process.pid);
+function hasYummyGraphServerOwner(yummyGraphDir) {
+  return hasYummyGraphDbLockedByYummyGraphServer(path.join(yummyGraphDir, 'lbug'), process.pid);
 }
 
 function extractAugmentContext(stderr) {
   const output = (stderr || '').trim();
-  const marker = output.indexOf('[GitNexus]');
-  const debug = process.env.GITNEXUS_DEBUG === '1' || process.env.GITNEXUS_DEBUG === 'true';
+  const marker = output.indexOf('[YummyGraph]');
+  const debug = process.env.YUMMYGRAPH_DEBUG === '1' || process.env.YUMMYGRAPH_DEBUG === 'true';
   if (debug && output.length > 0) {
     // Emit the FULL discarded prefix (everything before the marker, or all of
     // it when no marker is present) so suppressed diagnostics — LadybugDB lock
@@ -122,7 +122,7 @@ function extractAugmentContext(stderr) {
     // filtered out instead of a 180-char JSON-quoted preview.
     const discarded = marker === -1 ? output : output.slice(0, marker).trim();
     if (discarded.length > 0) {
-      process.stderr.write(`[GitNexus hook] augment stderr discarded prefix:\n${discarded}\n`);
+      process.stderr.write(`[YummyGraph hook] augment stderr discarded prefix:\n${discarded}\n`);
     }
   }
   return marker === -1 ? '' : output.slice(marker).trim();
@@ -187,15 +187,15 @@ function extractPattern(toolName, toolInput) {
 }
 
 /**
- * Spawn a gitnexus CLI command synchronously.
+ * Spawn a yummygraph CLI command synchronously.
  * Detects binary on PATH once, then runs exactly once.
  *
  * SECURITY: Never use shell: true with user-controlled arguments.
- * On Windows, invoke gitnexus.cmd directly (no shell needed).
+ * On Windows, invoke yummygraph.cmd directly (no shell needed).
  */
-function runGitNexusCli(args, cwd, timeout) {
+function runYummyGraphCli(args, cwd, timeout) {
   const isWin = process.platform === 'win32';
-  const hookCli = process.env.GITNEXUS_HOOK_CLI_PATH;
+  const hookCli = process.env.YUMMYGRAPH_HOOK_CLI_PATH;
   if (hookCli !== undefined && String(hookCli).trim() && fs.existsSync(String(hookCli))) {
     return spawnSync(process.execPath, [String(hookCli), ...args], {
       encoding: 'utf-8',
@@ -206,10 +206,10 @@ function runGitNexusCli(args, cwd, timeout) {
     });
   }
 
-  // Detect whether 'gitnexus' is on PATH (cheap check, no execution)
+  // Detect whether 'yummygraph' is on PATH (cheap check, no execution)
   let useDirectBinary = false;
   try {
-    const which = spawnSync(isWin ? 'where' : 'which', ['gitnexus'], {
+    const which = spawnSync(isWin ? 'where' : 'which', ['yummygraph'], {
       encoding: 'utf-8',
       timeout: 3000,
       stdio: ['pipe', 'pipe', 'pipe'],
@@ -221,7 +221,7 @@ function runGitNexusCli(args, cwd, timeout) {
   }
 
   if (useDirectBinary) {
-    return spawnSync(isWin ? 'gitnexus.cmd' : 'gitnexus', args, {
+    return spawnSync(isWin ? 'yummygraph.cmd' : 'yummygraph', args, {
       encoding: 'utf-8',
       timeout,
       cwd,
@@ -230,7 +230,7 @@ function runGitNexusCli(args, cwd, timeout) {
     });
   }
   // npx fallback needs shell on Windows since npx is a .cmd script
-  return spawnSync(isWin ? 'npx.cmd' : 'npx', ['-y', 'gitnexus', ...args], {
+  return spawnSync(isWin ? 'npx.cmd' : 'npx', ['-y', 'yummygraph', ...args], {
     encoding: 'utf-8',
     timeout: timeout + 5000,
     cwd,
@@ -256,8 +256,8 @@ function sendHookResponse(hookEventName, message) {
 function handlePreToolUse(input) {
   const cwd = input.cwd || process.cwd();
   if (!path.isAbsolute(cwd)) return;
-  const gitNexusDir = findGitNexusDir(cwd);
-  if (!gitNexusDir) return;
+  const yummyGraphDir = findYummyGraphDir(cwd);
+  if (!yummyGraphDir) return;
 
   const toolName = input.tool_name || '';
   const toolInput = input.tool_input || {};
@@ -266,17 +266,17 @@ function handlePreToolUse(input) {
 
   const pattern = extractPattern(toolName, toolInput);
   if (!pattern || pattern.length < 3) return;
-  if (hasGitNexusServerOwner(gitNexusDir)) {
-    process.stderr.write('[GitNexus] augment skipped: MCP server owns DB\n');
+  if (hasYummyGraphServerOwner(yummyGraphDir)) {
+    process.stderr.write('[YummyGraph] augment skipped: MCP server owns DB\n');
     return;
   }
 
-  const release = acquireHookSlot(gitNexusDir);
+  const release = acquireHookSlot(yummyGraphDir);
   if (!release) return;
 
   let result = '';
   try {
-    const child = runGitNexusCli(['augment', '--', pattern], cwd, 7000);
+    const child = runYummyGraphCli(['augment', '--', pattern], cwd, 7000);
     if (!child.error && child.status === 0) {
       result = extractAugmentContext(child.stderr || '');
     }
@@ -294,10 +294,10 @@ function handlePreToolUse(input) {
 /**
  * PostToolUse handler — detect index staleness after git mutations.
  *
- * Instead of spawning a full `gitnexus analyze` synchronously (which blocks
+ * Instead of spawning a full `yummygraph analyze` synchronously (which blocks
  * the agent for up to 120s and risks LadybugDB corruption on timeout), we do a
  * lightweight staleness check: compare `git rev-parse HEAD` against the
- * lastCommit stored in `.gitnexus/meta.json`. If they differ, notify the
+ * lastCommit stored in `.yummygraph/meta.json`. If they differ, notify the
  * agent so it can decide when to reindex.
  */
 function handlePostToolUse(input) {
@@ -313,8 +313,8 @@ function handlePostToolUse(input) {
 
   const cwd = input.cwd || process.cwd();
   if (!path.isAbsolute(cwd)) return;
-  const gitNexusDir = findGitNexusDir(cwd);
-  if (!gitNexusDir) return;
+  const yummyGraphDir = findYummyGraphDir(cwd);
+  if (!yummyGraphDir) return;
 
   // Compare HEAD against last indexed commit — skip if unchanged
   let currentHead = '';
@@ -336,7 +336,7 @@ function handlePostToolUse(input) {
   let lastCommit = '';
   let hadEmbeddings = false;
   try {
-    const meta = JSON.parse(fs.readFileSync(path.join(gitNexusDir, 'meta.json'), 'utf-8'));
+    const meta = JSON.parse(fs.readFileSync(path.join(yummyGraphDir, 'meta.json'), 'utf-8'));
     lastCommit = meta.lastCommit || '';
     hadEmbeddings = meta.stats && meta.stats.embeddings > 0;
   } catch {
@@ -349,7 +349,7 @@ function handlePostToolUse(input) {
   const analyzeCmd = formatAnalyzeCommand({ embeddings: hadEmbeddings });
   sendHookResponse(
     'PostToolUse',
-    `GitNexus index is stale (last indexed: ${lastCommit ? lastCommit.slice(0, 7) : 'never'}). ` +
+    `YummyGraph index is stale (last indexed: ${lastCommit ? lastCommit.slice(0, 7) : 'never'}). ` +
       `Run \`${analyzeCmd}\` to update the knowledge graph.`,
   );
 }
@@ -366,8 +366,8 @@ function main() {
     const handler = handlers[input.hook_event_name || ''];
     if (handler) handler(input);
   } catch (err) {
-    if (process.env.GITNEXUS_DEBUG) {
-      console.error('GitNexus hook error:', (err.message || '').slice(0, 200));
+    if (process.env.YUMMYGRAPH_DEBUG) {
+      console.error('YummyGraph hook error:', (err.message || '').slice(0, 200));
     }
   }
 }

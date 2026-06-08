@@ -62,7 +62,7 @@ import { LocalBackend } from '../../src/mcp/local/local-backend.js';
 const MOCK_REPO_ENTRY = {
   name: 'test-repo',
   path: '/tmp/test',
-  storagePath: '/tmp/test/.gitnexus',
+  storagePath: '/tmp/test/.yummygraph',
   indexedAt: '2026-05-01T00:00:00Z',
   lastCommit: 'abc1234',
 };
@@ -97,7 +97,7 @@ describe('WAL corruption feedback in MCP responses (#1402)', () => {
 
     expect(result.error).toBeDefined();
     expect(result.suggestion).toBe(
-      'The graph query failed — try gitnexus context <symbol> as a fallback',
+      'The graph query failed — try yummygraph context <symbol> as a fallback',
     );
     expect(result.recoverySuggestion).toBeDefined();
   });
@@ -140,7 +140,7 @@ describe('WAL corruption feedback in MCP responses (#1402)', () => {
 
     expect(result.error).toBeDefined();
     expect(result.suggestion).toBe(
-      'The graph query failed — try gitnexus context <symbol> as a fallback',
+      'The graph query failed — try yummygraph context <symbol> as a fallback',
     );
   });
 

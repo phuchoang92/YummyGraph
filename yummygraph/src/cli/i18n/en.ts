@@ -1,7 +1,7 @@
 export const en = {
   'common.notIndexed': 'No indexed repositories found.',
-  'common.runAnalyze': 'Run `gitnexus analyze` in a git repo to index it.',
-  'common.runAnalyzeShort': 'Run: gitnexus analyze',
+  'common.runAnalyze': 'Run `yummygraph analyze` in a git repo to index it.',
+  'common.runAnalyzeShort': 'Run: yummygraph analyze',
   'common.runForceConfirm': 'Run with --force to confirm deletion.',
   'common.path': 'Path',
   'common.storage': 'Storage',
@@ -17,7 +17,7 @@ export const en = {
   'list.unknown': 'unknown',
   'status.notGitRepo': 'Not a git repository.',
   'status.staleKuzu': 'Repository has a stale KuzuDB index from a previous version.',
-  'status.rebuildLadybug': 'Run: gitnexus analyze   (rebuilds the index with LadybugDB)',
+  'status.rebuildLadybug': 'Run: yummygraph analyze   (rebuilds the index with LadybugDB)',
   'status.repoNotIndexed': 'Repository not indexed.',
   'status.repository': 'Repository',
   'status.indexed': 'Indexed',
@@ -25,11 +25,11 @@ export const en = {
   'status.currentCommit': 'Current commit',
   'status.status': 'Status',
   'status.upToDate': '✅ up-to-date',
-  'status.stale': '⚠️ stale (re-run gitnexus analyze)',
-  'clean.deleteAll': 'This will delete GitNexus indexes for {{count}} repo(s):',
+  'status.stale': '⚠️ stale (re-run yummygraph analyze)',
+  'clean.deleteAll': 'This will delete YummyGraph indexes for {{count}} repo(s):',
   'clean.deletedRepo': 'Deleted: {{name}} ({{storagePath}})',
   'clean.notFoundHere': 'No indexed repository found in this directory.',
-  'clean.deleteCurrent': 'This will delete the GitNexus index for: {{repoName}}',
+  'clean.deleteCurrent': 'This will delete the YummyGraph index for: {{repoName}}',
   'clean.lbugSidecars.state': 'LadybugDB sidecar state: {{state}}',
   'clean.lbugSidecars.none': 'No quarantined LadybugDB missing-shadow WAL sidecars found.',
   'clean.lbugSidecars.preview':
@@ -37,15 +37,15 @@ export const en = {
   'clean.lbugSidecars.deleted':
     'Deleted {{count}} quarantined LadybugDB missing-shadow WAL sidecar(s).',
   'remove.nothingToRemove': 'Nothing to remove: {{message}}',
-  'remove.deleteTarget': 'This will delete the GitNexus index for: {{name}}',
+  'remove.deleteTarget': 'This will delete the YummyGraph index for: {{name}}',
   'remove.removed': 'Removed: {{name}}',
   'remove.failed': 'Failed to remove {{name}}: {{message}}',
-  'tool.noIndexed': 'GitNexus: No indexed repositories found. Run: gitnexus analyze',
-  'tool.usage.query': 'Usage: gitnexus query <search_query>',
-  'tool.usage.context': 'Usage: gitnexus context <symbol_name> [--uid <uid>] [--file <path>]',
+  'tool.noIndexed': 'YummyGraph: No indexed repositories found. Run: yummygraph analyze',
+  'tool.usage.query': 'Usage: yummygraph query <search_query>',
+  'tool.usage.context': 'Usage: yummygraph context <symbol_name> [--uid <uid>] [--file <path>]',
   'tool.usage.impact':
-    'Usage: gitnexus impact <symbol_name> [--uid <uid>] [--file <path>] [--kind <kind>] [--direction upstream|downstream]',
-  'tool.usage.cypher': 'Usage: gitnexus cypher <cypher_query>',
+    'Usage: yummygraph impact <symbol_name> [--uid <uid>] [--file <path>] [--kind <kind>] [--direction upstream|downstream]',
+  'tool.usage.cypher': 'Usage: yummygraph cypher <cypher_query>',
   'tool.warn.unknownKind':
     "--kind '{{kind}}' is not a known symbol kind (e.g. Function, Class, Method); it will not narrow the result.",
   'tool.detectChanges.noChanges': 'No changes detected.',
@@ -61,17 +61,17 @@ export const en = {
   'tool.detectChanges.steps_other': '{{count}} steps',
   'tool.detectChanges.changedSteps': 'changed: {{steps}}',
   'serve.walCorruption':
-    '\nGitNexus server could not start: the index has a corrupted WAL file.\n  {{suggestion}}\n',
+    '\nYummyGraph server could not start: the index has a corrupted WAL file.\n  {{suggestion}}\n',
   'serve.portInUse':
-    '\nFailed to start GitNexus server:\n  {{message}}\n\n  Port {{port}} is already in use. Either:\n    1. Stop the other process using port {{port}}\n    2. Use a different port: gitnexus serve --port 4748\n',
-  'serve.startFailed': '\nFailed to start GitNexus server:\n  {{message}}\n',
-  'doctor.title': 'GitNexus Doctor',
+    '\nFailed to start YummyGraph server:\n  {{message}}\n\n  Port {{port}} is already in use. Either:\n    1. Stop the other process using port {{port}}\n    2. Use a different port: yummygraph serve --port 4748\n',
+  'serve.startFailed': '\nFailed to start YummyGraph server:\n  {{message}}\n',
+  'doctor.title': 'YummyGraph Doctor',
   'doctor.runtime': 'Runtime',
   'doctor.capabilities': 'Capabilities',
   'doctor.embeddings': 'Embeddings',
   'doctor.labels.os': 'OS:',
   'doctor.labels.node': 'Node:',
-  'doctor.labels.gitnexus': 'GitNexus:',
+  'doctor.labels.yummygraph': 'YummyGraph:',
   'doctor.labels.ladybugdb': 'LadybugDB:',
   'doctor.labels.onnx': 'ONNX:',
   'doctor.labels.graphStore': 'Graph store:',
@@ -100,7 +100,7 @@ export const en = {
   'help.optionMeta.default': 'default',
   'help.optionMeta.preset': 'preset',
   'help.optionMeta.env': 'env',
-  'help.description.root': 'GitNexus local CLI and MCP server',
+  'help.description.root': 'YummyGraph local CLI and MCP server',
   'help.command.help.description': 'display help for command',
   'help.option.help': 'display help for command',
   'help.option.version': 'output the version number',
@@ -108,21 +108,21 @@ export const en = {
     'One-time setup: configure MCP for Cursor, Claude Code, OpenCode, Codex',
   'help.command.analyze.description': 'Index a repository (full analysis)',
   'help.command.index.description':
-    'Register an existing .gitnexus/ folder into the global registry (no re-analysis needed)',
+    'Register an existing .yummygraph/ folder into the global registry (no re-analysis needed)',
   'help.command.serve.description': 'Start local HTTP server for web UI connection',
   'help.command.mcp.description': 'Start MCP server (stdio) — serves all indexed repos',
   'help.command.list.description': 'List all indexed repositories',
   'help.command.status.description': 'Show index status for current repo',
   'help.command.doctor.description':
     'Show runtime platform capabilities and embedding configuration',
-  'help.command.clean.description': 'Delete GitNexus index for current repo',
+  'help.command.clean.description': 'Delete YummyGraph index for current repo',
   'help.command.remove.description':
-    'Delete the GitNexus index for a registered repo (by alias, name, or absolute path). Unlike `clean`, does not require being inside the repo. Idempotent on unknown targets.',
+    'Delete the YummyGraph index for a registered repo (by alias, name, or absolute path). Unlike `clean`, does not require being inside the repo. Idempotent on unknown targets.',
   'help.command.wiki.description': 'Generate repository wiki from knowledge graph',
   'help.command.augment.description':
     'Augment a search pattern with knowledge graph context (used by hooks)',
   'help.command.publish.description':
-    'Notify the understand-quickly registry that this repo has a fresh GitNexus index. Opt-in: requires UNDERSTAND_QUICKLY_TOKEN (fine-grained PAT with `Repository dispatches: write` on looptech-ai/understand-quickly). No-op without the token. See https://github.com/looptech-ai/understand-quickly.',
+    'Notify the understand-quickly registry that this repo has a fresh YummyGraph index. Opt-in: requires UNDERSTAND_QUICKLY_TOKEN (fine-grained PAT with `Repository dispatches: write` on looptech-ai/understand-quickly). No-op without the token. See https://github.com/looptech-ai/understand-quickly.',
   'help.command.query.description':
     'Search the knowledge graph for execution flows related to a concept',
   'help.command.context.description':
@@ -155,16 +155,16 @@ export const en = {
   'help.option.analyze.skills':
     'Generate repo-specific skill files from detected communities (no-op when --index-only is also set).',
   'help.option.analyze.skipAgentsMd':
-    'Skip updating the gitnexus section in AGENTS.md and CLAUDE.md',
+    'Skip updating the yummygraph section in AGENTS.md and CLAUDE.md',
   'help.option.analyze.noStats': 'Omit volatile file/symbol counts from AGENTS.md and CLAUDE.md',
   'help.option.analyze.skipSkills':
-    'Skip installing standard GitNexus skill files under .claude/skills/gitnexus/. Does not suppress community skills from --skills (those use .claude/skills/generated/). Use --index-only to skip all AI-context file injection.',
+    'Skip installing standard YummyGraph skill files under .claude/skills/yummygraph/. Does not suppress community skills from --skills (those use .claude/skills/generated/). Use --index-only to skip all AI-context file injection.',
   'help.option.analyze.indexOnly':
     'Pure index mode: skip all file injection (AGENTS.md, CLAUDE.md, skills)',
   'help.option.skipGit':
     'Treat the provided path/cwd as the index root and skip parent git-root discovery',
   'help.option.analyze.name':
-    'Register this repo under a custom name in ~/.gitnexus/registry.json (disambiguates repos whose paths share a basename, e.g. two different .../app folders)',
+    'Register this repo under a custom name in ~/.yummygraph/registry.json (disambiguates repos whose paths share a basename, e.g. two different .../app folders)',
   'help.option.analyze.allowDuplicateName':
     'Register this repo even if another path already uses the same --name alias. Leaves `-r <name>` ambiguous for the two paths; use -r <path> to disambiguate.',
   'help.option.verbose': 'Enable verbose output',
@@ -193,7 +193,7 @@ export const en = {
   'help.option.wiki.model': 'LLM model or Azure deployment name (default: minimax/minimax-m2.5)',
   'help.option.wiki.baseUrl':
     'LLM API base URL. Azure v1: https://{resource}.openai.azure.com/openai/v1',
-  'help.option.wiki.apiKey': 'LLM API key or Azure api-key (saved to ~/.gitnexus/config.json)',
+  'help.option.wiki.apiKey': 'LLM API key or Azure api-key (saved to ~/.yummygraph/config.json)',
   'help.option.wiki.apiVersion':
     'Azure api-version query param, e.g. 2024-10-21 (legacy Azure API only)',
   'help.option.wiki.reasoningModel':
@@ -250,5 +250,5 @@ export const en = {
   'help.option.group.contracts.repo': 'Filter by repo',
   'help.option.group.contracts.unmatched': 'Show only unmatched contracts',
   'help.analyze.environment':
-    '\nEnvironment variables:\n  GITNEXUS_NO_GITIGNORE=1   Skip .gitignore parsing (still reads .gitnexusignore)\n  GITNEXUS_MAX_FILE_SIZE=N  Override large-file skip threshold (KB). Default 512, max 32768.\n  GITNEXUS_WORKER_SUB_BATCH_TIMEOUT_MS=N  Worker idle timeout in milliseconds. Default 30000.\n  GITNEXUS_WAL_CHECKPOINT_THRESHOLD=N  LadybugDB WAL auto-checkpoint threshold in bytes (default 67108864 = 64 MiB; -1 keeps Ladybug stock ~16 MiB).\n  GITNEXUS_WORKER_SUB_BATCH_MAX_BYTES=N  Worker job byte budget. Default 8388608.\n  GITNEXUS_WORKER_POOL_SIZE=N  Parse worker count override. Default cores-1 capped at 16.\n  GITNEXUS_PARSE_CHUNK_CONCURRENCY=N  Concurrent in-flight parse chunks. Default 2.\n  GITNEXUS_WORKER_MAX_RESPAWNS_PER_SLOT=N  Max replacement spawns per slot before drop. Default 3.\n  GITNEXUS_WORKER_MAX_CUMULATIVE_TIMEOUT_MS=N  Total retry wall-time per job. Default 5x sub-batch timeout.\n  GITNEXUS_WORKER_CONSECUTIVE_FAILURE_THRESHOLD=N  Per-slot deaths to trip circuit breaker. Default max(3, poolSize).\n  GITNEXUS_EMBEDDING_THREADS=N  Limit local ONNX CPU threads for --embeddings.\n  GITNEXUS_SEMANTIC_EXACT_SCAN_LIMIT=N  Max embedding chunks for exact-scan fallback. Default 10000.\n\nFlags override the corresponding env vars when both are provided.\n\nTip: `.gitnexusignore` supports `.gitignore`-style negation. Add e.g.\n     `!__tests__/` to index a directory that is auto-filtered by default (#771).',
+    '\nEnvironment variables:\n  YUMMYGRAPH_NO_GITIGNORE=1   Skip .gitignore parsing (still reads .yummygraphignore)\n  YUMMYGRAPH_MAX_FILE_SIZE=N  Override large-file skip threshold (KB). Default 512, max 32768.\n  YUMMYGRAPH_WORKER_SUB_BATCH_TIMEOUT_MS=N  Worker idle timeout in milliseconds. Default 30000.\n  YUMMYGRAPH_WAL_CHECKPOINT_THRESHOLD=N  LadybugDB WAL auto-checkpoint threshold in bytes (default 67108864 = 64 MiB; -1 keeps Ladybug stock ~16 MiB).\n  YUMMYGRAPH_WORKER_SUB_BATCH_MAX_BYTES=N  Worker job byte budget. Default 8388608.\n  YUMMYGRAPH_WORKER_POOL_SIZE=N  Parse worker count override. Default cores-1 capped at 16.\n  YUMMYGRAPH_PARSE_CHUNK_CONCURRENCY=N  Concurrent in-flight parse chunks. Default 2.\n  YUMMYGRAPH_WORKER_MAX_RESPAWNS_PER_SLOT=N  Max replacement spawns per slot before drop. Default 3.\n  YUMMYGRAPH_WORKER_MAX_CUMULATIVE_TIMEOUT_MS=N  Total retry wall-time per job. Default 5x sub-batch timeout.\n  YUMMYGRAPH_WORKER_CONSECUTIVE_FAILURE_THRESHOLD=N  Per-slot deaths to trip circuit breaker. Default max(3, poolSize).\n  YUMMYGRAPH_EMBEDDING_THREADS=N  Limit local ONNX CPU threads for --embeddings.\n  YUMMYGRAPH_SEMANTIC_EXACT_SCAN_LIMIT=N  Max embedding chunks for exact-scan fallback. Default 10000.\n\nFlags override the corresponding env vars when both are provided.\n\nTip: `.yummygraphignore` supports `.gitignore`-style negation. Add e.g.\n     `!__tests__/` to index a directory that is auto-filtered by default (#771).',
 } as const;

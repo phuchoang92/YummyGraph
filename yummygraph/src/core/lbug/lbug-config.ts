@@ -21,7 +21,7 @@ import { logger } from '../logger.js';
 //   3. If both fail, log a diagnostic and return the original path
 
 const NON_ASCII_RE = /[^\x00-\x7F]/;
-const JUNCTION_PREFIX = 'gitnexus-junction-';
+const JUNCTION_PREFIX = 'yummygraph-junction-';
 
 const activeJunctions = new Set<string>();
 let cleanupRegistered = false;
@@ -36,12 +36,12 @@ function tryShortPath(p: string): string | null {
     // Pass the path via environment variable so the command string is
     // static — avoids CodeQL command-injection taint (the path never
     // appears in the shell command text).
-    const result = execFileSync('cmd.exe', ['/c', 'for %I in ("%GITNEXUS_SP%") do @echo %~sI'], {
+    const result = execFileSync('cmd.exe', ['/c', 'for %I in ("%YUMMYGRAPH_SP%") do @echo %~sI'], {
       encoding: 'utf-8',
       timeout: 5000,
       windowsHide: true,
       stdio: ['pipe', 'pipe', 'pipe'],
-      env: { ...process.env, GITNEXUS_SP: p },
+      env: { ...process.env, YUMMYGRAPH_SP: p },
     });
     const shortPath = result.trim();
     if (
@@ -167,7 +167,7 @@ export function toNativeSafePath(p: string): string {
 
   if (!isMainThread) {
     logger.warn(
-      `GitNexus: non-ASCII path in worker thread — junction fallback skipped. ` +
+      `YummyGraph: non-ASCII path in worker thread — junction fallback skipped. ` +
         `Path: "${p}". 8.3 short names may need to be enabled on this volume.`,
     );
     return p;
@@ -181,7 +181,7 @@ export function toNativeSafePath(p: string): string {
   }
 
   logger.warn(
-    `GitNexus: non-ASCII path "${p}" could not be converted to an ASCII-safe form. ` +
+    `YummyGraph: non-ASCII path "${p}" could not be converted to an ASCII-safe form. ` +
       'LadybugDB may fail with "Cannot open file." To fix: move the repo to a path ' +
       'without CJK/Unicode characters, or enable 8.3 short names on this volume ' +
       '(fsutil 8dot3name set 0).',
@@ -193,7 +193,7 @@ export function toNativeSafePath(p: string): string {
  * Shared configuration for `@ladybugdb/core` `Database` construction.
  *
  * Two values changed meaningfully in `@ladybugdb/core` 0.16.0 and need to be
- * pinned explicitly by every caller, otherwise GitNexus regresses:
+ * pinned explicitly by every caller, otherwise YummyGraph regresses:
  *
  * 1. `maxDBSize` defaults to `0`, which the native runtime interprets as
  *    "use the platform's full mmap address space" — typically 8 TB on
@@ -213,17 +213,17 @@ export function toNativeSafePath(p: string): string {
  */
 
 /**
- * Upper bound for any single GitNexus LadybugDB file (graph index, group
+ * Upper bound for any single YummyGraph LadybugDB file (graph index, group
  * bridge, install scratch, test fixture). 16 GiB is intentionally generous
- * for real-world code graphs (the GitNexus self-index uses < 50 MiB) while
+ * for real-world code graphs (the YummyGraph self-index uses < 50 MiB) while
  * remaining far below any 64-bit OS mmap ceiling.
  *
- * Override with the `GITNEXUS_LBUG_MAX_DB_SIZE` environment variable when
+ * Override with the `YUMMYGRAPH_LBUG_MAX_DB_SIZE` environment variable when
  * indexing genuinely huge monorepos. Values are coerced to a positive
  * integer; anything invalid falls back to the default.
  */
 export const LBUG_MAX_DB_SIZE: number = (() => {
-  const raw = process.env.GITNEXUS_LBUG_MAX_DB_SIZE;
+  const raw = process.env.YUMMYGRAPH_LBUG_MAX_DB_SIZE;
   if (raw) {
     const parsed = Number(raw);
     if (Number.isFinite(parsed) && parsed > 0) return Math.floor(parsed);
@@ -241,18 +241,18 @@ export const parseWalCheckpointThreshold = (raw: string | undefined): number | u
 };
 
 /**
- * Default GitNexus WAL auto-checkpoint threshold in bytes (64 MiB).
+ * Default YummyGraph WAL auto-checkpoint threshold in bytes (64 MiB).
  *
  * Larger than Ladybug's stock ~16 MiB to reduce checkpoint rename/remove
  * churn under heavy analyze write load — the original race that motivated
  * issue #1741 triggered at the stock threshold. README examples in
- * `README.md` and `gitnexus/README.md` and the recovery hint in
+ * `README.md` and `yummygraph/README.md` and the recovery hint in
  * `analyze.ts` MUST stay in sync with this value.
  */
 const DEFAULT_WAL_CHECKPOINT_THRESHOLD = 64 * 1024 * 1024;
 
 const resolveCheckpointThreshold = (): number => {
-  const raw = process.env.GITNEXUS_WAL_CHECKPOINT_THRESHOLD;
+  const raw = process.env.YUMMYGRAPH_WAL_CHECKPOINT_THRESHOLD;
   if (raw === undefined) return DEFAULT_WAL_CHECKPOINT_THRESHOLD;
   const parsed = parseWalCheckpointThreshold(raw);
   if (parsed !== undefined) return parsed;
@@ -263,7 +263,7 @@ const resolveCheckpointThreshold = (): number => {
   if (raw.trim().length > 0) {
     logger.warn(
       { rawValue: raw, fallback: DEFAULT_WAL_CHECKPOINT_THRESHOLD },
-      `Ignoring invalid GITNEXUS_WAL_CHECKPOINT_THRESHOLD=${raw}; expected integer >= -1; falling back to default (${DEFAULT_WAL_CHECKPOINT_THRESHOLD}).`,
+      `Ignoring invalid YUMMYGRAPH_WAL_CHECKPOINT_THRESHOLD=${raw}; expected integer >= -1; falling back to default (${DEFAULT_WAL_CHECKPOINT_THRESHOLD}).`,
     );
   }
   return DEFAULT_WAL_CHECKPOINT_THRESHOLD;
@@ -273,7 +273,7 @@ const resolveCheckpointThreshold = (): number => {
 const WAL_CORRUPTION_RE = /corrupt(ed)?\s+wal|invalid\s+wal\s+record|wal.*corrupt|checksum.*wal/i;
 
 export const WAL_RECOVERY_SUGGESTION =
-  'WAL corruption detected. Run `gitnexus analyze --force` to rebuild the index.';
+  'WAL corruption detected. Run `yummygraph analyze --force` to rebuild the index.';
 
 export function isWalCorruptionError(err: unknown): boolean {
   if (!err) return false;
@@ -283,7 +283,7 @@ export function isWalCorruptionError(err: unknown): boolean {
 
 // ─── Ladybug WAL checkpoint IO error matchers ───────────────────────────────
 //
-// Matched against LadybugDB v0.16.1 (see `gitnexus/package.json`
+// Matched against LadybugDB v0.16.1 (see `yummygraph/package.json`
 // @ladybugdb/core). Strict regexes encode local_file_system.cpp wording
 // verified at that version. Two-tier strategy: strict matchers first so we
 // only fire on real checkpoint-rotation shapes; a permissive fallback
@@ -372,7 +372,7 @@ export function createLbugDatabase(
     options.readOnly ?? false,
     LBUG_MAX_DB_SIZE,
     true, // autoCheckpoint (always on)
-    resolveCheckpointThreshold(), // checkpointThreshold (default 64 MiB; override with GITNEXUS_WAL_CHECKPOINT_THRESHOLD; -1 keeps Ladybug stock ~16 MiB)
+    resolveCheckpointThreshold(), // checkpointThreshold (default 64 MiB; override with YUMMYGRAPH_WAL_CHECKPOINT_THRESHOLD; -1 keeps Ladybug stock ~16 MiB)
     options.throwOnWalReplayFailure ?? true,
     true, // enableChecksums
   ) as lbug.Database;
@@ -380,7 +380,7 @@ export function createLbugDatabase(
 
 // ─── Lock-busy retry tuning knobs ───────────────────────────────────────────
 //
-// All four GitNexus retry pairs that touch native LadybugDB locks live with
+// All four YummyGraph retry pairs that touch native LadybugDB locks live with
 // a comment cross-reference here so an SRE tuning Windows flakes finds them
 // in one grep:
 //
@@ -411,16 +411,16 @@ const HANDLE_RELEASE_LOCK_CODES = new Set(['EBUSY', 'EPERM', 'EACCES']);
  * Test-fixture directory prefixes recognized by `isTestFixturePath`.
  *
  * IMPORTANT: this list must stay in sync with the prefixes passed to
- * `createTempDir` in `gitnexus/test/helpers/test-db.ts` and the prefixes
- * used by `withTestLbugDB` (`gitnexus/test/helpers/test-indexed-db.ts`).
+ * `createTempDir` in `yummygraph/test/helpers/test-db.ts` and the prefixes
+ * used by `withTestLbugDB` (`yummygraph/test/helpers/test-indexed-db.ts`).
  * If you add a new test that passes a custom prefix to `createTempDir`,
  * add it here too — otherwise the stale-sidecar sweep silently won't
  * fire for that fixture and CI flakes return.
  *
- * The default `createTempDir('gitnexus-test-')` and the lbug variant
- * `'gitnexus-lbug-'` cover today's call sites.
+ * The default `createTempDir('yummygraph-test-')` and the lbug variant
+ * `'yummygraph-lbug-'` cover today's call sites.
  */
-const TEST_FIXTURE_PREFIXES = ['gitnexus-lbug-', 'gitnexus-test-'];
+const TEST_FIXTURE_PREFIXES = ['yummygraph-lbug-', 'yummygraph-test-'];
 
 /**
  * Marker symbol attached to lock errors after `openWithLockRetry` exhausts
@@ -428,10 +428,10 @@ const TEST_FIXTURE_PREFIXES = ['gitnexus-lbug-', 'gitnexus-test-'];
  * does not re-retry a path that just spent up to ~1.5s in the open-time
  * loop — preventing 6s tail latencies (3× outer × 5× inner attempts).
  *
- * The symbol is internal to GitNexus; consumers should treat the underlying
+ * The symbol is internal to YummyGraph; consumers should treat the underlying
  * error message as the user-visible signal.
  */
-export const LBUG_OPEN_RETRY_EXHAUSTED = Symbol.for('gitnexus.lbug.openRetryExhausted');
+export const LBUG_OPEN_RETRY_EXHAUSTED = Symbol.for('yummygraph.lbug.openRetryExhausted');
 
 export const isOpenRetryExhausted = (err: unknown): boolean => {
   if (err === null || err === undefined || typeof err !== 'object') return false;
@@ -452,13 +452,13 @@ const tagOpenRetryExhausted = (err: unknown): unknown => {
  *
  * Defensive shape:
  *   - `path.resolve` normalizes `..` segments before the prefix check, so
- *     `<tmp>/gitnexus-lbug-x/../../etc/passwd` is rejected.
+ *     `<tmp>/yummygraph-lbug-x/../../etc/passwd` is rejected.
  *   - The tmpRoot check trims any trailing separator returned by some
  *     Windows TMP configurations (`C:\Users\X\Temp\`) so the startsWith
  *     comparison stays correct.
  *   - Only the IMMEDIATE parent directory is matched against the prefix
  *     list. An ancestor walk would let a tmpdir whose own basename starts
- *     with `gitnexus-lbug-` accept arbitrary nested paths under it.
+ *     with `yummygraph-lbug-` accept arbitrary nested paths under it.
  */
 const isTestFixturePath = (dbPath: string): boolean => {
   const tmpRoot = os.tmpdir().replace(new RegExp(`${path.sep === '\\' ? '\\\\' : path.sep}+$`), '');

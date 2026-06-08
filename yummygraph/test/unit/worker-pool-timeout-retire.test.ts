@@ -83,7 +83,7 @@ beforeEach(() => {
   TimeoutThenHealthyWorker.instances = [];
   TimeoutThenHealthyWorker.firstWorkerBehavior = 'stall';
   TimeoutThenHealthyWorker.safeReturnDelayMs = 40;
-  tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-worker-timeout-retire-'));
+  tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-worker-timeout-retire-'));
   const workerPath = path.join(tempDir, 'fake-worker.js');
   fs.writeFileSync(workerPath, '// fake worker path for createWorkerPool');
   workerUrl = pathToFileURL(workerPath) as URL;

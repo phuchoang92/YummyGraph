@@ -6,7 +6,7 @@
  * SFC script extraction, scope-based resolution, template-edge emission,
  * and graph build.
  *
- * Run: GITNEXUS_BENCH=1 npx vitest run test/integration/vue-pipeline-benchmark.test.ts
+ * Run: YUMMYGRAPH_BENCH=1 npx vitest run test/integration/vue-pipeline-benchmark.test.ts
  *
  * Each synthetic repo contains:
  *   - A shared `utils.ts` exporting one utility function per component
@@ -24,7 +24,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { runPipelineFromRepo } from '../../src/core/ingestion/pipeline.js';
 
-const BENCH_ENABLED = process.env.GITNEXUS_BENCH === '1';
+const BENCH_ENABLED = process.env.YUMMYGRAPH_BENCH === '1';
 
 interface BenchResult {
   fileCount: number;

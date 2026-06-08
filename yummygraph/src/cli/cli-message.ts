@@ -1,10 +1,10 @@
 /**
  * CLI message helpers — for user-facing banners, error guidance, and
- * recovery hints emitted by `gitnexus` subcommands.
+ * recovery hints emitted by `yummygraph` subcommands.
  *
  * These functions write **plain text** directly to `process.stderr` AND
  * tee a structured pino record through the singleton `logger`. Plain text
- * preserves the human-readable contract for users running `gitnexus`
+ * preserves the human-readable contract for users running `yummygraph`
  * interactively, redirecting to a file, or piping to `cat`/`grep`. The
  * structured tee keeps log aggregators happy.
  *
@@ -23,8 +23,8 @@
  *     ingestion pipeline events.
  *
  * Design note: stderr is the right channel even for non-error messages
- * because GitNexus CLI tools (`query`, `cypher`, `impact`) emit JSON
- * data on stdout for piping (`gitnexus query | jq`). User banners on
+ * because YummyGraph CLI tools (`query`, `cypher`, `impact`) emit JSON
+ * data on stdout for piping (`yummygraph query | jq`). User banners on
  * stdout would corrupt that pipeline.
  */
 import { logger } from '../core/logger.js';
@@ -53,7 +53,7 @@ export type RecoveryHint =
   | 'large-repo'
   | 'npm-resolution'
   | 'module-not-found'
-  | 'gitnexusrc-invalid'
+  | 'yummygraphrc-invalid'
   | 'default-branch-invalid';
 
 /**

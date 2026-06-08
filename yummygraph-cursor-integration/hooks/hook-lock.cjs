@@ -5,8 +5,8 @@ const HOOK_LOCK_SUBDIR = '.hook-locks';
 const HOOK_LOCK_MAX_INFLIGHT = 3;
 const HOOK_LOCK_STALE_MS = 30000;
 
-function acquireHookSlot(gitNexusDir) {
-  const lockDir = path.join(gitNexusDir, HOOK_LOCK_SUBDIR);
+function acquireHookSlot(yummyGraphDir) {
+  const lockDir = path.join(yummyGraphDir, HOOK_LOCK_SUBDIR);
   try {
     fs.mkdirSync(lockDir, { recursive: true });
   } catch {

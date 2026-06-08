@@ -1,10 +1,10 @@
 """
-GitNexus-Enhanced Agent for SWE-bench Evaluation
+YummyGraph-Enhanced Agent for SWE-bench Evaluation
 
 Extends mini-swe-agent's DefaultAgent with:
-1. Native augment mode: GitNexus tools via eval-server + grep enrichment (recommended)
-2. Native mode: GitNexus tools via eval-server only
-3. Baseline mode: Pure mini-swe-agent (no GitNexus — control group)
+1. Native augment mode: YummyGraph tools via eval-server + grep enrichment (recommended)
+2. Native mode: YummyGraph tools via eval-server only
+3. Baseline mode: Pure mini-swe-agent (no YummyGraph — control group)
 
 The agent class itself is minimal — the heavy lifting is in:
 - Prompt selection (system + instance templates per mode)
@@ -27,39 +27,39 @@ from minisweagent import Environment, Model
 from minisweagent.agents.default import AgentConfig, DefaultAgent
 from tool_registry import BINARIES_BY_KEY, TOOL_METRIC_KEYS
 
-logger = logging.getLogger("gitnexus_agent")
+logger = logging.getLogger("yummygraph_agent")
 
 PROMPTS_DIR = Path(__file__).parent.parent / "prompts"
 
 
-class GitNexusMode(str, Enum):
-    """Evaluation modes for GitNexus integration."""
-    BASELINE = "baseline"               # No GitNexus — pure mini-swe-agent
-    NATIVE = "native"                   # GitNexus tools via eval-server
+class YummyGraphMode(str, Enum):
+    """Evaluation modes for YummyGraph integration."""
+    BASELINE = "baseline"               # No YummyGraph — pure mini-swe-agent
+    NATIVE = "native"                   # YummyGraph tools via eval-server
     NATIVE_AUGMENT = "native_augment"   # Native tools + grep enrichment (recommended)
 
 
-class GitNexusAgentConfig(AgentConfig):
-    """Extended config for GitNexus evaluation agent."""
-    gitnexus_mode: GitNexusMode = GitNexusMode.BASELINE
+class YummyGraphAgentConfig(AgentConfig):
+    """Extended config for YummyGraph evaluation agent."""
+    yummygraph_mode: YummyGraphMode = YummyGraphMode.BASELINE
     augment_timeout: float = AUGMENT_TIMEOUT_SECONDS
     augment_min_pattern_length: int = 3
-    track_gitnexus_usage: bool = True
+    track_yummygraph_usage: bool = True
 
 
-class GitNexusAgent(DefaultAgent):
+class YummyGraphAgent(DefaultAgent):
     """
-    Agent that optionally enriches its capabilities with GitNexus code intelligence.
+    Agent that optionally enriches its capabilities with YummyGraph code intelligence.
 
     In BASELINE mode, behaves identically to DefaultAgent.
-    In NATIVE mode, GitNexus tools are available as bash commands via eval-server.
-    In NATIVE_AUGMENT mode, GitNexus tools + automatic grep result enrichment.
+    In NATIVE mode, YummyGraph tools are available as bash commands via eval-server.
+    In NATIVE_AUGMENT mode, YummyGraph tools + automatic grep result enrichment.
     """
 
-    def __init__(self, model: Model, env: Environment, *, config_class: type = GitNexusAgentConfig, **kwargs):
-        mode = kwargs.get("gitnexus_mode", GitNexusMode.BASELINE)
+    def __init__(self, model: Model, env: Environment, *, config_class: type = YummyGraphAgentConfig, **kwargs):
+        mode = kwargs.get("yummygraph_mode", YummyGraphMode.BASELINE)
         if isinstance(mode, str):
-            mode = GitNexusMode(mode)
+            mode = YummyGraphMode(mode)
 
         # Load system template
         system_file = PROMPTS_DIR / f"system_{mode.value}.jinja"
@@ -72,18 +72,18 @@ class GitNexusAgent(DefaultAgent):
             kwargs["instance_template"] = instance_file.read_text()
 
         super().__init__(model, env, config_class=config_class, **kwargs)
-        self.gitnexus_mode = mode
-        self.gitnexus_metrics = GitNexusMetrics()
+        self.yummygraph_mode = mode
+        self.yummygraph_metrics = YummyGraphMetrics()
 
     def execute_actions(self, message: dict) -> list[dict]:
-        """Execute actions with optional GitNexus augmentation and tracking."""
-        if self.config.track_gitnexus_usage:
+        """Execute actions with optional YummyGraph augmentation and tracking."""
+        if self.config.track_yummygraph_usage:
             self._track_tool_usage(message)
 
         outputs = [self.env.execute(action) for action in message.get("extra", {}).get("actions", [])]
 
         # Augment grep/find observations in NATIVE_AUGMENT mode
-        if self.gitnexus_mode == GitNexusMode.NATIVE_AUGMENT:
+        if self.yummygraph_mode == YummyGraphMode.NATIVE_AUGMENT:
             actions = message.get("extra", {}).get("actions", [])
             for i, (action, output) in enumerate(zip(actions, outputs)):
                 augmented = self._maybe_augment(action, output)
@@ -97,7 +97,7 @@ class GitNexusAgent(DefaultAgent):
     def _maybe_augment(self, action: dict, output: dict) -> dict | None:
         """
         If the action is a search command (grep, find, rg, ag), augment the output
-        with GitNexus knowledge graph context.
+        with YummyGraph knowledge graph context.
         """
         command = action.get("command", "")
         if not command:
@@ -110,23 +110,23 @@ class GitNexusAgent(DefaultAgent):
         start = time.time()
         try:
             augment_result = self.env.execute({
-                "command": f'gitnexus-augment "{pattern}" 2>&1 || true',
+                "command": f'yummygraph-augment "{pattern}" 2>&1 || true',
                 "timeout": self.config.augment_timeout,
             })
             elapsed = time.time() - start
-            self.gitnexus_metrics.augmentation_calls += 1
-            self.gitnexus_metrics.augmentation_time += elapsed
+            self.yummygraph_metrics.augmentation_calls += 1
+            self.yummygraph_metrics.augmentation_time += elapsed
 
             augment_text = augment_result.get("output", "").strip()
-            if augment_text and "[GitNexus]" in augment_text:
+            if augment_text and "[YummyGraph]" in augment_text:
                 original_output = output.get("output", "")
                 output = dict(output)
                 output["output"] = f"{original_output}\n\n{augment_text}"
-                self.gitnexus_metrics.augmentation_hits += 1
+                self.yummygraph_metrics.augmentation_hits += 1
                 return output
         except Exception as e:
             logger.debug(f"Augmentation failed for pattern '{pattern}': {e}")
-            self.gitnexus_metrics.augmentation_errors += 1
+            self.yummygraph_metrics.augmentation_errors += 1
 
         return None
 
@@ -151,29 +151,29 @@ class GitNexusAgent(DefaultAgent):
         return None
 
     def _track_tool_usage(self, message: dict):
-        """Track which GitNexus tools the agent uses."""
+        """Track which YummyGraph tools the agent uses."""
         for action in message.get("extra", {}).get("actions", []):
             command = action.get("command", "")
             for key, binary in BINARIES_BY_KEY.items():
-                if binary in command and key in self.gitnexus_metrics.tool_calls:
-                    self.gitnexus_metrics.tool_calls[key] += 1
+                if binary in command and key in self.yummygraph_metrics.tool_calls:
+                    self.yummygraph_metrics.tool_calls[key] += 1
                     break
 
     def serialize(self, *extra_dicts) -> dict:
-        """Serialize with GitNexus-specific metrics."""
-        gitnexus_data = {
+        """Serialize with YummyGraph-specific metrics."""
+        yummygraph_data = {
             "info": {
-                "gitnexus": {
-                    "mode": self.gitnexus_mode.value,
-                    "metrics": self.gitnexus_metrics.to_dict(),
+                "yummygraph": {
+                    "mode": self.yummygraph_mode.value,
+                    "metrics": self.yummygraph_metrics.to_dict(),
                 },
             },
         }
-        return super().serialize(gitnexus_data, *extra_dicts)
+        return super().serialize(yummygraph_data, *extra_dicts)
 
 
-class GitNexusMetrics:
-    """Tracks GitNexus-specific metrics during evaluation."""
+class YummyGraphMetrics:
+    """Tracks YummyGraph-specific metrics during evaluation."""
 
     def __init__(self):
         self.tool_calls: dict[str, int] = {key: 0 for key in TOOL_METRIC_KEYS}

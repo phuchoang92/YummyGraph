@@ -7,7 +7,7 @@ import { createRequire } from 'module';
 
 const PKG_VERSION = (createRequire(import.meta.url)('../../package.json') as { version: string })
   .version;
-const NPX_REF = `gitnexus@${PKG_VERSION}`;
+const NPX_REF = `yummygraph@${PKG_VERSION}`;
 
 const execFileMock = vi.fn((...args: any[]) => {
   const callback = args.at(-1);
@@ -84,7 +84,7 @@ describe('setupOpenCode — JSONC preservation', () => {
     expect(raw).toContain('This comment must survive');
 
     const config = parseJsonc(raw);
-    expect(config.mcp.gitnexus).toBeDefined();
+    expect(config.mcp.yummygraph).toBeDefined();
     expect(config.model).toBe('test');
   });
 
@@ -102,7 +102,7 @@ describe('setupOpenCode — JSONC preservation', () => {
     expect(raw).toContain('block comment');
 
     const config = parseJsonc(raw);
-    expect(config.mcp.gitnexus).toBeDefined();
+    expect(config.mcp.yummygraph).toBeDefined();
     expect(config.model).toBe('test');
   });
 
@@ -122,7 +122,7 @@ describe('setupOpenCode — JSONC preservation', () => {
     const config = parseJsonc(raw);
     expect(config.model).toBe('test');
     expect(config.provider).toBe('anthropic');
-    expect(config.mcp.gitnexus).toBeDefined();
+    expect(config.mcp.yummygraph).toBeDefined();
   });
 
   it('handles plain JSON without comments (backwards compatible)', async () => {
@@ -137,7 +137,7 @@ describe('setupOpenCode — JSONC preservation', () => {
 
     expect(config.model).toBe('test');
     expect(config.provider).toBe('openai');
-    expect(config.mcp.gitnexus).toBeDefined();
+    expect(config.mcp.yummygraph).toBeDefined();
   });
 
   it('handles missing opencode.json (creates fresh)', async () => {
@@ -149,7 +149,7 @@ describe('setupOpenCode — JSONC preservation', () => {
     const raw = await fs.readFile(opencodeJsonPath(), 'utf-8');
     const config = parseJsonc(raw);
 
-    expect(config.mcp.gitnexus).toBeDefined();
+    expect(config.mcp.yummygraph).toBeDefined();
   });
 
   it('preserves all existing top-level keys', async () => {
@@ -175,18 +175,18 @@ describe('setupOpenCode — JSONC preservation', () => {
     expect(config.plugin).toEqual(['foo']);
     expect(config.provider).toBe('anthropic');
     expect(config.mcp.other).toEqual({ command: 'bar' });
-    expect(config.mcp.gitnexus).toBeDefined();
+    expect(config.mcp.yummygraph).toBeDefined();
   });
 
-  it('updates existing gitnexus MCP entry without losing other keys', async () => {
-    execFileSyncMock.mockReturnValueOnce('/usr/local/bin/gitnexus\n');
+  it('updates existing yummygraph MCP entry without losing other keys', async () => {
+    execFileSyncMock.mockReturnValueOnce('/usr/local/bin/yummygraph\n');
 
     const jsonc = `{
   // config comment
   "model": "test",
   "mcp": {
     "other": { "command": "keep" },
-    "gitnexus": { "command": "old-gitnexus", "args": ["old"] }
+    "yummygraph": { "command": "old-yummygraph", "args": ["old"] }
   }
 }`;
     await fs.writeFile(opencodeJsonPath(), jsonc, 'utf-8');
@@ -200,9 +200,9 @@ describe('setupOpenCode — JSONC preservation', () => {
     const config = parseJsonc(raw);
     expect(config.model).toBe('test');
     expect(config.mcp.other).toEqual({ command: 'keep' });
-    expect(config.mcp.gitnexus).toEqual({
+    expect(config.mcp.yummygraph).toEqual({
       type: 'local',
-      command: ['/usr/local/bin/gitnexus', 'mcp'],
+      command: ['/usr/local/bin/yummygraph', 'mcp'],
     });
   });
 
@@ -215,10 +215,10 @@ describe('setupOpenCode — JSONC preservation', () => {
 
     const raw = await fs.readFile(opencodeJsonPath(), 'utf-8');
     expect(raw).toBe(corrupt);
-    expect(raw).not.toContain('gitnexus');
+    expect(raw).not.toContain('yummygraph');
   });
 
-  it('uses npx fallback format when gitnexus binary is not on PATH', async () => {
+  it('uses npx fallback format when yummygraph binary is not on PATH', async () => {
     execFileSyncMock.mockImplementation(() => {
       throw new Error('not found');
     });
@@ -235,7 +235,7 @@ describe('setupOpenCode — JSONC preservation', () => {
     const raw = await fs.readFile(opencodeJsonPath(), 'utf-8');
     const config = parseJsonc(raw);
 
-    expect(config.mcp.gitnexus).toEqual({
+    expect(config.mcp.yummygraph).toEqual({
       type: 'local',
       command: ['npx', '-y', NPX_REF, 'mcp'],
     });
@@ -243,7 +243,7 @@ describe('setupOpenCode — JSONC preservation', () => {
 
   it('uses Windows npx fallback when where returns only a non-wrapper shim', async () => {
     setPlatform('win32');
-    execFileSyncMock.mockReturnValueOnce('C:\\Users\\dev\\AppData\\Roaming\\npm\\gitnexus\n');
+    execFileSyncMock.mockReturnValueOnce('C:\\Users\\dev\\AppData\\Roaming\\npm\\yummygraph\n');
 
     const jsonc = `{
   "model": "test",
@@ -257,7 +257,7 @@ describe('setupOpenCode — JSONC preservation', () => {
     const raw = await fs.readFile(opencodeJsonPath(), 'utf-8');
     const config = parseJsonc(raw);
 
-    expect(config.mcp.gitnexus).toEqual({
+    expect(config.mcp.yummygraph).toEqual({
       type: 'local',
       command: ['cmd', '/c', 'npx', '-y', NPX_REF, 'mcp'],
     });
@@ -265,7 +265,7 @@ describe('setupOpenCode — JSONC preservation', () => {
 
   it('uses Windows npx fallback when where returns only a .ps1 path', async () => {
     setPlatform('win32');
-    execFileSyncMock.mockReturnValueOnce('C:\\Users\\dev\\AppData\\Roaming\\npm\\gitnexus.ps1\n');
+    execFileSyncMock.mockReturnValueOnce('C:\\Users\\dev\\AppData\\Roaming\\npm\\yummygraph.ps1\n');
 
     const jsonc = `{
   "model": "test",
@@ -279,7 +279,7 @@ describe('setupOpenCode — JSONC preservation', () => {
     const raw = await fs.readFile(opencodeJsonPath(), 'utf-8');
     const config = parseJsonc(raw);
 
-    expect(config.mcp.gitnexus).toEqual({
+    expect(config.mcp.yummygraph).toEqual({
       type: 'local',
       command: ['cmd', '/c', 'npx', '-y', NPX_REF, 'mcp'],
     });
@@ -294,7 +294,7 @@ describe('setupOpenCode — JSONC preservation', () => {
 
     const raw = await fs.readFile(opencodeJsonPath(), 'utf-8');
     expect(raw).toContain('\t"model"');
-    expect(raw).toContain('\t"gitnexus"');
+    expect(raw).toContain('\t"yummygraph"');
   });
 
   it('preserves 4-space indentation in existing file', async () => {
@@ -307,7 +307,7 @@ describe('setupOpenCode — JSONC preservation', () => {
     await setupCommand();
 
     const raw = await fs.readFile(opencodeJsonPath(), 'utf-8');
-    const mcpLine = raw.split('\n').find((l) => l.includes('"gitnexus"'));
+    const mcpLine = raw.split('\n').find((l) => l.includes('"yummygraph"'));
     expect(mcpLine).toMatch(/^    /);
   });
 
@@ -372,7 +372,7 @@ describe('setupCursor — JSONC preservation', () => {
 
     const raw = await fs.readFile(mcpPath(), 'utf-8');
     const config = JSON.parse(raw);
-    expect(config.mcpServers.gitnexus).toBeDefined();
+    expect(config.mcpServers.yummygraph).toBeDefined();
   });
 
   it('preserves existing mcpServers and comments', async () => {
@@ -391,7 +391,7 @@ describe('setupCursor — JSONC preservation', () => {
     expect(raw).toContain('my cursor config');
     const config = parseJsonc(raw);
     expect(config.mcpServers.other).toEqual({ command: 'keep' });
-    expect(config.mcpServers.gitnexus).toBeDefined();
+    expect(config.mcpServers.yummygraph).toBeDefined();
   });
 
   it('does not wipe corrupt file', async () => {
@@ -407,7 +407,7 @@ describe('setupCursor — JSONC preservation', () => {
 
   it('uses Windows npx fallback when where returns only a non-wrapper shim', async () => {
     setPlatform('win32');
-    execFileSyncMock.mockReturnValueOnce('C:\\Users\\dev\\AppData\\Roaming\\npm\\gitnexus\n');
+    execFileSyncMock.mockReturnValueOnce('C:\\Users\\dev\\AppData\\Roaming\\npm\\yummygraph\n');
 
     const { setupCommand } = await import('../../src/cli/setup.js');
     await setupCommand();
@@ -415,7 +415,7 @@ describe('setupCursor — JSONC preservation', () => {
     const raw = await fs.readFile(mcpPath(), 'utf-8');
     const config = parseJsonc(raw);
 
-    expect(config.mcpServers.gitnexus).toEqual({
+    expect(config.mcpServers.yummygraph).toEqual({
       command: 'cmd',
       args: ['/c', 'npx', '-y', NPX_REF, 'mcp'],
     });
@@ -473,7 +473,7 @@ describe('setupClaudeCode — JSONC preservation', () => {
 
     const raw = await fs.readFile(mcpPath(), 'utf-8');
     const config = JSON.parse(raw);
-    expect(config.mcpServers.gitnexus).toBeDefined();
+    expect(config.mcpServers.yummygraph).toBeDefined();
   });
 
   it('preserves existing keys and comments', async () => {
@@ -494,7 +494,7 @@ describe('setupClaudeCode — JSONC preservation', () => {
     const config = parseJsonc(raw);
     expect(config.permissions).toEqual(['read']);
     expect(config.mcpServers.other).toEqual({ command: 'keep' });
-    expect(config.mcpServers.gitnexus).toBeDefined();
+    expect(config.mcpServers.yummygraph).toBeDefined();
   });
 
   it('does not wipe corrupt file', async () => {
@@ -586,24 +586,24 @@ describe('installClaudeCodeHooks — JSONC preservation', () => {
     expect(config.permissions).toEqual(['read']);
     expect(config.hooks.PreToolUse.length).toBe(2);
     expect(config.hooks.PreToolUse[0].matcher).toBe('Write');
-    expect(config.hooks.PreToolUse[1].hooks[0].command).toContain('gitnexus-hook');
+    expect(config.hooks.PreToolUse[1].hooks[0].command).toContain('yummygraph-hook');
     expect(config.hooks.PostToolUse).toBeDefined();
   });
 
-  it('does not add duplicate gitnexus-hook entries', async () => {
+  it('does not add duplicate yummygraph-hook entries', async () => {
     const jsonc = JSON.stringify(
       {
         hooks: {
           PreToolUse: [
             {
               matcher: 'Grep|Glob|Bash',
-              hooks: [{ type: 'command', command: 'node "gitnexus-hook.cjs"', timeout: 10 }],
+              hooks: [{ type: 'command', command: 'node "yummygraph-hook.cjs"', timeout: 10 }],
             },
           ],
           PostToolUse: [
             {
               matcher: 'Bash',
-              hooks: [{ type: 'command', command: 'node "gitnexus-hook.cjs"', timeout: 10 }],
+              hooks: [{ type: 'command', command: 'node "yummygraph-hook.cjs"', timeout: 10 }],
             },
           ],
         },

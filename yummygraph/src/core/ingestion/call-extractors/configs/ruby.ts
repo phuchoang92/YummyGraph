@@ -1,6 +1,6 @@
-// gitnexus/src/core/ingestion/call-extractors/configs/ruby.ts
+// yummygraph/src/core/ingestion/call-extractors/configs/ruby.ts
 
-import { SupportedLanguages } from 'gitnexus-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 import type { CallExtractionConfig } from '../../call-types.js';
 
 export const rubyCallConfig: CallExtractionConfig = {

@@ -1,11 +1,11 @@
 import { test, expect } from '@playwright/test';
 
 /**
- * E2E tests for the GitNexus web UI — exploring view features.
+ * E2E tests for the YummyGraph web UI — exploring view features.
  *
  * Requires:
- *   - gitnexus serve running on localhost:4747 with at least one indexed repo
- *   - gitnexus-web dev server running on localhost:5173
+ *   - yummygraph serve running on localhost:4747 with at least one indexed repo
+ *   - yummygraph-web dev server running on localhost:5173
  *
  * Skipped when servers aren't available (CI without services, etc.).
  * Set E2E=1 to force-run even without the availability check.
@@ -25,7 +25,7 @@ test.beforeAll(async () => {
       backendRes.status === 'rejected' ||
       (backendRes.status === 'fulfilled' && !backendRes.value.ok)
     ) {
-      test.skip(true, 'gitnexus serve not available on :4747');
+      test.skip(true, 'yummygraph serve not available on :4747');
       return;
     }
     if (
@@ -39,7 +39,7 @@ test.beforeAll(async () => {
     if (backendRes.status === 'fulfilled') {
       const repos = await backendRes.value.json();
       if (!repos.length) {
-        test.skip(true, 'No indexed repos — run gitnexus analyze first');
+        test.skip(true, 'No indexed repos — run yummygraph analyze first');
         return;
       }
     }
@@ -63,7 +63,7 @@ async function waitForGraphLoaded(page: import('@playwright/test').Page) {
 
   const landingCards = page.locator('[data-testid="landing-repo-card"]');
   const preferredLandingCard = landingCards
-    .filter({ hasText: /GitNexus|local-integration/ })
+    .filter({ hasText: /YummyGraph|local-integration/ })
     .first();
   try {
     await landingCards.first().waitFor({ state: 'visible', timeout: 15_000 });

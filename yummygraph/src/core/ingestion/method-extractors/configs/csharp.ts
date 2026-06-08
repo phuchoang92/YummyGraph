@@ -1,7 +1,7 @@
-// gitnexus/src/core/ingestion/method-extractors/configs/csharp.ts
+// yummygraph/src/core/ingestion/method-extractors/configs/csharp.ts
 // Verified against tree-sitter-c-sharp 0.23.1
 
-import { SupportedLanguages } from 'gitnexus-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 import type {
   MethodExtractionConfig,
   MethodInfo,

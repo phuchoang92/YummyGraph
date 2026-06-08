@@ -21,7 +21,7 @@ describe('loadSettings', () => {
 
   it('merges stored values with defaults', () => {
     sessionStorage.setItem(
-      'gitnexus-llm-settings',
+      'yummygraph-llm-settings',
       JSON.stringify({
         activeProvider: 'ollama',
         ollama: { model: 'qwen3-coder:30b' },
@@ -36,14 +36,14 @@ describe('loadSettings', () => {
   });
 
   it('returns defaults on corrupted JSON', () => {
-    sessionStorage.setItem('gitnexus-llm-settings', 'not-json{{{');
+    sessionStorage.setItem('yummygraph-llm-settings', 'not-json{{{');
     const settings = loadSettings();
     expect(settings.activeProvider).toBeDefined();
   });
 
   it('migrates legacy localStorage to sessionStorage', () => {
     localStorage.setItem(
-      'gitnexus-llm-settings',
+      'yummygraph-llm-settings',
       JSON.stringify({
         activeProvider: 'ollama',
         ollama: { model: 'migrated-model' },
@@ -52,8 +52,8 @@ describe('loadSettings', () => {
 
     const settings = loadSettings();
     expect(settings.ollama.model).toBe('migrated-model');
-    expect(sessionStorage.getItem('gitnexus-llm-settings')).not.toBeNull();
-    expect(localStorage.getItem('gitnexus-llm-settings')).toBeNull();
+    expect(sessionStorage.getItem('yummygraph-llm-settings')).not.toBeNull();
+    expect(localStorage.getItem('yummygraph-llm-settings')).toBeNull();
   });
 });
 
@@ -67,10 +67,10 @@ describe('saveSettings / clearSettings', () => {
 
   it('clearSettings removes settings from both storages', () => {
     saveSettings({ ...loadSettings(), activeProvider: 'anthropic' });
-    expect(sessionStorage.getItem('gitnexus-llm-settings')).not.toBeNull();
+    expect(sessionStorage.getItem('yummygraph-llm-settings')).not.toBeNull();
     clearSettings();
-    expect(sessionStorage.getItem('gitnexus-llm-settings')).toBeNull();
-    expect(localStorage.getItem('gitnexus-llm-settings')).toBeNull();
+    expect(sessionStorage.getItem('yummygraph-llm-settings')).toBeNull();
+    expect(localStorage.getItem('yummygraph-llm-settings')).toBeNull();
   });
 });
 

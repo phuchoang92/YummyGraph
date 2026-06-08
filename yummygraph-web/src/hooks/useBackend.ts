@@ -4,7 +4,7 @@ import { DEFAULT_BACKEND_URL } from '../config/ui-constants';
 
 // ── localStorage keys ────────────────────────────────────────────────────────
 
-const LS_URL_KEY = 'gitnexus-backend-url';
+const LS_URL_KEY = 'yummygraph-backend-url';
 
 // ── Public interface ─────────────────────────────────────────────────────────
 

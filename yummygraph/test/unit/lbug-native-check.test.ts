@@ -27,7 +27,7 @@ describe('checkLbugNative', () => {
       expect(result.message).toContain('--allow-build=@ladybugdb/core');
       expect(result.message).toContain('pnpm add -g --allow-build=@ladybugdb/core');
       const allowBuildIdx = result.message!.indexOf('--allow-build=@ladybugdb/core');
-      const dlxIdx = result.message!.indexOf('dlx gitnexus');
+      const dlxIdx = result.message!.indexOf('dlx yummygraph');
       expect(allowBuildIdx).toBeGreaterThanOrEqual(0);
       expect(dlxIdx).toBeGreaterThan(allowBuildIdx);
     } finally {

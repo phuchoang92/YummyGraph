@@ -10,7 +10,7 @@ const repoRoot = path.resolve(testDir, '../..');
 const distCli = path.join(repoRoot, 'dist', 'cli', 'index.js');
 const fixtureSource = path.resolve(testDir, '..', 'fixtures', 'mini-repo');
 
-const runAnalyzeWithForcedOom = (cwd: string, gitnexusHome: string) =>
+const runAnalyzeWithForcedOom = (cwd: string, yummygraphHome: string) =>
   spawnSync(process.execPath, [distCli, 'analyze'], {
     cwd,
     encoding: 'utf8',
@@ -18,10 +18,10 @@ const runAnalyzeWithForcedOom = (cwd: string, gitnexusHome: string) =>
     stdio: ['pipe', 'pipe', 'pipe'],
     env: {
       ...process.env,
-      GITNEXUS_HOME: gitnexusHome,
+      YUMMYGRAPH_HOME: yummygraphHome,
       NODE_OPTIONS: '',
-      GITNEXUS_TEST_RESPAWN_HEAP_MB: '32',
-      GITNEXUS_TEST_FORCE_HEAP_OOM: '1',
+      YUMMYGRAPH_TEST_RESPAWN_HEAP_MB: '32',
+      YUMMYGRAPH_TEST_FORCE_HEAP_OOM: '1',
       CI: '1',
     },
   });
@@ -35,7 +35,7 @@ describe('analyze OOM guidance (real child-process OOM)', () => {
     }
 
     const oomTestRepoParent = fs.mkdtempSync(path.join(os.tmpdir(), 'gn-oom-e2e-repo-'));
-    const oomTestGitnexusHome = fs.mkdtempSync(path.join(os.tmpdir(), 'gn-oom-e2e-home-'));
+    const oomTestYummygraphHome = fs.mkdtempSync(path.join(os.tmpdir(), 'gn-oom-e2e-home-'));
     const repoPath = path.join(oomTestRepoParent, 'mini-repo');
 
     fs.cpSync(fixtureSource, repoPath, { recursive: true });
@@ -54,21 +54,21 @@ describe('analyze OOM guidance (real child-process OOM)', () => {
     });
 
     try {
-      const result = runAnalyzeWithForcedOom(repoPath, oomTestGitnexusHome);
+      const result = runAnalyzeWithForcedOom(repoPath, oomTestYummygraphHome);
       const combinedOutput = `${result.stderr}\n${result.stdout}`;
 
       expect(result.status).not.toBeNull();
       expect(result.status).not.toBe(0);
       expect(combinedOutput).toContain('Analysis likely ran out of memory (heap cap auto-sized to');
       expect(combinedOutput).toContain(
-        'NODE_OPTIONS="--max-old-space-size=<MB>" gitnexus analyze [your-args]',
+        'NODE_OPTIONS="--max-old-space-size=<MB>" yummygraph analyze [your-args]',
       );
       expect(combinedOutput).toContain(
-        '(Windows: set NODE_OPTIONS=--max-old-space-size=<MB> && gitnexus analyze [your-args])',
+        '(Windows: set NODE_OPTIONS=--max-old-space-size=<MB> && yummygraph analyze [your-args])',
       );
     } finally {
       fs.rmSync(oomTestRepoParent, { recursive: true, force: true });
-      fs.rmSync(oomTestGitnexusHome, { recursive: true, force: true });
+      fs.rmSync(oomTestYummygraphHome, { recursive: true, force: true });
     }
   }, 60_000);
 });

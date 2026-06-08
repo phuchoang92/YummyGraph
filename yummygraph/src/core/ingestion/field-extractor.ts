@@ -1,7 +1,7 @@
-// gitnexus/src/core/ingestion/field-extractor.ts
+// yummygraph/src/core/ingestion/field-extractor.ts
 
 import type { SyntaxNode } from './utils/ast-helpers.js';
-import { SupportedLanguages } from 'gitnexus-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 import type { FieldExtractorContext, ExtractedFields, FieldVisibility } from './field-types.js';
 
 /**

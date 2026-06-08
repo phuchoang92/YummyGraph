@@ -5,8 +5,8 @@ import { cliResources } from '../../src/cli/i18n/resources.js';
 describe('cli i18n', () => {
   afterEach(() => setCliLanguage(null));
 
-  it('detects Chinese from GitNexus-specific or locale environment variables', () => {
-    expect(detectCliLanguage({ GITNEXUS_LANG: 'zh-CN' } as NodeJS.ProcessEnv)).toBe('zh-CN');
+  it('detects Chinese from YummyGraph-specific or locale environment variables', () => {
+    expect(detectCliLanguage({ YUMMYGRAPH_LANG: 'zh-CN' } as NodeJS.ProcessEnv)).toBe('zh-CN');
     expect(detectCliLanguage({ LC_ALL: 'zh_CN.UTF-8' } as NodeJS.ProcessEnv)).toBe('zh-CN');
     expect(detectCliLanguage({ LANG: 'en_US.UTF-8' } as NodeJS.ProcessEnv)).toBe('en');
   });

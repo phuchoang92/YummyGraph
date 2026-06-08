@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { SupportedLanguages } from 'gitnexus-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 import {
   detectFrameworkFromPath,
   detectFrameworkFromAST,

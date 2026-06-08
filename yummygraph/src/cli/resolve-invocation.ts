@@ -1,7 +1,7 @@
 /**
  * npm 11.x npx-install-crash nudge for the `analyze` command (#1939).
  *
- * The gitnexus/pnpm/npx selection itself lives in the canonical hook helper
+ * The yummygraph/pnpm/npx selection itself lives in the canonical hook helper
  * (hooks/claude/resolve-analyze-cmd.cjs) — self-contained CJS because the copied
  * hook runtime cannot import from the package. We reuse it here via createRequire
  * instead of re-implementing it, so there is one source of truth for the
@@ -14,17 +14,17 @@
 import { execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 
-type InvocationMode = 'gitnexus' | 'pnpm' | 'npx';
+type InvocationMode = 'yummygraph' | 'pnpm' | 'npx';
 
 interface InvocationResolver {
   // `probe` is injectable in the cjs (defaults to the real PATH probe) so the
   // preference order is unit-testable without spawning; the CLI calls it with
   // no argument.
   resolveInvocationMode: (
-    probe?: (command: string, gitnexusWrapper?: boolean) => string | null,
+    probe?: (command: string, yummygraphWrapper?: boolean) => string | null,
   ) => InvocationMode;
   formatDocumentationDlxCommand: (
-    gitnexusArgs: string,
+    yummygraphArgs: string,
     options?: { embeddings?: boolean },
   ) => string;
   NPX_REF: string;
@@ -83,7 +83,7 @@ export function getNpmMajorVersion(): number | null {
 
 /**
  * One-line stderr nudge when an npm 11+ user is on the npx install path (#1939).
- * Skipped when a global `gitnexus` or `pnpm` is already preferred, so it never
+ * Skipped when a global `yummygraph` or `pnpm` is already preferred, so it never
  * nags users who are not exposed to the npx/arborist crash.
  */
 export function warnIfNpm11NpxRisk(): void {
@@ -91,8 +91,8 @@ export function warnIfNpm11NpxRisk(): void {
   const major = getNpmMajorVersion();
   if (major === null || major < 11) return;
   process.stderr.write(
-    `Warning: npm ${major}.x can crash while installing gitnexus via npx ` +
+    `Warning: npm ${major}.x can crash while installing yummygraph via npx ` +
       `(npm/arborist "node.target is null"). Prefer: ${formatDocumentationDlxCommand('analyze')} ` +
-      `or npm install -g ${NPX_REF}. See https://github.com/abhigyanpatwari/GitNexus/issues/1939\n`,
+      `or npm install -g ${NPX_REF}. See https://github.com/abhigyanpatwari/YummyGraph/issues/1939\n`,
   );
 }

@@ -1,4 +1,4 @@
-import type { ParsedFile } from 'gitnexus-shared';
+import type { ParsedFile } from 'yummygraph-shared';
 import { isClassLike, populateClassOwnedMembers } from '../../scope-resolution/scope/walkers.js';
 
 /**

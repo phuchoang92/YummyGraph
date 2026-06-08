@@ -140,8 +140,8 @@ describe('IncludeExtractor → syncGroup integration (finding #7)', () => {
     // fixture repos, then hands the StoredContract-shaped output to
     // syncGroup via extractorOverride. This exercises the real extraction
     // code + the matching pipeline together.
-    const providerDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-include-int-provider-'));
-    const consumerDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-include-int-consumer-'));
+    const providerDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-include-int-provider-'));
+    const consumerDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-include-int-consumer-'));
     try {
       fs.mkdirSync(path.join(providerDir, 'shared/api'), { recursive: true });
       fs.writeFileSync(
@@ -159,13 +159,13 @@ describe('IncludeExtractor → syncGroup integration (finding #7)', () => {
         id: 'provider',
         path: 'app/provider',
         repoPath: providerDir,
-        storagePath: path.join(providerDir, '.gitnexus'),
+        storagePath: path.join(providerDir, '.yummygraph'),
       });
       const consumerOutput = await extractor.extract(null, consumerDir, {
         id: 'consumer',
         path: 'app/consumer',
         repoPath: consumerDir,
-        storagePath: path.join(consumerDir, '.gitnexus'),
+        storagePath: path.join(consumerDir, '.yummygraph'),
       });
 
       const stored: StoredContract[] = [

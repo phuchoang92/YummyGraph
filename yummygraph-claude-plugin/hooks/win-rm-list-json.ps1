@@ -1,13 +1,13 @@
 $ErrorActionPreference = 'Stop'
-$target = $env:GITNEXUS_HOOK_RM_TARGET
+$target = $env:YUMMYGRAPH_HOOK_RM_TARGET
 if ([string]::IsNullOrWhiteSpace($target)) { Write-Output '[]'; exit 0 }
 $target = (Resolve-Path -LiteralPath $target).ProviderPath
 
-if (-not ([Management.Automation.PSTypeName]'GitNexusHookRm.Native').Type) {
+if (-not ([Management.Automation.PSTypeName]'YummyGraphHookRm.Native').Type) {
 Add-Type @'
 using System;
 using System.Runtime.InteropServices;
-namespace GitNexusHookRm {
+namespace YummyGraphHookRm {
   public static class Native {
     public const int ErrorMoreData = 234;
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
@@ -42,28 +42,28 @@ namespace GitNexusHookRm {
 
 $h = [uint32]0
 $key = [guid]::NewGuid().ToString('N')
-$rmErr = [GitNexusHookRm.Native]::RmStartSession([ref]$h, 0, $key)
+$rmErr = [YummyGraphHookRm.Native]::RmStartSession([ref]$h, 0, $key)
 if ($rmErr -ne 0) { Write-Output '[]'; exit 0 }
 $files = @($target)
-$err = [GitNexusHookRm.Native]::RmRegisterResources($h, 1, $files, 0, [IntPtr]::Zero, 0, $null)
+$err = [YummyGraphHookRm.Native]::RmRegisterResources($h, 1, $files, 0, [IntPtr]::Zero, 0, $null)
 if ($err -ne 0) {
-  [void][GitNexusHookRm.Native]::RmEndSession($h)
+  [void][YummyGraphHookRm.Native]::RmEndSession($h)
   Write-Output '[]'
   exit 0
 }
 $need = [uint32]0
 $n = [uint32]0
 $reboot = [uint32]0
-$err = [GitNexusHookRm.Native]::RmGetList($h, [ref]$need, [ref]$n, $null, [ref]$reboot)
-if ($err -ne [GitNexusHookRm.Native]::ErrorMoreData) {
-  [void][GitNexusHookRm.Native]::RmEndSession($h)
+$err = [YummyGraphHookRm.Native]::RmGetList($h, [ref]$need, [ref]$n, $null, [ref]$reboot)
+if ($err -ne [YummyGraphHookRm.Native]::ErrorMoreData) {
+  [void][YummyGraphHookRm.Native]::RmEndSession($h)
   Write-Output '[]'
   exit 0
 }
 $n = $need
-$buf = New-Object GitNexusHookRm.Native+RM_PROCESS_INFO[] ([int]$n)
-$err = [GitNexusHookRm.Native]::RmGetList($h, [ref]$need, [ref]$n, $buf, [ref]$reboot)
-[void][GitNexusHookRm.Native]::RmEndSession($h)
+$buf = New-Object YummyGraphHookRm.Native+RM_PROCESS_INFO[] ([int]$n)
+$err = [YummyGraphHookRm.Native]::RmGetList($h, [ref]$need, [ref]$n, $buf, [ref]$reboot)
+[void][YummyGraphHookRm.Native]::RmEndSession($h)
 if ($err -ne 0) { Write-Output '[]'; exit 0 }
 
 $out = @()

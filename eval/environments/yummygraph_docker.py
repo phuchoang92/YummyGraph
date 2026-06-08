@@ -1,9 +1,9 @@
 """
-GitNexus Docker Environment for SWE-bench Evaluation
+YummyGraph Docker Environment for SWE-bench Evaluation
 
 Extends mini-swe-agent's Docker environment to:
-1. Install GitNexus (Node.js + npm + gitnexus package)
-2. Run `gitnexus analyze` on the repository
+1. Install YummyGraph (Node.js + npm + yummygraph package)
+2. Run `yummygraph analyze` on the repository
 3. Start the eval-server daemon (persistent HTTP server with warm KuzuDB)
 4. Install standalone tool scripts in /usr/local/bin/ (works with subprocess.run)
 5. Cache indexes per (repo, base_commit) to avoid re-indexing
@@ -13,8 +13,8 @@ This means .bashrc is NOT sourced, exported functions are NOT available, and env
 don't persist. The tool scripts must be standalone executables in $PATH.
 
 Architecture:
-  Agent bash cmd → /usr/local/bin/gitnexus-query → curl localhost:4848/tool/query → eval-server → KuzuDB
-  Fallback: → npx gitnexus query (cold start, slower)
+  Agent bash cmd → /usr/local/bin/yummygraph-query → curl localhost:4848/tool/query → eval-server → KuzuDB
+  Fallback: → npx yummygraph query (cold start, slower)
 
 Tool call latency: ~50-100ms via eval-server, ~5-10s via CLI fallback.
 """
@@ -35,79 +35,79 @@ from minisweagent.environments.docker import DockerEnvironment
 from tool_registry import TOOL_SPECS, ToolScriptSpec
 from utils.errors import is_debug_enabled, log_safe_exception
 
-logger = logging.getLogger("gitnexus_docker")
+logger = logging.getLogger("yummygraph_docker")
 
-DEFAULT_CACHE_DIR = Path.home() / ".gitnexus-eval-cache"
+DEFAULT_CACHE_DIR = Path.home() / ".yummygraph-eval-cache"
 EVAL_SERVER_PORT = 4848
 EVAL_SERVER_HOST = "127.0.0.1"
 
 
-class GitNexusDockerEnvironment(DockerEnvironment):
+class YummyGraphDockerEnvironment(DockerEnvironment):
     """
-    Docker environment with GitNexus pre-installed, indexed, and eval-server running.
+    Docker environment with YummyGraph pre-installed, indexed, and eval-server running.
 
     Setup flow:
     1. Start Docker container (base SWE-bench image)
-    2. Install Node.js + gitnexus inside the container
-    3. Run `gitnexus analyze` (or restore from cache)
-    4. Start `gitnexus eval-server` daemon (keeps KuzuDB warm)
+    2. Install Node.js + yummygraph inside the container
+    3. Run `yummygraph analyze` (or restore from cache)
+    4. Start `yummygraph eval-server` daemon (keeps KuzuDB warm)
     5. Install standalone tool scripts in /usr/local/bin/
-    6. Agent runs with near-instant GitNexus tool calls
+    6. Agent runs with near-instant YummyGraph tool calls
     """
 
     def __init__(
         self,
         *,
-        enable_gitnexus: bool = True,
+        enable_yummygraph: bool = True,
         cache_dir: str | Path | None = None,
         skip_embeddings: bool = True,
-        gitnexus_timeout: int = 120,
+        yummygraph_timeout: int = 120,
         eval_server_port: int = EVAL_SERVER_PORT,
         eval_server_host: str = EVAL_SERVER_HOST,
         **kwargs,
     ):
         super().__init__(**kwargs)
-        self.enable_gitnexus = enable_gitnexus
+        self.enable_yummygraph = enable_yummygraph
         self.cache_dir = Path(cache_dir) if cache_dir else DEFAULT_CACHE_DIR
         self.skip_embeddings = skip_embeddings
-        self.gitnexus_timeout = gitnexus_timeout
+        self.yummygraph_timeout = yummygraph_timeout
         self.eval_server_port = eval_server_port
         self.eval_server_host = eval_server_host
         self.index_time: float = 0.0
-        self._gitnexus_ready = False
+        self._yummygraph_ready = False
 
     def start(self) -> dict:
-        """Start the container and set up GitNexus."""
+        """Start the container and set up YummyGraph."""
         result = super().start()
 
-        if self.enable_gitnexus:
+        if self.enable_yummygraph:
             try:
-                self._setup_gitnexus()
+                self._setup_yummygraph()
             except Exception as e:
                 log_safe_exception(
                     logger,
-                    "GitNexus setup failed, continuing without it",
+                    "YummyGraph setup failed, continuing without it",
                     e,
                     include_debug=is_debug_enabled(),
                     level="warning",
                 )
-                self._gitnexus_ready = False
+                self._yummygraph_ready = False
 
         return result
 
-    def _setup_gitnexus(self):
-        """Install and configure GitNexus in the container."""
+    def _setup_yummygraph(self):
+        """Install and configure YummyGraph in the container."""
         start = time.time()
 
         self._ensure_nodejs()
-        self._install_gitnexus()
+        self._install_yummygraph()
         self._index_repository()
         self._start_eval_server()
         self._install_tools()
 
         self.index_time = time.time() - start
-        self._gitnexus_ready = True
-        logger.info(f"GitNexus setup completed in {self.index_time:.1f}s")
+        self._yummygraph_ready = True
+        logger.info(f"YummyGraph setup completed in {self.index_time:.1f}s")
 
     def _ensure_nodejs(self):
         """Ensure Node.js >= 18 is available in the container."""
@@ -129,55 +129,55 @@ class GitNexusDockerEnvironment(DockerEnvironment):
         else:
             logger.info(f"Node.js already available: {output}")
 
-    def _install_gitnexus(self):
-        """Install the gitnexus npm package globally."""
-        check = self.execute({"command": "npx gitnexus --version 2>/dev/null || echo 'NOT_FOUND'"})
+    def _install_yummygraph(self):
+        """Install the yummygraph npm package globally."""
+        check = self.execute({"command": "npx yummygraph --version 2>/dev/null || echo 'NOT_FOUND'"})
         if "NOT_FOUND" in check.get("output", ""):
-            logger.info("Installing gitnexus...")
+            logger.info("Installing yummygraph...")
             result = self.execute({
-                "command": "npm install -g gitnexus",
+                "command": "npm install -g yummygraph",
                 "timeout": 60,
             })
             if result.get("returncode", 1) != 0:
-                raise RuntimeError(f"Failed to install gitnexus: {result.get('output', '')}")
+                raise RuntimeError(f"Failed to install yummygraph: {result.get('output', '')}")
 
     def _index_repository(self):
-        """Run gitnexus analyze on the repo, using cache if available."""
+        """Run yummygraph analyze on the repo, using cache if available."""
         repo_info = self._get_repo_info()
         cache_key = self._make_cache_key(repo_info)
         cache_path = self.cache_dir / cache_key
 
         if cache_path.exists():
-            logger.info(f"Restoring GitNexus index from cache: {cache_key}")
+            logger.info(f"Restoring YummyGraph index from cache: {cache_key}")
             self._restore_cache(cache_path)
             return
 
-        logger.info("Running gitnexus analyze...")
+        logger.info("Running yummygraph analyze...")
         skip_flag = "--skip-embeddings" if self.skip_embeddings else ""
         result = self.execute({
-            "command": f"cd /testbed && npx gitnexus analyze . {skip_flag} 2>&1",
-            "timeout": self.gitnexus_timeout,
+            "command": f"cd /testbed && npx yummygraph analyze . {skip_flag} 2>&1",
+            "timeout": self.yummygraph_timeout,
         })
 
         if result.get("returncode", 1) != 0:
             output = result.get("output", "")
             if "error" in output.lower() and "indexed" not in output.lower():
-                raise RuntimeError(f"gitnexus analyze failed: {output[-500:]}")
+                raise RuntimeError(f"yummygraph analyze failed: {output[-500:]}")
 
         self._save_cache(cache_path, repo_info)
 
     def _start_eval_server(self):
-        """Start the GitNexus eval-server daemon in the background."""
+        """Start the YummyGraph eval-server daemon in the background."""
         logger.info(
             f"Starting eval-server on {self.eval_server_host}:{self.eval_server_port}..."
         )
 
         self.execute({
             "command": (
-                f"nohup npx gitnexus eval-server --port {self.eval_server_port} "
+                f"nohup npx yummygraph eval-server --port {self.eval_server_port} "
                 f"--host {self.eval_server_host} "
                 f"--idle-timeout 600 "
-                f"> /tmp/gitnexus-eval-server.log 2>&1 &"
+                f"> /tmp/yummygraph-eval-server.log 2>&1 &"
             ),
             "timeout": 5,
         })
@@ -201,7 +201,7 @@ class GitNexusDockerEnvironment(DockerEnvironment):
                 return
 
         log_output = self.execute({
-            "command": "cat /tmp/gitnexus-eval-server.log 2>/dev/null | tail -20",
+            "command": "cat /tmp/yummygraph-eval-server.log 2>/dev/null | tail -20",
         })
         logger.warning(
             f"Eval-server didn't become ready in "
@@ -213,7 +213,7 @@ class GitNexusDockerEnvironment(DockerEnvironment):
     @staticmethod
     def _render_tool_script(spec: ToolScriptSpec, port: str, host: str = EVAL_SERVER_HOST) -> str:
         """
-        Render a standalone bash script for a GitNexus tool.
+        Render a standalone bash script for a YummyGraph tool.
 
         Scripts call the eval-server fast path when an endpoint is present,
         and fall back to the CLI otherwise.
@@ -221,8 +221,8 @@ class GitNexusDockerEnvironment(DockerEnvironment):
         lines = ["#!/bin/bash"]
 
         if spec.endpoint:
-            lines.append(f'PORT="${{GITNEXUS_EVAL_PORT:-{port}}}"')
-            lines.append(f'HOST="${{GITNEXUS_EVAL_HOST:-{host}}}"')
+            lines.append(f'PORT="${{YUMMYGRAPH_EVAL_PORT:-{port}}}"')
+            lines.append(f'HOST="${{YUMMYGRAPH_EVAL_HOST:-{host}}}"')
 
         if spec.header:
             lines.append(spec.header.strip())
@@ -242,7 +242,7 @@ class GitNexusDockerEnvironment(DockerEnvironment):
 
     def _install_tools(self):
         """
-        Install standalone GitNexus tool scripts in /usr/local/bin/.
+        Install standalone YummyGraph tool scripts in /usr/local/bin/.
 
         Each script is a self-contained bash script that:
         1. Calls the eval-server via curl (fast path, ~100ms)
@@ -262,15 +262,15 @@ class GitNexusDockerEnvironment(DockerEnvironment):
             # Use heredoc with quoted delimiter — prevents all variable expansion and quoting issues
             self.execute({
                 "command": (
-                    f"cat << 'GITNEXUS_SCRIPT_EOF' > /usr/local/bin/{spec.bin_name}\n"
+                    f"cat << 'YUMMYGRAPH_SCRIPT_EOF' > /usr/local/bin/{spec.bin_name}\n"
                     f"{script_content}\n"
-                    "GITNEXUS_SCRIPT_EOF\n"
+                    "YUMMYGRAPH_SCRIPT_EOF\n"
                     f"chmod +x /usr/local/bin/{spec.bin_name}"
                 ),
                 "timeout": 5,
             })
 
-        logger.info(f"Installed {len(TOOL_SPECS)} GitNexus tool scripts in /usr/local/bin/")
+        logger.info(f"Installed {len(TOOL_SPECS)} YummyGraph tool scripts in /usr/local/bin/")
 
     def _get_repo_info(self) -> dict:
         """Get repository identity info from the container."""
@@ -291,19 +291,19 @@ class GitNexusDockerEnvironment(DockerEnvironment):
         return hashlib.sha256(content.encode()).hexdigest()[:16]
 
     def _save_cache(self, cache_path: Path, repo_info: dict):
-        """Save the GitNexus index to the host cache directory."""
+        """Save the YummyGraph index to the host cache directory."""
         try:
             cache_path.mkdir(parents=True, exist_ok=True)
 
             find_result = self.execute({
-                "command": "find /root/.gitnexus -name 'kuzu' -type d 2>/dev/null | head -1"
+                "command": "find /root/.yummygraph -name 'kuzu' -type d 2>/dev/null | head -1"
             })
-            gitnexus_dir = find_result.get("output", "").strip()
+            yummygraph_dir = find_result.get("output", "").strip()
 
-            if gitnexus_dir:
-                parent = str(Path(gitnexus_dir).parent)
+            if yummygraph_dir:
+                parent = str(Path(yummygraph_dir).parent)
                 self.execute({
-                    "command": f"cd {parent} && tar czf /tmp/gitnexus-cache.tar.gz .",
+                    "command": f"cd {parent} && tar czf /tmp/yummygraph-cache.tar.gz .",
                     "timeout": 30,
                 })
 
@@ -311,17 +311,17 @@ class GitNexusDockerEnvironment(DockerEnvironment):
                 if container_id:
                     import subprocess as sp
                     sp.run(
-                        ["docker", "cp", f"{container_id}:/tmp/gitnexus-cache.tar.gz",
+                        ["docker", "cp", f"{container_id}:/tmp/yummygraph-cache.tar.gz",
                          str(cache_path / "index.tar.gz")],
                         check=True, capture_output=True,
                     )
                     (cache_path / "metadata.json").write_text(json.dumps(repo_info, indent=2))
-                    logger.info(f"Cached GitNexus index: {cache_path}")
+                    logger.info(f"Cached YummyGraph index: {cache_path}")
 
         except Exception as e:
             log_safe_exception(
                 logger,
-                "Failed to cache GitNexus index",
+                "Failed to cache YummyGraph index",
                 e,
                 include_debug=is_debug_enabled(),
                 level="warning",
@@ -330,7 +330,7 @@ class GitNexusDockerEnvironment(DockerEnvironment):
                 shutil.rmtree(cache_path, ignore_errors=True)
 
     def _restore_cache(self, cache_path: Path):
-        """Restore a cached GitNexus index into the container."""
+        """Restore a cached YummyGraph index into the container."""
         try:
             cache_tarball = cache_path / "index.tar.gz"
             if not cache_tarball.exists():
@@ -342,23 +342,23 @@ class GitNexusDockerEnvironment(DockerEnvironment):
             if container_id:
                 import subprocess as sp
 
-                self.execute({"command": "mkdir -p /root/.gitnexus"})
+                self.execute({"command": "mkdir -p /root/.yummygraph"})
 
                 storage_result = self.execute({
-                    "command": "npx gitnexus list 2>/dev/null | grep -o '/root/.gitnexus/[^ ]*' | head -1 || echo '/root/.gitnexus/repos/default'"
+                    "command": "npx yummygraph list 2>/dev/null | grep -o '/root/.yummygraph/[^ ]*' | head -1 || echo '/root/.yummygraph/repos/default'"
                 })
-                storage_path = storage_result.get("output", "").strip() or "/root/.gitnexus/repos/default"
+                storage_path = storage_result.get("output", "").strip() or "/root/.yummygraph/repos/default"
                 self.execute({"command": f"mkdir -p {storage_path}"})
 
                 sp.run(
-                    ["docker", "cp", str(cache_tarball), f"{container_id}:/tmp/gitnexus-cache.tar.gz"],
+                    ["docker", "cp", str(cache_tarball), f"{container_id}:/tmp/yummygraph-cache.tar.gz"],
                     check=True, capture_output=True,
                 )
                 self.execute({
-                    "command": f"cd {storage_path} && tar xzf /tmp/gitnexus-cache.tar.gz",
+                    "command": f"cd {storage_path} && tar xzf /tmp/yummygraph-cache.tar.gz",
                     "timeout": 30,
                 })
-                logger.info("GitNexus index restored from cache")
+                logger.info("YummyGraph index restored from cache")
 
         except Exception as e:
             log_safe_exception(
@@ -372,7 +372,7 @@ class GitNexusDockerEnvironment(DockerEnvironment):
 
     def stop(self) -> dict:
         """Stop the container, shutting down eval-server first."""
-        if self._gitnexus_ready:
+        if self._yummygraph_ready:
             try:
                 self.execute({
                     "command": f"curl -sf -X POST http://127.0.0.1:{self.eval_server_port}/shutdown 2>/dev/null || true",
@@ -384,18 +384,18 @@ class GitNexusDockerEnvironment(DockerEnvironment):
         return super().stop()
 
     def get_template_vars(self) -> dict:
-        """Add GitNexus-specific template variables."""
+        """Add YummyGraph-specific template variables."""
         base_vars = super().get_template_vars()
-        base_vars["gitnexus_ready"] = self._gitnexus_ready
-        base_vars["gitnexus_index_time"] = self.index_time
+        base_vars["yummygraph_ready"] = self._yummygraph_ready
+        base_vars["yummygraph_index_time"] = self.index_time
         return base_vars
 
     def serialize(self) -> dict:
-        """Include GitNexus environment info in serialization."""
+        """Include YummyGraph environment info in serialization."""
         base = super().serialize()
-        base.setdefault("info", {})["gitnexus_env"] = {
-            "enabled": self.enable_gitnexus,
-            "ready": self._gitnexus_ready,
+        base.setdefault("info", {})["yummygraph_env"] = {
+            "enabled": self.enable_yummygraph,
+            "ready": self._yummygraph_ready,
             "index_time_seconds": round(self.index_time, 2),
             "skip_embeddings": self.skip_embeddings,
             "eval_server_port": self.eval_server_port,

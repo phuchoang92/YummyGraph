@@ -1,4 +1,4 @@
-import type { CaptureMatch, ParsedImport, ParsedTypeBinding, TypeRef } from 'gitnexus-shared';
+import type { CaptureMatch, ParsedImport, ParsedTypeBinding, TypeRef } from 'yummygraph-shared';
 
 export function interpretGoImport(captures: CaptureMatch): ParsedImport | null {
   const kind = captures['@import.kind']?.text;

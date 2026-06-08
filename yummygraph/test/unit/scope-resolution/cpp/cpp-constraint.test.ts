@@ -19,7 +19,7 @@ import {
   evaluateForTest,
   getRegistrySize,
 } from '../../../../src/core/ingestion/languages/cpp/constraint-filter.js';
-import type { ArityVerdict, ParameterTypeClass, SymbolDefinition } from 'gitnexus-shared';
+import type { ArityVerdict, ParameterTypeClass, SymbolDefinition } from 'yummygraph-shared';
 
 function templateConstraintsFor(src: string): CppConstraintPayload | undefined {
   const matches = emitCppScopeCaptures(src, 'test.cpp');

@@ -32,22 +32,22 @@ export const resolveEmbeddingConfig = (
     ...DEFAULT_EMBEDDING_CONFIG,
     ...overrides,
     batchSize: parsePositiveInt(
-      'GITNEXUS_EMBEDDING_BATCH_SIZE',
-      env.GITNEXUS_EMBEDDING_BATCH_SIZE,
+      'YUMMYGRAPH_EMBEDDING_BATCH_SIZE',
+      env.YUMMYGRAPH_EMBEDDING_BATCH_SIZE,
       overrides.batchSize ?? DEFAULT_EMBEDDING_CONFIG.batchSize,
     ),
     subBatchSize: parsePositiveInt(
-      'GITNEXUS_EMBEDDING_SUB_BATCH_SIZE',
-      env.GITNEXUS_EMBEDDING_SUB_BATCH_SIZE,
+      'YUMMYGRAPH_EMBEDDING_SUB_BATCH_SIZE',
+      env.YUMMYGRAPH_EMBEDDING_SUB_BATCH_SIZE,
       overrides.subBatchSize ?? DEFAULT_EMBEDDING_CONFIG.subBatchSize,
     ),
     threads: parsePositiveInt(
-      'GITNEXUS_EMBEDDING_THREADS',
-      env.GITNEXUS_EMBEDDING_THREADS,
+      'YUMMYGRAPH_EMBEDDING_THREADS',
+      env.YUMMYGRAPH_EMBEDDING_THREADS,
       overrides.threads ?? defaultEmbeddingThreads(),
     ),
     device:
-      parseDevice(env.GITNEXUS_EMBEDDING_DEVICE) ??
+      parseDevice(env.YUMMYGRAPH_EMBEDDING_DEVICE) ??
       overrides.device ??
       DEFAULT_EMBEDDING_CONFIG.device,
   };

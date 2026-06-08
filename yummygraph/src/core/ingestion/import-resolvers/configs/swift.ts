@@ -24,7 +24,7 @@
  * ordering are identical to the old scan.
  */
 
-import { SupportedLanguages } from 'gitnexus-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 import type { ImportResolutionConfig, ImportResolverStrategy, ResolveCtx } from '../types.js';
 
 interface SwiftTargetIndex {

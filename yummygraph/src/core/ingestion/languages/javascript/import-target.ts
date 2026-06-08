@@ -20,7 +20,7 @@
  * `tsconfigPaths` is null.
  */
 
-import { SupportedLanguages } from 'gitnexus-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 import { resolveTsTarget, type TsResolveContext } from '../typescript/import-target.js';
 
 export type JsResolveContext = TsResolveContext;

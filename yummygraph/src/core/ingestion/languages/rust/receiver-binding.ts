@@ -1,4 +1,4 @@
-import type { CaptureMatch } from 'gitnexus-shared';
+import type { CaptureMatch } from 'yummygraph-shared';
 import { syntheticCapture } from '../../utils/ast-helpers.js';
 import type { SyntaxNode } from '../../utils/ast-helpers.js';
 

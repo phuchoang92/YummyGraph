@@ -1,6 +1,6 @@
-// gitnexus/src/core/ingestion/field-extractors/configs/go.ts
+// yummygraph/src/core/ingestion/field-extractors/configs/go.ts
 
-import { SupportedLanguages } from 'gitnexus-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 import type { FieldExtractionConfig } from '../generic.js';
 import { extractSimpleTypeName } from '../../type-extractors/shared.js';
 import type { FieldVisibility } from '../../field-types.js';

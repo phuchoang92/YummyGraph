@@ -1,4 +1,4 @@
-import type { ParsedFile, Scope, ScopeId, SymbolDefinition } from 'gitnexus-shared';
+import type { ParsedFile, Scope, ScopeId, SymbolDefinition } from 'yummygraph-shared';
 import { isCppInlineNamespaceScope } from './inline-namespaces.js';
 
 /**
@@ -242,7 +242,7 @@ export function isCppDefGloballyVisible(filePath: string, nodeId: string): boole
  *
  * A naive `def.qualifiedName.indexOf('.') === -1` check is unreliable
  * because `populateClassOwnedMembers`
- * (`gitnexus/src/core/ingestion/scope-resolution/scope/walkers.ts`)
+ * (`yummygraph/src/core/ingestion/scope-resolution/scope/walkers.ts`)
  * only dot-qualifies `qualifiedName` for `Class` scopes. Namespace-nested
  * defs (`namespace ns { void foo(); }`) arrive in `localDefs` with
  * `qualifiedName === 'foo'` and `ownerId === undefined`, indistinguishable

@@ -78,12 +78,12 @@ export async function cleanupTempDir(tmpDir: string): Promise<void> {
  *
  * IMPORTANT: when adding a new test that passes a custom `prefix`, also add
  * the prefix to `TEST_FIXTURE_PREFIXES` in
- * `gitnexus/src/core/lbug/lbug-config.ts`. The stale-sidecar sweep relies
+ * `yummygraph/src/core/lbug/lbug-config.ts`. The stale-sidecar sweep relies
  * on the prefix list to recognize test fixtures; an unknown prefix means
  * the sweep silently won't fire for that fixture and Windows CI flakes
  * return.
  */
-export async function createTempDir(prefix: string = 'gitnexus-test-'): Promise<TestDBHandle> {
+export async function createTempDir(prefix: string = 'yummygraph-test-'): Promise<TestDBHandle> {
   const tmpDir = await fsp.mkdtemp(path.join(os.tmpdir(), prefix));
   return {
     dbPath: tmpDir,

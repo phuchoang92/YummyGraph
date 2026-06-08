@@ -1,7 +1,7 @@
-// gitnexus/src/core/ingestion/method-extractors/configs/dart.ts
+// yummygraph/src/core/ingestion/method-extractors/configs/dart.ts
 // Verified against tree-sitter-dart 1.0.0 (80e23c07)
 
-import { SupportedLanguages } from 'gitnexus-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 import type {
   MethodExtractionConfig,
   ParameterInfo,

@@ -2,7 +2,7 @@
  * Tests for the local-embedding-runtime blocker error path in the
  * `analyzeCommand` CLI (#1515 / #1987 review follow-up).
  *
- * On macOS Intel (darwin/x64) `initEmbedder` throws a GitNexus-authored blocker
+ * On macOS Intel (darwin/x64) `initEmbedder` throws a YummyGraph-authored blocker
  * before importing transformers.js. The analyze error handler must route that
  * message to a clean `local-embedding-unsupported` message (exit 1) — not the
  * generic MODULE_NOT_FOUND "installation may be corrupt" hint, and not the
@@ -30,7 +30,7 @@ vi.mock('../../src/core/lbug/lbug-adapter.js', () => ({
 }));
 
 vi.mock('../../src/storage/repo-manager.js', () => ({
-  getStoragePaths: vi.fn(() => ({ storagePath: '.gitnexus', lbugPath: '.gitnexus/lbug' })),
+  getStoragePaths: vi.fn(() => ({ storagePath: '.yummygraph', lbugPath: '.yummygraph/lbug' })),
   getGlobalRegistryPath: vi.fn(() => 'registry.json'),
   RegistryNameCollisionError: class RegistryNameCollisionError extends Error {},
   AnalysisNotFinalizedError: class AnalysisNotFinalizedError extends Error {},
@@ -47,7 +47,7 @@ vi.mock('../../src/core/ingestion/utils/max-file-size.js', () => ({
 }));
 
 // analyze.ts imports isHfDownloadFailure from hf-env.js, which transitively
-// pulls gitnexus-shared. Mock it to break the chain and to drive the
+// pulls yummygraph-shared. Mock it to break the chain and to drive the
 // blocker-vs-HF ordering test below. isLocalEmbeddingRuntimeBlockerMessage
 // (runtime-support.js) is intentionally NOT mocked — the real branch must fire.
 vi.mock('../../src/core/embeddings/hf-env.js', () => ({

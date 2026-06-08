@@ -9,7 +9,7 @@
  *
  * ## Dependency direction
  *
- *     gitnexus-shared (NodeLabel)             — leaf
+ *     yummygraph-shared (NodeLabel)             — leaf
  *          ↑
  *     symbol-table.ts                         — pure file/callable index
  *          ↑
@@ -85,14 +85,14 @@
  * overall architecture.
  */
 
-import type { NodeLabel } from 'gitnexus-shared';
+import type { NodeLabel } from 'yummygraph-shared';
 import type { TypeRegistry, MutableTypeRegistry } from './type-registry.js';
 import type { MethodRegistry, MutableMethodRegistry } from './method-registry.js';
 import type { FieldRegistry, MutableFieldRegistry } from './field-registry.js';
 import { createTypeRegistry } from './type-registry.js';
 import { createMethodRegistry } from './method-registry.js';
 import { createFieldRegistry } from './field-registry.js';
-import type { SymbolDefinition } from 'gitnexus-shared';
+import type { SymbolDefinition } from 'yummygraph-shared';
 import type { SymbolTableReader, SymbolTableWriter, AddMetadata } from './symbol-table.js';
 import { createSymbolTable } from './symbol-table.js';
 import { createRegistrationTable } from './registration-table.js';

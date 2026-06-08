@@ -20,7 +20,7 @@
  * their own `ConversionRankFn` in the future.
  */
 
-import type { ParameterTypeClass } from 'gitnexus-shared';
+import type { ParameterTypeClass } from 'yummygraph-shared';
 import { hasCppUserDefinedConversion } from './user-defined-conversions.js';
 
 /** Set of normalized arithmetic types that support implicit conversion. */

@@ -10,7 +10,7 @@
  * but is now emitted by the scope-resolution pipeline. The router still
  * returns 'skip' for these calls so they don't become spurious call edges.
  *
- * NOTE: This file is intentionally duplicated in gitnexus-web/ because the
+ * NOTE: This file is intentionally duplicated in yummygraph-web/ because the
  * two packages have separate build targets (Node native vs WASM/browser).
  * Keep both copies in sync until a shared package is introduced.
  */

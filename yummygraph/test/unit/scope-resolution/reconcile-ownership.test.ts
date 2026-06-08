@@ -10,7 +10,7 @@
  */
 
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import type { ParsedFile, SymbolDefinition } from 'gitnexus-shared';
+import type { ParsedFile, SymbolDefinition } from 'yummygraph-shared';
 import { createSemanticModel } from '../../../src/core/ingestion/model/semantic-model.js';
 import {
   reconcileOwnership,

@@ -1,7 +1,7 @@
-// gitnexus/src/core/ingestion/method-extractors/configs/python.ts
+// yummygraph/src/core/ingestion/method-extractors/configs/python.ts
 // Verified against tree-sitter-python 0.23.4
 
-import { SupportedLanguages } from 'gitnexus-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 import type {
   MethodExtractionConfig,
   ParameterInfo,

@@ -3,7 +3,7 @@
  */
 
 import { loadGroupConfig } from './config-parser.js';
-import { getDefaultGitnexusDir, getGroupDir } from './storage.js';
+import { getDefaultYummygraphDir, getGroupDir } from './storage.js';
 
 export async function resolveAtGroupMemberRepoPath(
   groupName: string,
@@ -12,7 +12,7 @@ export async function resolveAtGroupMemberRepoPath(
   const trimmed = groupName.trim();
   if (!trimmed) return { ok: false, error: 'Group name is empty.' };
   try {
-    const groupDir = getGroupDir(getDefaultGitnexusDir(), trimmed);
+    const groupDir = getGroupDir(getDefaultYummygraphDir(), trimmed);
     const config = await loadGroupConfig(groupDir);
     const keys = Object.keys(config.repos).sort((a, b) => a.localeCompare(b));
     if (keys.length === 0) {

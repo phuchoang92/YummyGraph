@@ -12,7 +12,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { resolvePythonImportTarget } from '../../../../src/core/ingestion/languages/python/index.js';
-import type { ParsedImport } from 'gitnexus-shared';
+import type { ParsedImport } from 'yummygraph-shared';
 
 function mkImport(targetRaw: string): ParsedImport {
   return { kind: 'absolute', targetRaw, isRelative: false, names: [] } as unknown as ParsedImport;

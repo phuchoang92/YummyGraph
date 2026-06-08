@@ -218,7 +218,7 @@ export const phpExportChecker: ExportChecker = (node, _name) => {
  * Swift: treat symbols as exported unless explicitly marked private/fileprivate.
  *
  * Swift's default access level is `internal`, which means visible to all files
- * in the same module/target. Since GitNexus indexes at the target level,
+ * in the same module/target. Since YummyGraph indexes at the target level,
  * `internal` symbols should be treated as exported (cross-file visible).
  * Only `private` and `fileprivate` symbols are truly file-scoped.
  */

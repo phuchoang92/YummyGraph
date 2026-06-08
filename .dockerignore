@@ -16,6 +16,6 @@ coverage
 
 **/*.tsbuildinfo
 
-.gitnexus
-gitnexus-web/playwright-report
-gitnexus-web/test-results
+.yummygraph
+yummygraph-web/playwright-report
+yummygraph-web/test-results

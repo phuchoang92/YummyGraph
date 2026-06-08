@@ -28,7 +28,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import type { ParsedFile } from 'gitnexus-shared';
+import type { ParsedFile } from 'yummygraph-shared';
 import { extractParsedFile } from '../../../../src/core/ingestion/scope-extractor-bridge.js';
 import { pythonProvider } from '../../../../src/core/ingestion/languages/python.js';
 

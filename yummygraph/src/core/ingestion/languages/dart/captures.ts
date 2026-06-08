@@ -27,7 +27,7 @@
  */
 
 import Parser from 'tree-sitter';
-import type { Capture, CaptureMatch } from 'gitnexus-shared';
+import type { Capture, CaptureMatch } from 'yummygraph-shared';
 import {
   nodeToCapture,
   syntheticCapture,

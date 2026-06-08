@@ -10,7 +10,7 @@ describe('TopicExtractor', () => {
   let extractor: TopicExtractor;
 
   beforeEach(() => {
-    tmpDir = path.join(os.tmpdir(), `gitnexus-topic-${Date.now()}`);
+    tmpDir = path.join(os.tmpdir(), `yummygraph-topic-${Date.now()}`);
     fs.mkdirSync(tmpDir, { recursive: true });
     extractor = new TopicExtractor();
   });
@@ -29,7 +29,7 @@ describe('TopicExtractor', () => {
     id: 'test-repo',
     path: 'test/app',
     repoPath,
-    storagePath: path.join(repoPath, '.gitnexus'),
+    storagePath: path.join(repoPath, '.yummygraph'),
   });
 
   describe('Kafka — Java', () => {
@@ -484,17 +484,17 @@ await consumer.subscribe({ topic: 'order.placed' });`,
     });
   });
 
-  // ─── #1185: topic extractor must honour .gitnexusignore ─────────────
+  // ─── #1185: topic extractor must honour .yummygraphignore ─────────────
   //
   // The source-scan glob used to use a hardcoded ignore array; it now
   // consumes the shared `IgnoreService` (mirrors `filesystem-walker.ts`)
-  // so any `.gitnexusignore` pattern excludes those files from contract
+  // so any `.yummygraphignore` pattern excludes those files from contract
   // extraction. Special case for this extractor: the Go-specific
   // `_test.go` filter is preserved via a small wrapper around the base
   // filter (so glob-level pruning still applies); the second test below
   // pins that behaviour against accidental regressions.
-  describe('respects .gitnexusignore (#1185)', () => {
-    it('source-scan glob skips files matched by .gitnexusignore', async () => {
+  describe('respects .yummygraphignore (#1185)', () => {
+    it('source-scan glob skips files matched by .yummygraphignore', async () => {
       // Control: a regular @KafkaListener that SHOULD be discovered.
       writeFile(
         'src/EventHandler.java',
@@ -507,7 +507,7 @@ public void handleUserCreated(ConsumerRecord<String, String> record) {}`,
         `@KafkaListener(topics = "leaked.event")
 public void handleLeaked(ConsumerRecord<String, String> r) {}`,
       );
-      writeFile('.gitnexusignore', 'mentor_env/\n');
+      writeFile('.yummygraphignore', 'mentor_env/\n');
 
       const contracts = await extractor.extract(null, tmpDir, makeRepo(tmpDir));
       const ids = contracts.map((c) => c.contractId);
@@ -516,7 +516,7 @@ public void handleLeaked(ConsumerRecord<String, String> r) {}`,
       expect(contracts.some((c) => c.symbolRef?.filePath?.startsWith('mentor_env/'))).toBe(false);
     });
 
-    it('still prunes `*_test.go` even when .gitnexusignore is empty (wrapper preserves glob-level filter)', async () => {
+    it('still prunes `*_test.go` even when .yummygraphignore is empty (wrapper preserves glob-level filter)', async () => {
       // Regression guard: replacing the hardcoded `**/*_test.go` glob
       // entry with a wrapper around `createIgnoreFilter` must keep this
       // file out of the scan. Without the wrapper, the previous test

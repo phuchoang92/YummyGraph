@@ -2,7 +2,7 @@
  * Regression tests for createServer() CORS + PNA middleware (Express 5).
  *
  * Express 5 / path-to-regexp v8 rejects bare `app.options('*')`, which broke
- * `gitnexus serve` in CI after #872. These tests mirror the registration order
+ * `yummygraph serve` in CI after #872. These tests mirror the registration order
  * in createServer() without booting LadybugDB or MCP.
  */
 import express from 'express';
@@ -70,14 +70,14 @@ describe('createServer CORS/PNA stack — OPTIONS preflight', () => {
     const res = await fetch(`${baseUrl}/api/repos`, {
       method: 'OPTIONS',
       headers: {
-        Origin: 'https://gitnexus.vercel.app',
+        Origin: 'https://yummygraph.vercel.app',
         'Access-Control-Request-Method': 'GET',
         'Access-Control-Request-Private-Network': 'true',
       },
     });
 
     expect(res.status).toBe(204);
-    expect(res.headers.get('access-control-allow-origin')).toBe('https://gitnexus.vercel.app');
+    expect(res.headers.get('access-control-allow-origin')).toBe('https://yummygraph.vercel.app');
     expect(res.headers.get('access-control-allow-private-network')).toBe('true');
   });
 

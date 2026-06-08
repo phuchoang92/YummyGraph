@@ -5,7 +5,7 @@
  * under vendor/ and materialized into node_modules/ at postinstall. Dart
  * and Proto are built from source with node-gyp; Swift ships platform
  * prebuilds activated via node-gyp-build. All three can be skipped via
- * GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 (postinstall scripts), or can silently
+ * YUMMYGRAPH_SKIP_OPTIONAL_GRAMMARS=1 (postinstall scripts), or can silently
  * soft-fail when the toolchain is missing (Dart/Proto) or no prebuild
  * matches the host platform (Swift).
  *
@@ -46,7 +46,7 @@ export interface MissingGrammar {
  * locate the entry path even when the `.node` binding is absent (the
  * package directory exists without a working `.node` binding), giving false
  * negatives for the exact users we want to warn:
- * those who installed with `GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1` or whose
+ * those who installed with `YUMMYGRAPH_SKIP_OPTIONAL_GRAMMARS=1` or whose
  * native rebuild soft-failed for missing toolchain.
  *
  * Node's module cache memoizes `require()` for us — calling this multiple
@@ -76,7 +76,7 @@ export function detectMissingOptionalGrammars(): MissingGrammar[] {
         // direct `console.error` in CLI code (only `console.log` is allowed
         // there for tool-data stdout output).
         cliWarn(
-          `GitNexus: optional grammar "${g.name}" is installed but failed to load (${msg.slice(0, 200)}). ${g.extensions.join('/')} files will not be parsed.`,
+          `YummyGraph: optional grammar "${g.name}" is installed but failed to load (${msg.slice(0, 200)}). ${g.extensions.join('/')} files will not be parsed.`,
           { grammar: g.name, extensions: g.extensions, error: msg },
         );
       }
@@ -111,7 +111,7 @@ export function warnMissingOptionalGrammars(opts?: {
       continue;
     }
     cliWarn(
-      `GitNexus${ctx}: optional grammar "${g.name}" is unavailable — ${g.extensions.join('/')} files will not be parsed. Reinstall without GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 (and ensure python3, make, g++) to enable.`,
+      `YummyGraph${ctx}: optional grammar "${g.name}" is unavailable — ${g.extensions.join('/')} files will not be parsed. Reinstall without YUMMYGRAPH_SKIP_OPTIONAL_GRAMMARS=1 (and ensure python3, make, g++) to enable.`,
       { grammar: g.name, extensions: g.extensions, context: opts?.context },
     );
   }

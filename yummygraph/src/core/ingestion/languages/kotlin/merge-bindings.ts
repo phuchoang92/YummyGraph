@@ -1,4 +1,4 @@
-import type { BindingRef } from 'gitnexus-shared';
+import type { BindingRef } from 'yummygraph-shared';
 
 function tierOf(binding: BindingRef): number {
   switch (binding.origin) {

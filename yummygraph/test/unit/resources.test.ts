@@ -57,14 +57,14 @@ describe('getResourceDefinitions', () => {
 
   it('includes repos resource', () => {
     const defs = getResourceDefinitions();
-    const repos = defs.find((d) => d.uri === 'gitnexus://repos');
+    const repos = defs.find((d) => d.uri === 'yummygraph://repos');
     expect(repos).toBeDefined();
     expect(repos!.mimeType).toBe('text/yaml');
   });
 
   it('includes setup resource', () => {
     const defs = getResourceDefinitions();
-    const setup = defs.find((d) => d.uri === 'gitnexus://setup');
+    const setup = defs.find((d) => d.uri === 'yummygraph://setup');
     expect(setup).toBeDefined();
     expect(setup!.mimeType).toBe('text/markdown');
   });
@@ -88,14 +88,14 @@ describe('getResourceTemplates', () => {
   it('includes context, clusters, processes, schema, cluster detail, process detail, group contracts/status', () => {
     const templates = getResourceTemplates();
     const uris = templates.map((t) => t.uriTemplate);
-    expect(uris).toContain('gitnexus://repo/{name}/context');
-    expect(uris).toContain('gitnexus://repo/{name}/clusters');
-    expect(uris).toContain('gitnexus://repo/{name}/processes');
-    expect(uris).toContain('gitnexus://repo/{name}/schema');
-    expect(uris).toContain('gitnexus://repo/{name}/cluster/{clusterName}');
-    expect(uris).toContain('gitnexus://repo/{name}/process/{processName}');
-    expect(uris).toContain('gitnexus://group/{name}/contracts');
-    expect(uris).toContain('gitnexus://group/{name}/status');
+    expect(uris).toContain('yummygraph://repo/{name}/context');
+    expect(uris).toContain('yummygraph://repo/{name}/clusters');
+    expect(uris).toContain('yummygraph://repo/{name}/processes');
+    expect(uris).toContain('yummygraph://repo/{name}/schema');
+    expect(uris).toContain('yummygraph://repo/{name}/cluster/{clusterName}');
+    expect(uris).toContain('yummygraph://repo/{name}/process/{processName}');
+    expect(uris).toContain('yummygraph://group/{name}/contracts');
+    expect(uris).toContain('yummygraph://group/{name}/status');
   });
 
   it('each template has uriTemplate, name, description, mimeType', () => {
@@ -110,7 +110,7 @@ describe('getResourceTemplates', () => {
 
 describe('parseResourceUri', () => {
   it('parses group contracts without query', () => {
-    const p = parseResourceUri('gitnexus://group/acme/contracts');
+    const p = parseResourceUri('yummygraph://group/acme/contracts');
     expect(p).toEqual({
       kind: 'group',
       groupName: 'acme',
@@ -121,7 +121,7 @@ describe('parseResourceUri', () => {
 
   it('parses nested group name and contracts query params', () => {
     const p = parseResourceUri(
-      'gitnexus://group/acme/billing/contracts?type=http&repo=app%2Fapi&unmatchedOnly=true',
+      'yummygraph://group/acme/billing/contracts?type=http&repo=app%2Fapi&unmatchedOnly=true',
     );
     expect(p.kind).toBe('group');
     if (p.kind !== 'group' || p.resourceType !== 'contracts') throw new Error('unexpected');
@@ -134,14 +134,14 @@ describe('parseResourceUri', () => {
   });
 
   it('coerces unmatchedOnly false from string', () => {
-    const p = parseResourceUri('gitnexus://group/g1/contracts?unmatchedOnly=false');
+    const p = parseResourceUri('yummygraph://group/g1/contracts?unmatchedOnly=false');
     expect(p.kind).toBe('group');
     if (p.kind !== 'group' || p.resourceType !== 'contracts') throw new Error('unexpected');
     expect(p.contractsFilter.unmatchedOnly).toBe(false);
   });
 
   it('parses group status', () => {
-    const p = parseResourceUri('gitnexus://group/my/product/status');
+    const p = parseResourceUri('yummygraph://group/my/product/status');
     expect(p).toEqual({
       kind: 'group',
       groupName: 'my/product',
@@ -150,7 +150,7 @@ describe('parseResourceUri', () => {
   });
 
   it('round-trips repo URI like legacy regex', () => {
-    const p = parseResourceUri('gitnexus://repo/my%20project/schema');
+    const p = parseResourceUri('yummygraph://repo/my%20project/schema');
     expect(p).toEqual({
       kind: 'repo',
       repoName: 'my project',
@@ -159,14 +159,14 @@ describe('parseResourceUri', () => {
   });
 
   it('rejects unknown group resource tail', () => {
-    expect(() => parseResourceUri('gitnexus://group/foo/bar')).toThrow('Unknown group resource');
+    expect(() => parseResourceUri('yummygraph://group/foo/bar')).toThrow('Unknown group resource');
   });
 });
 
 // ─── readResource URI parsing ────────────────────────────────────────
 
 describe('readResource', () => {
-  it('routes gitnexus://repos to listRepos', async () => {
+  it('routes yummygraph://repos to listRepos', async () => {
     const backend = createMockBackend({
       repos: [
         {
@@ -179,18 +179,18 @@ describe('readResource', () => {
       ],
     });
 
-    const result = await readResource('gitnexus://repos', backend);
+    const result = await readResource('yummygraph://repos', backend);
     expect(backend.listRepos).toHaveBeenCalled();
     expect(result).toContain('my-project');
   });
 
   it('returns empty message when no repos', async () => {
     const backend = createMockBackend({ repos: [] });
-    const result = await readResource('gitnexus://repos', backend);
+    const result = await readResource('yummygraph://repos', backend);
     expect(result).toContain('No repositories indexed');
   });
 
-  it('routes gitnexus://setup to setup resource', async () => {
+  it('routes yummygraph://setup to setup resource', async () => {
     const backend = createMockBackend({
       repos: [
         {
@@ -202,20 +202,20 @@ describe('readResource', () => {
         },
       ],
     });
-    const result = await readResource('gitnexus://setup', backend);
-    expect(result).toContain('GitNexus MCP');
+    const result = await readResource('yummygraph://setup', backend);
+    expect(result).toContain('YummyGraph MCP');
     expect(result).toContain('proj');
   });
 
   it('returns fallback when setup has no repos', async () => {
     const backend = createMockBackend({ repos: [] });
-    const result = await readResource('gitnexus://setup', backend);
+    const result = await readResource('yummygraph://setup', backend);
     expect(result).toContain('No repositories indexed');
   });
 
   it('routes group contracts resource through backend', async () => {
     const backend = createMockBackend();
-    const uri = 'gitnexus://group/g1/contracts?type=http&unmatchedOnly=true';
+    const uri = 'yummygraph://group/g1/contracts?type=http&unmatchedOnly=true';
     await readResource(uri, backend);
     expect(backend.readGroupContractsResource).toHaveBeenCalledWith('g1', {
       type: 'http',
@@ -225,11 +225,11 @@ describe('readResource', () => {
 
   it('routes group status resource through backend', async () => {
     const backend = createMockBackend();
-    await readResource('gitnexus://group/acme/status', backend);
+    await readResource('yummygraph://group/acme/status', backend);
     expect(backend.readGroupStatusResource).toHaveBeenCalledWith('acme');
   });
 
-  it('routes gitnexus://repo/{name}/context correctly', async () => {
+  it('routes yummygraph://repo/{name}/context correctly', async () => {
     const backend = createMockBackend({
       context: {
         projectName: 'test-project',
@@ -237,7 +237,7 @@ describe('readResource', () => {
       },
     });
 
-    const result = await readResource('gitnexus://repo/test-project/context', backend);
+    const result = await readResource('yummygraph://repo/test-project/context', backend);
     expect(backend.resolveRepo).toHaveBeenCalledWith('test-project');
     expect(result).toContain('test-project');
     expect(result).toContain('files: 10');
@@ -245,49 +245,49 @@ describe('readResource', () => {
 
   it('returns error when context has no codebase loaded', async () => {
     const backend = createMockBackend({ context: null });
-    const result = await readResource('gitnexus://repo/test-project/context', backend);
+    const result = await readResource('yummygraph://repo/test-project/context', backend);
     expect(result).toContain('error');
   });
 
-  it('routes gitnexus://repo/{name}/schema to static schema', async () => {
+  it('routes yummygraph://repo/{name}/schema to static schema', async () => {
     const backend = createMockBackend();
-    const result = await readResource('gitnexus://repo/any/schema', backend);
-    expect(result).toContain('GitNexus Graph Schema');
+    const result = await readResource('yummygraph://repo/any/schema', backend);
+    expect(result).toContain('YummyGraph Graph Schema');
     expect(result).toContain('CALLS');
     expect(result).toContain('IMPORTS');
   });
 
-  it('routes gitnexus://repo/{name}/clusters correctly', async () => {
+  it('routes yummygraph://repo/{name}/clusters correctly', async () => {
     const backend = createMockBackend({
       clusters: {
         clusters: [{ heuristicLabel: 'Auth', symbolCount: 10, cohesion: 0.9 }],
       },
     });
-    const result = await readResource('gitnexus://repo/test/clusters', backend);
+    const result = await readResource('yummygraph://repo/test/clusters', backend);
     expect(backend.queryClusters).toHaveBeenCalledWith('test', 100);
     expect(result).toContain('Auth');
   });
 
   it('returns empty modules when no clusters', async () => {
     const backend = createMockBackend({ clusters: { clusters: [] } });
-    const result = await readResource('gitnexus://repo/test/clusters', backend);
+    const result = await readResource('yummygraph://repo/test/clusters', backend);
     expect(result).toContain('modules: []');
   });
 
   it('handles cluster query error gracefully', async () => {
     const backend = createMockBackend();
     backend.queryClusters = vi.fn().mockRejectedValue(new Error('DB locked'));
-    const result = await readResource('gitnexus://repo/test/clusters', backend);
+    const result = await readResource('yummygraph://repo/test/clusters', backend);
     expect(result).toContain('DB locked');
   });
 
-  it('routes gitnexus://repo/{name}/processes correctly', async () => {
+  it('routes yummygraph://repo/{name}/processes correctly', async () => {
     const backend = createMockBackend({
       processes: {
         processes: [{ heuristicLabel: 'LoginFlow', processType: 'intra_community', stepCount: 3 }],
       },
     });
-    const result = await readResource('gitnexus://repo/test/processes', backend);
+    const result = await readResource('yummygraph://repo/test/processes', backend);
     expect(backend.queryProcesses).toHaveBeenCalledWith('test', 50);
     expect(result).toContain('LoginFlow');
   });
@@ -295,18 +295,18 @@ describe('readResource', () => {
   it('handles process query error gracefully', async () => {
     const backend = createMockBackend();
     backend.queryProcesses = vi.fn().mockRejectedValue(new Error('timeout'));
-    const result = await readResource('gitnexus://repo/test/processes', backend);
+    const result = await readResource('yummygraph://repo/test/processes', backend);
     expect(result).toContain('timeout');
   });
 
-  it('routes gitnexus://repo/{name}/cluster/{clusterName} correctly', async () => {
+  it('routes yummygraph://repo/{name}/cluster/{clusterName} correctly', async () => {
     const backend = createMockBackend({
       clusterDetail: {
         cluster: { heuristicLabel: 'Auth', symbolCount: 5, cohesion: 0.85 },
         members: [{ name: 'login', type: 'Function', filePath: 'src/auth.ts' }],
       },
     });
-    const result = await readResource('gitnexus://repo/test/cluster/Auth', backend);
+    const result = await readResource('yummygraph://repo/test/cluster/Auth', backend);
     expect(backend.queryClusterDetail).toHaveBeenCalledWith('Auth', 'test');
     expect(result).toContain('Auth');
     expect(result).toContain('login');
@@ -316,11 +316,11 @@ describe('readResource', () => {
     const backend = createMockBackend({
       clusterDetail: { error: 'Cluster not found' },
     });
-    const result = await readResource('gitnexus://repo/test/cluster/Missing', backend);
+    const result = await readResource('yummygraph://repo/test/cluster/Missing', backend);
     expect(result).toContain('Cluster not found');
   });
 
-  it('routes gitnexus://repo/{name}/process/{processName} correctly', async () => {
+  it('routes yummygraph://repo/{name}/process/{processName} correctly', async () => {
     const backend = createMockBackend({
       processDetail: {
         process: { heuristicLabel: 'LoginFlow', processType: 'intra_community', stepCount: 3 },
@@ -330,7 +330,7 @@ describe('readResource', () => {
         ],
       },
     });
-    const result = await readResource('gitnexus://repo/test/process/LoginFlow', backend);
+    const result = await readResource('yummygraph://repo/test/process/LoginFlow', backend);
     expect(backend.queryProcessDetail).toHaveBeenCalledWith('LoginFlow', 'test');
     expect(result).toContain('LoginFlow');
     expect(result).toContain('login');
@@ -341,27 +341,27 @@ describe('readResource', () => {
     const backend = createMockBackend({
       processDetail: { error: 'Process not found' },
     });
-    const result = await readResource('gitnexus://repo/test/process/Missing', backend);
+    const result = await readResource('yummygraph://repo/test/process/Missing', backend);
     expect(result).toContain('Process not found');
   });
 
   it('throws for unknown resource URI', async () => {
     const backend = createMockBackend();
-    await expect(readResource('gitnexus://unknown', backend)).rejects.toThrow(
+    await expect(readResource('yummygraph://unknown', backend)).rejects.toThrow(
       'Unknown resource URI',
     );
   });
 
   it('throws for unknown repo-scoped resource type', async () => {
     const backend = createMockBackend();
-    await expect(readResource('gitnexus://repo/test/nonexistent', backend)).rejects.toThrow(
+    await expect(readResource('yummygraph://repo/test/nonexistent', backend)).rejects.toThrow(
       'Unknown resource',
     );
   });
 
   it('decodes URI-encoded repo names', async () => {
     const backend = createMockBackend();
-    await readResource('gitnexus://repo/my%20project/schema', backend);
+    await readResource('yummygraph://repo/my%20project/schema', backend);
     // Should not throw — the schema resource is static
   });
 
@@ -372,7 +372,7 @@ describe('readResource', () => {
         members: [],
       },
     });
-    await readResource('gitnexus://repo/test/cluster/Auth%20Module', backend);
+    await readResource('yummygraph://repo/test/cluster/Auth%20Module', backend);
     expect(backend.queryClusterDetail).toHaveBeenCalledWith('Auth Module', 'test');
   });
 
@@ -383,12 +383,12 @@ describe('readResource', () => {
         { name: 'proj-b', path: '/b', indexedAt: '2024-01-02', lastCommit: 'def' },
       ],
     });
-    const result = await readResource('gitnexus://repos', backend);
+    const result = await readResource('yummygraph://repos', backend);
     expect(result).toContain('Multiple repos indexed');
     expect(result).toContain('repo parameter');
     // The example must use a registered tool name, not the unregistered
-    // `gitnexus_search` / `gitnexus_*` prefix (#2059).
+    // `yummygraph_search` / `yummygraph_*` prefix (#2059).
     expect(result).toContain('query({query: "auth"');
-    expect(result).not.toMatch(/gitnexus_/);
+    expect(result).not.toMatch(/yummygraph_/);
   });
 });

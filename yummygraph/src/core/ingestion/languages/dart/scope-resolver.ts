@@ -26,8 +26,8 @@
  *     field-walk heuristic over-connects when types are reliable).
  */
 
-import type { ParsedFile } from 'gitnexus-shared';
-import { SupportedLanguages } from 'gitnexus-shared';
+import type { ParsedFile } from 'yummygraph-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 import { buildMro, defaultLinearize } from '../../scope-resolution/passes/mro.js';
 import { populateClassOwnedMembers, isClassLike } from '../../scope-resolution/scope/walkers.js';
 import { resolveDefGraphId } from '../../scope-resolution/graph-bridge/ids.js';

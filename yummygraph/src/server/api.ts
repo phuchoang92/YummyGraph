@@ -1,7 +1,7 @@
 /**
  * HTTP API Server
  *
- * REST API for browser-based clients to query the local .gitnexus/ index.
+ * REST API for browser-based clients to query the local .yummygraph/ index.
  * Also hosts the MCP server over StreamableHTTP for remote AI tool access.
  *
  * Security: binds to localhost by default (use --host to override).
@@ -25,7 +25,7 @@ import {
   isReadOnlyDbError,
 } from '../core/lbug/lbug-adapter.js';
 import { isValidQueryParams } from '../core/lbug/query-params.js';
-import { NODE_TABLES, type GraphNode, type GraphRelationship } from 'gitnexus-shared';
+import { NODE_TABLES, type GraphNode, type GraphRelationship } from 'yummygraph-shared';
 import { searchFTSFromLbug } from '../core/search/bm25-index.js';
 import { hybridSearch } from '../core/search/hybrid-search.js';
 import { LocalBackend } from '../mcp/local/local-backend.js';
@@ -51,7 +51,7 @@ const pkg = _require('../../package.json');
  *     10.0.0.0/8      → 10.x.x.x
  *     172.16.0.0/12   → 172.16.x.x – 172.31.x.x
  *     192.168.0.0/16  → 192.168.x.x
- * - https://gitnexus.vercel.app — the deployed GitNexus web UI
+ * - https://yummygraph.vercel.app — the deployed YummyGraph web UI
  *
  * @param origin - The value of the HTTP `Origin` request header, or `undefined`
  *                 when the header is absent (non-browser request).
@@ -70,7 +70,7 @@ export const isAllowedOrigin = (origin: string | undefined): boolean => {
     origin === 'http://127.0.0.1' ||
     origin.startsWith('http://[::1]:') ||
     origin === 'http://[::1]' ||
-    origin === 'https://gitnexus.vercel.app'
+    origin === 'https://yummygraph.vercel.app'
   ) {
     return true;
   }
@@ -135,7 +135,7 @@ export const resolveWebDistDir = async (
   primaryDir: string,
   fallbackDir: string,
 ): Promise<string | null> => {
-  const envDir = process.env.GITNEXUS_WEB_DIST;
+  const envDir = process.env.YUMMYGRAPH_WEB_DIST;
   const dirs = envDir ? [envDir, primaryDir, fallbackDir] : [primaryDir, fallbackDir];
   for (const dir of dirs) {
     try {
@@ -155,7 +155,7 @@ export const landingPageHtml = (): string => `<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>GitNexus</title>
+<title>YummyGraph</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:Outfit,system-ui,-apple-system,sans-serif;background:#06060a;color:#e4e4ed;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1.5rem}
@@ -179,7 +179,7 @@ a.ext:hover{text-decoration:underline}
 </head>
 <body>
 <div class="card">
-  <div class="logo">GitNexus</div>
+  <div class="logo">YummyGraph</div>
   <div class="subtitle">API server is running</div>
   <div class="section-title">Endpoints</div>
   <p class="endpoint"><a href="/api/info">/api/info</a> <span style="color:#5a5a70">— Server version &amp; context</span></p>
@@ -190,10 +190,10 @@ a.ext:hover{text-decoration:underline}
   <p class="endpoint"><code>/api/mcp</code> <span style="color:#5a5a70">— MCP over StreamableHTTP</span></p>
   <div class="divider"></div>
   <div class="section-title">Web UI not found</div>
-  <div class="terminal"><span class="prompt">$ </span><span class="cmd">cd gitnexus-web &amp;&amp; npm run build</span></div>
+  <div class="terminal"><span class="prompt">$ </span><span class="cmd">cd yummygraph-web &amp;&amp; npm run build</span></div>
   <div class="link-row">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-    <a class="ext" href="https://gitnexus.vercel.app" target="_blank" rel="noopener noreferrer">gitnexus.vercel.app</a>
+    <a class="ext" href="https://yummygraph.vercel.app" target="_blank" rel="noopener noreferrer">yummygraph.vercel.app</a>
     <span style="color:#5a5a70">— connects to this server</span>
   </div>
 </div>
@@ -755,7 +755,7 @@ export const createServer = async (port: number, host: string = '127.0.0.1') => 
     let found = null;
 
     // Normalize: if a full path is passed, extract just the basename.
-    // e.g. "C:\Users\LENOVO\.gitnexus\repos\todo.txt-cli" -> "todo.txt-cli"
+    // e.g. "C:\Users\LENOVO\.yummygraph\repos\todo.txt-cli" -> "todo.txt-cli"
     const normalizedName = repoName ? path.basename(repoName) : undefined;
 
     if (normalizedName) {
@@ -900,7 +900,7 @@ export const createServer = async (port: number, host: string = '127.0.0.1') => 
     try {
       const entry = await resolveRepo(requestedRepo(req), false, req);
       if (!entry) {
-        res.status(404).json({ error: 'Repository not found. Run: gitnexus analyze' });
+        res.status(404).json({ error: 'Repository not found. Run: yummygraph analyze' });
         return;
       }
       // Timed out waiting for an active analysis job
@@ -953,11 +953,11 @@ export const createServer = async (port: number, host: string = '127.0.0.1') => 
           await closeLbug();
         } catch {}
 
-        // 1. Delete the .gitnexus index/storage directory
+        // 1. Delete the .yummygraph index/storage directory
         const storagePath = getStoragePath(entry.path);
         await fs.rm(storagePath, { recursive: true, force: true }).catch(() => {});
 
-        // 2. Delete the cloned repo dir if it lives under ~/.gitnexus/repos/.
+        // 2. Delete the cloned repo dir if it lives under ~/.yummygraph/repos/.
         // getCloneDir now throws on names that are not filesystem-safe (e.g.
         // local repos registered with names like "my project" or "org/repo").
         // Such repos legitimately have no clone dir, so treat the rejection as
@@ -1231,7 +1231,7 @@ export const createServer = async (port: number, host: string = '127.0.0.1') => 
       const response: any = { results: results.searchResults ?? results };
       if (results.ftsAvailable === false) {
         response.warning =
-          'FTS indexes missing — keyword search degraded. Run: gitnexus analyze --repair-fts (or gitnexus analyze --force) to rebuild indexes.';
+          'FTS indexes missing — keyword search degraded. Run: yummygraph analyze --repair-fts (or yummygraph analyze --force) to rebuild indexes.';
       }
       res.json(response);
     } catch (err: any) {
@@ -1835,12 +1835,12 @@ export const createServer = async (port: number, host: string = '127.0.0.1') => 
 
   // ── Web UI (served at root) ───────────────────────────────────────
 
-  // Resolve the gitnexus-web dist directory relative to this file's location.
+  // Resolve the yummygraph-web dist directory relative to this file's location.
   // In the published package: <pkg>/dist/server/api.js → <pkg>/web/
-  // In dev (tsx):            gitnexus/src/server/api.ts → gitnexus-web/dist/
+  // In dev (tsx):            yummygraph/src/server/api.ts → yummygraph-web/dist/
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
   const webDistDir = path.resolve(__dirname, '..', '..', 'web');
-  const devWebDistDir = path.resolve(__dirname, '..', '..', '..', 'gitnexus-web', 'dist');
+  const devWebDistDir = path.resolve(__dirname, '..', '..', '..', 'yummygraph-web', 'dist');
   const staticDir = await resolveWebDistDir(webDistDir, devWebDistDir);
   registerWebUI(app, staticDir);
 
@@ -1855,7 +1855,7 @@ export const createServer = async (port: number, host: string = '127.0.0.1') => 
   await new Promise<void>((resolve, reject) => {
     const server = app.listen(port, host, () => {
       const displayHost = host === '::' || host === '0.0.0.0' ? 'localhost' : host;
-      console.log(`GitNexus server running on http://${displayHost}:${port}`);
+      console.log(`YummyGraph server running on http://${displayHost}:${port}`);
       resolve();
     });
     server.on('error', (err) => reject(err));
@@ -1887,7 +1887,7 @@ export const createServer = async (port: number, host: string = '127.0.0.1') => 
     // because the new transport architecture made it unnecessary.
     let shuttingDown = false;
     process.on('uncaughtException', (err) => {
-      logger.error({ err }, 'GitNexus uncaughtException');
+      logger.error({ err }, 'YummyGraph uncaughtException');
       flushLoggerSync();
       if (!shuttingDown) {
         shuttingDown = true;
@@ -1897,7 +1897,7 @@ export const createServer = async (port: number, host: string = '127.0.0.1') => 
     process.on('unhandledRejection', (reason: unknown) => {
       // Availability-first: log the rejection without exiting.
       const err = reason instanceof Error ? reason : new Error(String(reason));
-      logger.error({ err }, 'GitNexus unhandledRejection');
+      logger.error({ err }, 'YummyGraph unhandledRejection');
     });
   });
 };

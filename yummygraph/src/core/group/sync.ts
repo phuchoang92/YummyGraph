@@ -298,7 +298,7 @@ export async function syncGroup(config: GroupConfig, opts?: SyncOptions): Promis
       const msg = err instanceof Error ? err.message : String(err);
       logger.warn(
         { err: msg, groupDir: opts.groupDir },
-        '⚠️ writeBridge failed; contracts.json is intact but bridge.lbug is stale. Re-run `gitnexus group sync` to retry.',
+        '⚠️ writeBridge failed; contracts.json is intact but bridge.lbug is stale. Re-run `yummygraph group sync` to retry.',
       );
     }
   }

@@ -1,6 +1,6 @@
 import Parser from 'tree-sitter';
 import { createRequire } from 'node:module';
-import { SupportedLanguages } from 'gitnexus-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 
 import { logger } from '../logger.js';
 const _require = createRequire(import.meta.url);
@@ -41,7 +41,7 @@ interface GrammarSource {
   severity?: 'warn' | 'error';
 }
 
-const ISSUES_URL = 'https://github.com/abhigyanpatwari/GitNexus/issues';
+const ISSUES_URL = 'https://github.com/abhigyanpatwari/YummyGraph/issues';
 
 const SOURCES: Record<string, GrammarSource> = {
   [SupportedLanguages.JavaScript]: {
@@ -141,7 +141,7 @@ const SOURCES: Record<string, GrammarSource> = {
     optional: true,
     unavailableNote:
       'Swift parsing disabled: vendored `tree-sitter-swift` (under ' +
-      '`gitnexus/vendor/tree-sitter-swift`) failed to load. ' +
+      '`yummygraph/vendor/tree-sitter-swift`) failed to load. ' +
       'Likely cause: no prebuilt `.node` for this platform/architecture. ' +
       `See ${ISSUES_URL}/1130.`,
   },
@@ -150,7 +150,7 @@ const SOURCES: Record<string, GrammarSource> = {
     optional: true,
     unavailableNote:
       'Dart parsing disabled: vendored `tree-sitter-dart` (under ' +
-      '`gitnexus/vendor/tree-sitter-dart`) failed to load. ' +
+      '`yummygraph/vendor/tree-sitter-dart`) failed to load. ' +
       'Likely cause: native compile failed at install (missing python3/make/g++). ' +
       `See ${ISSUES_URL}/1125.`,
   },
@@ -193,7 +193,7 @@ const logFailure = (key: string, result: LoadResult): void => {
   if (result.ok === true) return;
   if (logged.has(key)) return;
   logged.add(key);
-  const message = `[gitnexus] ${result.note} (${result.error.message})`;
+  const message = `[yummygraph] ${result.note} (${result.error.message})`;
 
   // Severity routes to the correct pino level. Both go to stderr (pino's
   // default destination), so MCP stdio framing is preserved either way —

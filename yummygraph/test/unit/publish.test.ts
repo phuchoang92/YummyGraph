@@ -9,13 +9,13 @@ import {
   parseOwnerRepoFromRemote,
   stripGitSuffix,
   UNDERSTAND_QUICKLY_TOKEN_ENV,
-} from 'gitnexus-shared';
+} from 'yummygraph-shared';
 
-describe('understand-quickly helpers (gitnexus-shared)', () => {
+describe('understand-quickly helpers (yummygraph-shared)', () => {
   describe('isValidOwnerRepo', () => {
     it.each([
       ['looptech-ai/understand-quickly', true],
-      ['abhigyanpatwari/GitNexus', true],
+      ['abhigyanpatwari/YummyGraph', true],
       // LOW 8: GitHub user/org slugs are alnum/hyphen only — no underscore.
       ['Some_Org/Some.Repo-2', false],
       ['', false],
@@ -72,7 +72,7 @@ describe('understand-quickly helpers (gitnexus-shared)', () => {
       ['git@github.com:looptech-ai/understand-quickly.git', 'looptech-ai/understand-quickly'],
       ['https://github.com/looptech-ai/understand-quickly', 'looptech-ai/understand-quickly'],
       ['https://github.com/looptech-ai/understand-quickly.git', 'looptech-ai/understand-quickly'],
-      ['ssh://git@github.com/abhigyanpatwari/GitNexus.git', 'abhigyanpatwari/GitNexus'],
+      ['ssh://git@github.com/abhigyanpatwari/YummyGraph.git', 'abhigyanpatwari/YummyGraph'],
     ])('parses %s -> %s', (url, expected) => {
       expect(parseOwnerRepoFromRemote(url)).toBe(expected);
     });
@@ -119,9 +119,9 @@ describe('publishCommand (no-token no-op)', () => {
     vi.resetModules();
     tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'gn-publish-test-'));
     // Simulate an existing index so hasIndex() returns true.
-    await fs.mkdir(path.join(tempDir, '.gitnexus'), { recursive: true });
+    await fs.mkdir(path.join(tempDir, '.yummygraph'), { recursive: true });
     await fs.writeFile(
-      path.join(tempDir, '.gitnexus', 'meta.json'),
+      path.join(tempDir, '.yummygraph', 'meta.json'),
       JSON.stringify({ repoPath: tempDir, lastCommit: '', indexedAt: '' }),
       'utf-8',
     );
@@ -156,7 +156,7 @@ describe('publishCommand (no-token no-op)', () => {
 
   it('exits 0 with no token even when no index/repo exists (BLOCKER 2)', async () => {
     // Per the README, CLI --help, and PR body: without a token, the
-    // command must be a no-op even if the repo lacks `.gitnexus/`.
+    // command must be a no-op even if the repo lacks `.yummygraph/`.
     const noIndexDir = await fs.mkdtemp(path.join(os.tmpdir(), 'gn-publish-noidx-'));
     try {
       const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(() => {
@@ -185,9 +185,9 @@ describe('publishCommand response branches (MEDIUM 5)', () => {
   beforeEach(async () => {
     vi.resetModules();
     tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'gn-publish-resp-'));
-    await fs.mkdir(path.join(tempDir, '.gitnexus'), { recursive: true });
+    await fs.mkdir(path.join(tempDir, '.yummygraph'), { recursive: true });
     await fs.writeFile(
-      path.join(tempDir, '.gitnexus', 'meta.json'),
+      path.join(tempDir, '.yummygraph', 'meta.json'),
       JSON.stringify({ repoPath: tempDir, lastCommit: '', indexedAt: '' }),
       'utf-8',
     );

@@ -29,7 +29,7 @@
  * sanctioned non-frozen Map cast (Contract Invariant I6).
  */
 
-import type { ParsedFile, TypeRef } from 'gitnexus-shared';
+import type { ParsedFile, TypeRef } from 'yummygraph-shared';
 import type { ScopeResolutionIndexes } from '../../model/scope-resolution-indexes.js';
 import type { WorkspaceResolutionIndex } from '../../scope-resolution/workspace-index.js';
 import { followChainPostFinalize } from '../../scope-resolution/passes/imported-return-types.js';

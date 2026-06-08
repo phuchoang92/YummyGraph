@@ -1,5 +1,5 @@
 /**
- * Smoke-test `gitnexus group` CLI via tsx (same pattern as cli-e2e.test.ts).
+ * Smoke-test `yummygraph group` CLI via tsx (same pattern as cli-e2e.test.ts).
  * Does not exercise LadybugDB-backed commands end-to-end (needs indexed fixtures).
  */
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
@@ -20,7 +20,7 @@ const tsxImportUrl = pathToFileURL(path.join(tsxPkgDir, 'dist', 'loader.mjs')).h
 let tmpHome: string;
 
 beforeAll(() => {
-  tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-group-cli-'));
+  tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-group-cli-'));
 });
 
 afterAll(() => {
@@ -35,7 +35,7 @@ function runGroup(args: string[]) {
     encoding: 'utf8',
     timeout: 20000,
     stdio: ['pipe', 'pipe', 'pipe'],
-    env: { ...process.env, GITNEXUS_HOME: tmpHome },
+    env: { ...process.env, YUMMYGRAPH_HOME: tmpHome },
   });
 }
 
@@ -74,7 +74,7 @@ describe('group CLI', () => {
   });
 
   it('group impact runs with Issue #794 style flags (fixture-backed home)', () => {
-    const home = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-cli-impact-'));
+    const home = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-cli-impact-'));
     try {
       const gd = path.join(home, 'groups', 'test-group');
       fs.mkdirSync(gd, { recursive: true });
@@ -102,7 +102,7 @@ describe('group CLI', () => {
           encoding: 'utf8',
           timeout: 20000,
           stdio: ['pipe', 'pipe', 'pipe'],
-          env: { ...process.env, GITNEXUS_HOME: home },
+          env: { ...process.env, YUMMYGRAPH_HOME: home },
         },
       );
       expect(r.status).not.toBe(0);

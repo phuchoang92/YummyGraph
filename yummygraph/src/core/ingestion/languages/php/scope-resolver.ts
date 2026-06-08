@@ -19,8 +19,8 @@
  * read (lazily, at resolution time), `phpProvider` is fully initialized.
  */
 
-import type { ParsedFile } from 'gitnexus-shared';
-import { SupportedLanguages } from 'gitnexus-shared';
+import type { ParsedFile } from 'yummygraph-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 import { buildMro, defaultLinearize } from '../../scope-resolution/passes/mro.js';
 import {
   findReceiverTypeBinding,
@@ -36,7 +36,7 @@ import {
 import { narrowOverloadCandidates } from '../../scope-resolution/passes/overload-narrowing.js';
 import type { SemanticModel } from '../../model/semantic-model.js';
 import type { ScopeResolutionIndexes } from '../../model/scope-resolution-indexes.js';
-import type { SymbolDefinition } from 'gitnexus-shared';
+import type { SymbolDefinition } from 'yummygraph-shared';
 import { phpProvider } from '../php.js';
 import { phpArityCompatibility, phpMergeBindings } from './index.js';
 import { resolvePhpImportTargetInternal, loadPhpComposerConfig } from './import-target.js';

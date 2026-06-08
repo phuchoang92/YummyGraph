@@ -1,7 +1,7 @@
 /**
  * Integration Tests: Claude Code Hooks End-to-End
  *
- * Tests the hook scripts with real git repos and .gitnexus directories.
+ * Tests the hook scripts with real git repos and .yummygraph directories.
  * Unlike unit/hooks.test.ts which tests source code patterns and simple
  * stdin/stdout, these tests verify actual behavior with filesystem state.
  */
@@ -13,21 +13,21 @@ import os from 'os';
 import {
   runHook,
   parseHookOutput,
-  createGitNexusPathEntry,
+  createYummyGraphPathEntry,
   envWithPath,
 } from '../utils/hook-test-helpers.js';
 
 // ─── Paths to both hook variants ────────────────────────────────────
 
-const CJS_HOOK = path.resolve(__dirname, '..', '..', 'hooks', 'claude', 'gitnexus-hook.cjs');
+const CJS_HOOK = path.resolve(__dirname, '..', '..', 'hooks', 'claude', 'yummygraph-hook.cjs');
 const PLUGIN_HOOK = path.resolve(
   __dirname,
   '..',
   '..',
   '..',
-  'gitnexus-claude-plugin',
+  'yummygraph-claude-plugin',
   'hooks',
-  'gitnexus-hook.js',
+  'yummygraph-hook.js',
 );
 
 const HOOKS = [
@@ -35,15 +35,15 @@ const HOOKS = [
   ...(fs.existsSync(PLUGIN_HOOK) ? [{ name: 'Plugin', path: PLUGIN_HOOK }] : []),
 ];
 
-// ─── Temp git repo with .gitnexus ───────────────────────────────────
+// ─── Temp git repo with .yummygraph ───────────────────────────────────
 
 let tmpDir: string;
-let gitNexusDir: string;
+let yummyGraphDir: string;
 
 beforeAll(() => {
   tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hooks-e2e-'));
-  gitNexusDir = path.join(tmpDir, '.gitnexus');
-  fs.mkdirSync(gitNexusDir, { recursive: true });
+  yummyGraphDir = path.join(tmpDir, '.yummygraph');
+  fs.mkdirSync(yummyGraphDir, { recursive: true });
 
   // Initialize a real git repo
   spawnSync('git', ['init'], { cwd: tmpDir, stdio: 'pipe' });
@@ -67,7 +67,7 @@ describe.each(HOOKS)('hooks e2e ($name)', ({ name, path: hookPath }) => {
     it('detects stale index when meta.json lastCommit differs from HEAD', () => {
       // Write meta.json with an old commit hash
       fs.writeFileSync(
-        path.join(gitNexusDir, 'meta.json'),
+        path.join(yummyGraphDir, 'meta.json'),
         JSON.stringify({ lastCommit: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', stats: {} }),
       );
 
@@ -81,18 +81,18 @@ describe.each(HOOKS)('hooks e2e ($name)', ({ name, path: hookPath }) => {
           cwd: tmpDir,
         },
         tmpDir,
-        { env: { ...process.env, GITNEXUS_INVOCATION: 'npx' } },
+        { env: { ...process.env, YUMMYGRAPH_INVOCATION: 'npx' } },
       );
 
       const output = parseHookOutput(result.stdout);
       expect(output).not.toBeNull();
       expect(output!.additionalContext).toContain('stale');
-      expect(output!.additionalContext).toContain('npx gitnexus@latest analyze');
+      expect(output!.additionalContext).toContain('npx yummygraph@latest analyze');
     });
 
-    it('prefers pnpm dlx when GITNEXUS_INVOCATION=pnpm', () => {
+    it('prefers pnpm dlx when YUMMYGRAPH_INVOCATION=pnpm', () => {
       fs.writeFileSync(
-        path.join(gitNexusDir, 'meta.json'),
+        path.join(yummyGraphDir, 'meta.json'),
         JSON.stringify({ lastCommit: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', stats: {} }),
       );
 
@@ -106,25 +106,25 @@ describe.each(HOOKS)('hooks e2e ($name)', ({ name, path: hookPath }) => {
           cwd: tmpDir,
         },
         tmpDir,
-        { env: { ...process.env, GITNEXUS_INVOCATION: 'pnpm' } },
+        { env: { ...process.env, YUMMYGRAPH_INVOCATION: 'pnpm' } },
       );
 
       const output = parseHookOutput(result.stdout);
       expect(output).not.toBeNull();
       expect(output!.additionalContext).toContain('--allow-build=@ladybugdb/core');
-      expect(output!.additionalContext).toContain('gitnexus@latest analyze');
+      expect(output!.additionalContext).toContain('yummygraph@latest analyze');
     });
 
-    it('auto-detects a PATH-installed gitnexus and suggests `gitnexus analyze` (no npx)', () => {
-      // No GITNEXUS_INVOCATION forcing — this exercises the hook's real PATH probe
-      // (#1938): a launcher on PATH must yield `gitnexus analyze`, never the
-      // npm-11 npx crash path. createGitNexusPathEntry scrubs any ambient gitnexus
+    it('auto-detects a PATH-installed yummygraph and suggests `yummygraph analyze` (no npx)', () => {
+      // No YUMMYGRAPH_INVOCATION forcing — this exercises the hook's real PATH probe
+      // (#1938): a launcher on PATH must yield `yummygraph analyze`, never the
+      // npm-11 npx crash path. createYummyGraphPathEntry scrubs any ambient yummygraph
       // first, so the result cannot pass for the wrong reason.
       fs.writeFileSync(
-        path.join(gitNexusDir, 'meta.json'),
+        path.join(yummyGraphDir, 'meta.json'),
         JSON.stringify({ lastCommit: 'abababababababababababababababababababab', stats: {} }),
       );
-      const gn = createGitNexusPathEntry();
+      const gn = createYummyGraphPathEntry();
       try {
         const result = runHook(
           hookPath,
@@ -141,22 +141,22 @@ describe.each(HOOKS)('hooks e2e ($name)', ({ name, path: hookPath }) => {
 
         const output = parseHookOutput(result.stdout);
         expect(output).not.toBeNull();
-        expect(output!.additionalContext).toContain('Run `gitnexus analyze`');
-        expect(output!.additionalContext).not.toContain('npx gitnexus');
+        expect(output!.additionalContext).toContain('Run `yummygraph analyze`');
+        expect(output!.additionalContext).not.toContain('npx yummygraph');
       } finally {
         gn.cleanup();
       }
     });
 
-    it('appends --embeddings to the auto-detected `gitnexus analyze` when the index had embeddings', () => {
+    it('appends --embeddings to the auto-detected `yummygraph analyze` when the index had embeddings', () => {
       fs.writeFileSync(
-        path.join(gitNexusDir, 'meta.json'),
+        path.join(yummyGraphDir, 'meta.json'),
         JSON.stringify({
           lastCommit: 'cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd',
           stats: { embeddings: 42 },
         }),
       );
-      const gn = createGitNexusPathEntry();
+      const gn = createYummyGraphPathEntry();
       try {
         const result = runHook(
           hookPath,
@@ -173,8 +173,8 @@ describe.each(HOOKS)('hooks e2e ($name)', ({ name, path: hookPath }) => {
 
         const output = parseHookOutput(result.stdout);
         expect(output).not.toBeNull();
-        expect(output!.additionalContext).toContain('Run `gitnexus analyze --embeddings`');
-        expect(output!.additionalContext).not.toContain('npx gitnexus');
+        expect(output!.additionalContext).toContain('Run `yummygraph analyze --embeddings`');
+        expect(output!.additionalContext).not.toContain('npx yummygraph');
       } finally {
         gn.cleanup();
       }
@@ -191,7 +191,7 @@ describe.each(HOOKS)('hooks e2e ($name)', ({ name, path: hookPath }) => {
 
       // Write meta.json with matching commit
       fs.writeFileSync(
-        path.join(gitNexusDir, 'meta.json'),
+        path.join(yummyGraphDir, 'meta.json'),
         JSON.stringify({ lastCommit: head, stats: {} }),
       );
 
@@ -209,7 +209,7 @@ describe.each(HOOKS)('hooks e2e ($name)', ({ name, path: hookPath }) => {
 
     it('includes --embeddings flag when previous index had embeddings', () => {
       fs.writeFileSync(
-        path.join(gitNexusDir, 'meta.json'),
+        path.join(yummyGraphDir, 'meta.json'),
         JSON.stringify({
           lastCommit: 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
           stats: { embeddings: 42 },
@@ -226,17 +226,17 @@ describe.each(HOOKS)('hooks e2e ($name)', ({ name, path: hookPath }) => {
           cwd: tmpDir,
         },
         tmpDir,
-        { env: { ...process.env, GITNEXUS_INVOCATION: 'npx' } },
+        { env: { ...process.env, YUMMYGRAPH_INVOCATION: 'npx' } },
       );
 
       const output = parseHookOutput(result.stdout);
       expect(output).not.toBeNull();
-      expect(output!.additionalContext).toContain('npx gitnexus@latest analyze --embeddings');
+      expect(output!.additionalContext).toContain('npx yummygraph@latest analyze --embeddings');
     });
 
     it('treats missing meta.json as stale', () => {
       // Remove meta.json
-      const metaPath = path.join(gitNexusDir, 'meta.json');
+      const metaPath = path.join(yummyGraphDir, 'meta.json');
       if (fs.existsSync(metaPath)) fs.unlinkSync(metaPath);
 
       const result = runHook(hookPath, {
@@ -254,7 +254,7 @@ describe.each(HOOKS)('hooks e2e ($name)', ({ name, path: hookPath }) => {
 
     it('ignores failed git commands (exit_code !== 0)', () => {
       fs.writeFileSync(
-        path.join(gitNexusDir, 'meta.json'),
+        path.join(yummyGraphDir, 'meta.json'),
         JSON.stringify({ lastCommit: 'cccccccccccccccccccccccccccccccccccccccc', stats: {} }),
       );
 
@@ -272,7 +272,7 @@ describe.each(HOOKS)('hooks e2e ($name)', ({ name, path: hookPath }) => {
 
     it('ignores non-mutation git commands', () => {
       fs.writeFileSync(
-        path.join(gitNexusDir, 'meta.json'),
+        path.join(yummyGraphDir, 'meta.json'),
         JSON.stringify({ lastCommit: 'dddddddddddddddddddddddddddddddddddddddd', stats: {} }),
       );
 
@@ -292,7 +292,7 @@ describe.each(HOOKS)('hooks e2e ($name)', ({ name, path: hookPath }) => {
 
     it('detects all 5 git mutation types', () => {
       fs.writeFileSync(
-        path.join(gitNexusDir, 'meta.json'),
+        path.join(yummyGraphDir, 'meta.json'),
         JSON.stringify({ lastCommit: 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', stats: {} }),
       );
 
@@ -318,8 +318,8 @@ describe.each(HOOKS)('hooks e2e ($name)', ({ name, path: hookPath }) => {
     });
   });
 
-  describe('PreToolUse — silent without gitnexus CLI', () => {
-    // PreToolUse tries to spawn `gitnexus augment` which won't be available in CI.
+  describe('PreToolUse — silent without yummygraph CLI', () => {
+    // PreToolUse tries to spawn `yummygraph augment` which won't be available in CI.
     // Verify it fails gracefully (no output, no crash).
 
     it('handles Grep pattern gracefully when CLI is unavailable', () => {
@@ -331,7 +331,7 @@ describe.each(HOOKS)('hooks e2e ($name)', ({ name, path: hookPath }) => {
       });
 
       // Should not crash — status is 0 if it exits cleanly, or null if the
-      // spawned `gitnexus augment` hangs and the 10s timeout kills the process.
+      // spawned `yummygraph augment` hangs and the 10s timeout kills the process.
       expect(result.status === 0 || result.status === null).toBe(true);
     });
 
@@ -391,7 +391,7 @@ describe.each(HOOKS)('hooks e2e ($name)', ({ name, path: hookPath }) => {
 
   describe('unhappy paths', () => {
     it('handles corrupted meta.json (invalid JSON) without crashing', () => {
-      fs.writeFileSync(path.join(gitNexusDir, 'meta.json'), 'THIS IS NOT JSON {{{');
+      fs.writeFileSync(path.join(yummyGraphDir, 'meta.json'), 'THIS IS NOT JSON {{{');
 
       const result = runHook(hookPath, {
         hook_event_name: 'PostToolUse',
@@ -406,7 +406,7 @@ describe.each(HOOKS)('hooks e2e ($name)', ({ name, path: hookPath }) => {
     });
 
     it('handles meta.json with missing lastCommit field', () => {
-      fs.writeFileSync(path.join(gitNexusDir, 'meta.json'), JSON.stringify({ stats: {} }));
+      fs.writeFileSync(path.join(yummyGraphDir, 'meta.json'), JSON.stringify({ stats: {} }));
 
       const result = runHook(hookPath, {
         hook_event_name: 'PostToolUse',
@@ -440,7 +440,7 @@ describe.each(HOOKS)('hooks e2e ($name)', ({ name, path: hookPath }) => {
 
     it('handles empty tool_input for PostToolUse without crashing', () => {
       fs.writeFileSync(
-        path.join(gitNexusDir, 'meta.json'),
+        path.join(yummyGraphDir, 'meta.json'),
         JSON.stringify({ lastCommit: 'aaaa', stats: {} }),
       );
 
@@ -460,7 +460,7 @@ describe.each(HOOKS)('hooks e2e ($name)', ({ name, path: hookPath }) => {
 
     it('ignores non-Bash tool for PostToolUse', () => {
       fs.writeFileSync(
-        path.join(gitNexusDir, 'meta.json'),
+        path.join(yummyGraphDir, 'meta.json'),
         JSON.stringify({ lastCommit: 'aaaa', stats: {} }),
       );
 
@@ -478,20 +478,20 @@ describe.each(HOOKS)('hooks e2e ($name)', ({ name, path: hookPath }) => {
     });
   });
 
-  describe('directory without .gitnexus', () => {
-    // The hook walks up 5 parent directories looking for .gitnexus.
+  describe('directory without .yummygraph', () => {
+    // The hook walks up 5 parent directories looking for .yummygraph.
     // To guarantee none is found, create a deeply nested temp dir at the
-    // filesystem root where no .gitnexus could exist in any ancestor.
-    let noGitNexusDir: string;
+    // filesystem root where no .yummygraph could exist in any ancestor.
+    let noYummyGraphDir: string;
 
     beforeAll(() => {
-      // Use a root-level temp path so parent traversal can't find .gitnexus
+      // Use a root-level temp path so parent traversal can't find .yummygraph
       const root = os.platform() === 'win32' ? 'C:\\' : '/tmp';
-      const base = path.join(root, `no-gitnexus-${Date.now()}`);
+      const base = path.join(root, `no-yummygraph-${Date.now()}`);
       // Nest 6 levels deep (hook walks up 5) to ensure isolation
-      noGitNexusDir = path.join(base, 'a', 'b', 'c', 'd', 'e', 'f');
-      fs.mkdirSync(noGitNexusDir, { recursive: true });
-      spawnSync('git', ['init'], { cwd: noGitNexusDir, stdio: 'pipe' });
+      noYummyGraphDir = path.join(base, 'a', 'b', 'c', 'd', 'e', 'f');
+      fs.mkdirSync(noYummyGraphDir, { recursive: true });
+      spawnSync('git', ['init'], { cwd: noYummyGraphDir, stdio: 'pipe' });
     });
 
     afterAll(() => {
@@ -499,30 +499,30 @@ describe.each(HOOKS)('hooks e2e ($name)', ({ name, path: hookPath }) => {
       const root = os.platform() === 'win32' ? 'C:\\' : '/tmp';
       const base = path.join(
         root,
-        path.basename(path.resolve(noGitNexusDir, '..', '..', '..', '..', '..', '..')),
+        path.basename(path.resolve(noYummyGraphDir, '..', '..', '..', '..', '..', '..')),
       );
       fs.rmSync(base, { recursive: true, force: true });
     });
 
-    it('ignores PostToolUse when no .gitnexus directory exists', () => {
+    it('ignores PostToolUse when no .yummygraph directory exists', () => {
       const result = runHook(hookPath, {
         hook_event_name: 'PostToolUse',
         tool_name: 'Bash',
         tool_input: { command: 'git commit -m "x"' },
         tool_output: { exit_code: 0 },
-        cwd: noGitNexusDir,
+        cwd: noYummyGraphDir,
       });
 
       const output = parseHookOutput(result.stdout);
       expect(output).toBeNull();
     });
 
-    it('ignores PreToolUse when no .gitnexus directory exists', () => {
+    it('ignores PreToolUse when no .yummygraph directory exists', () => {
       const result = runHook(hookPath, {
         hook_event_name: 'PreToolUse',
         tool_name: 'Grep',
         tool_input: { pattern: 'somePattern' },
-        cwd: noGitNexusDir,
+        cwd: noYummyGraphDir,
       });
 
       const output = parseHookOutput(result.stdout);

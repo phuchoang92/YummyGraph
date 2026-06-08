@@ -30,7 +30,7 @@ import type {
   ScopeTree,
   SymbolDefinition,
   TypeRef,
-} from 'gitnexus-shared';
+} from 'yummygraph-shared';
 import type { ScopeResolutionIndexes } from '../../../../src/core/ingestion/model/scope-resolution-indexes.js';
 
 function fakeScope(

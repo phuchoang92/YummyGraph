@@ -11,7 +11,7 @@ vi.mock('../../src/core/lbug/lbug-adapter.js', () => ({
 }));
 
 vi.mock('../../src/storage/repo-manager.js', () => ({
-  getStoragePaths: vi.fn(() => ({ storagePath: '.gitnexus', lbugPath: '.gitnexus/lbug' })),
+  getStoragePaths: vi.fn(() => ({ storagePath: '.yummygraph', lbugPath: '.yummygraph/lbug' })),
   getGlobalRegistryPath: vi.fn(() => 'registry.json'),
   RegistryNameCollisionError: class RegistryNameCollisionError extends Error {},
   AnalysisNotFinalizedError: class AnalysisNotFinalizedError extends Error {},
@@ -29,7 +29,7 @@ vi.mock('../../src/core/ingestion/utils/max-file-size.js', () => ({
 
 describe('analyzeCommand --wal-checkpoint-threshold parsing', () => {
   const ORIGINAL_NODE_OPTIONS = process.env.NODE_OPTIONS;
-  const ORIGINAL_THRESHOLD = process.env.GITNEXUS_WAL_CHECKPOINT_THRESHOLD;
+  const ORIGINAL_THRESHOLD = process.env.YUMMYGRAPH_WAL_CHECKPOINT_THRESHOLD;
 
   beforeEach(() => {
     vi.resetModules();
@@ -45,9 +45,9 @@ describe('analyzeCommand --wal-checkpoint-threshold parsing', () => {
       process.env.NODE_OPTIONS = ORIGINAL_NODE_OPTIONS;
     }
     if (ORIGINAL_THRESHOLD === undefined) {
-      delete process.env.GITNEXUS_WAL_CHECKPOINT_THRESHOLD;
+      delete process.env.YUMMYGRAPH_WAL_CHECKPOINT_THRESHOLD;
     } else {
-      process.env.GITNEXUS_WAL_CHECKPOINT_THRESHOLD = ORIGINAL_THRESHOLD;
+      process.env.YUMMYGRAPH_WAL_CHECKPOINT_THRESHOLD = ORIGINAL_THRESHOLD;
     }
   });
 
@@ -76,12 +76,12 @@ describe('analyzeCommand --wal-checkpoint-threshold parsing', () => {
     ['0', '0'],
     ['1024', '1024'],
   ])(
-    'sets GITNEXUS_WAL_CHECKPOINT_THRESHOLD=%s during runFullAnalysis and restores afterwards',
+    'sets YUMMYGRAPH_WAL_CHECKPOINT_THRESHOLD=%s during runFullAnalysis and restores afterwards',
     async (cliValue, expectedEnv) => {
       const { analyzeCommand } = await import('../../src/cli/analyze.js');
       let envAtCallTime: string | undefined;
       runFullAnalysisMock.mockImplementation(async () => {
-        envAtCallTime = process.env.GITNEXUS_WAL_CHECKPOINT_THRESHOLD;
+        envAtCallTime = process.env.YUMMYGRAPH_WAL_CHECKPOINT_THRESHOLD;
         return {
           repoName: 'repo',
           repoPath: '/repo',
@@ -93,7 +93,7 @@ describe('analyzeCommand --wal-checkpoint-threshold parsing', () => {
       await analyzeCommand(undefined, { walCheckpointThreshold: cliValue });
 
       expect(envAtCallTime).toBe(expectedEnv);
-      expect(process.env.GITNEXUS_WAL_CHECKPOINT_THRESHOLD).toBe(ORIGINAL_THRESHOLD);
+      expect(process.env.YUMMYGRAPH_WAL_CHECKPOINT_THRESHOLD).toBe(ORIGINAL_THRESHOLD);
     },
   );
 });

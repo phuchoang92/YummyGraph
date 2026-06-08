@@ -18,8 +18,8 @@ interface ProcessFlowModalProps {
   isFullScreen?: boolean;
 }
 
-// Initialize mermaid with cyan/purple theme matching GitNexus
-// Initialize mermaid with cyan/purple theme matching GitNexus
+// Initialize mermaid with cyan/purple theme matching YummyGraph
+// Initialize mermaid with cyan/purple theme matching YummyGraph
 mermaid.initialize({
   startOnLoad: false,
   suppressErrorRendering: true, // Try to suppress if supported

@@ -10,7 +10,7 @@ import { describe, it, expect } from 'vitest';
 import { resolveImportPath } from '../../src/core/ingestion/import-resolvers/standard.js';
 import { stripJsExtension } from '../../src/core/ingestion/import-resolvers/standard.js';
 import { buildSuffixIndex } from '../../src/core/ingestion/import-resolvers/utils.js';
-import { SupportedLanguages } from 'gitnexus-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 
 function makeCtx(files: string[]) {
   // Match production normalization: only replace backslashes with forward slashes

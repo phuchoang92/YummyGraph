@@ -1,14 +1,14 @@
 /**
  * Direct CLI Tool Commands
  *
- * Exposes GitNexus tools (query, context, impact, cypher) as direct CLI commands.
+ * Exposes YummyGraph tools (query, context, impact, cypher) as direct CLI commands.
  * Bypasses MCP entirely — invokes LocalBackend directly for minimal overhead.
  *
  * Usage:
- *   gitnexus query "authentication flow"
- *   gitnexus context --name "validateUser"
- *   gitnexus impact --target "AuthService" --direction upstream
- *   gitnexus cypher "MATCH (n:Function) RETURN n.name LIMIT 10"
+ *   yummygraph query "authentication flow"
+ *   yummygraph context --name "validateUser"
+ *   yummygraph impact --target "AuthService" --direction upstream
+ *   yummygraph cypher "MATCH (n:Function) RETURN n.name LIMIT 10"
  *
  * Note: Output goes to stdout via fs.writeSync(fd 1), bypassing LadybugDB's
  * native module which captures the Node.js process.stdout stream during init.
@@ -49,7 +49,7 @@ function output(data: any): void {
     writeSync(1, text + '\n');
   } catch (err: any) {
     if (err?.code === 'EPIPE') {
-      // Consumer closed the pipe (e.g., `gitnexus cypher ... | head -1`)
+      // Consumer closed the pipe (e.g., `yummygraph cypher ... | head -1`)
       // Exit cleanly per Unix convention
       process.exit(0);
     }
@@ -178,7 +178,7 @@ export async function impactCommand(
         (err instanceof Error ? err.message : String(err)) || 'Impact analysis failed unexpectedly',
       target: { name: target },
       direction: options?.direction || 'upstream',
-      suggestion: 'Try reducing --depth or using gitnexus context <symbol> as a fallback',
+      suggestion: 'Try reducing --depth or using yummygraph context <symbol> as a fallback',
     });
     process.exit(1);
   }

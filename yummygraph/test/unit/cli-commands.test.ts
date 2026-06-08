@@ -37,10 +37,10 @@ describe('CLI commands', () => {
   });
 
   describe('package.json bin entry', () => {
-    it('exposes gitnexus binary', async () => {
+    it('exposes yummygraph binary', async () => {
       const pkg = await import('../../package.json', { with: { type: 'json' } });
       expect(pkg.default.bin).toBeDefined();
-      expect(pkg.default.bin.gitnexus || pkg.default.bin).toBeDefined();
+      expect(pkg.default.bin.yummygraph || pkg.default.bin).toBeDefined();
     });
   });
 

@@ -217,7 +217,7 @@ describe('Codex CLI subprocess contract', () => {
     const outputIdx = args.indexOf('--output-last-message');
     expect(outputIdx).toBeGreaterThan(-1);
     const outputPath = args[outputIdx + 1];
-    expect(outputPath).toContain('gitnexus-wiki-codex-');
+    expect(outputPath).toContain('yummygraph-wiki-codex-');
     expect(outputPath).toContain('last-message.txt');
   });
 

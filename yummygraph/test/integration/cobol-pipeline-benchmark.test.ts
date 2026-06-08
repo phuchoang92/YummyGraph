@@ -5,7 +5,7 @@
  * wall-clock time and peak heap through the full pipeline — scanning,
  * preprocessing, COPY expansion, CALL resolution, and scope extraction.
  *
- * Run: GITNEXUS_BENCH=1 npx vitest run test/integration/cobol-pipeline-benchmark.test.ts
+ * Run: YUMMYGRAPH_BENCH=1 npx vitest run test/integration/cobol-pipeline-benchmark.test.ts
  *
  * COBOL is wired as a standalone provider, so the scope-resolution phase is
  * skipped for it (standalone guard in phase.ts) and node/edge counts come
@@ -27,7 +27,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { runPipelineFromRepo } from '../../src/core/ingestion/pipeline.js';
 
-const BENCH_ENABLED = process.env.GITNEXUS_BENCH === '1';
+const BENCH_ENABLED = process.env.YUMMYGRAPH_BENCH === '1';
 
 interface BenchResult {
   fileCount: number;

@@ -45,7 +45,7 @@ async function findRepoForCwd(cwd: string): Promise<{
 
       // Check if cwd is inside repo OR repo is inside cwd
       // Must match at a path separator boundary to avoid false positives
-      // (e.g. /projects/gitnexusv2 should NOT match /projects/gitnexus)
+      // (e.g. /projects/yummygraphv2 should NOT match /projects/yummygraph)
       let matched = false;
       if (normalizedCwd === normalizedRepo) {
         matched = true;
@@ -298,7 +298,7 @@ export async function augment(pattern: string, cwd?: string): Promise<string> {
     // Step 4: Rank by cohesion (internal signal) and format
     enriched.sort((a, b) => b.cohesion - a.cohesion);
 
-    const lines: string[] = [`[GitNexus] ${enriched.length} related symbols found:`, ''];
+    const lines: string[] = [`[YummyGraph] ${enriched.length} related symbols found:`, ''];
 
     for (const item of enriched) {
       lines.push(`${item.name} (${item.filePath})`);

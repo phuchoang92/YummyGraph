@@ -234,11 +234,11 @@ describe('isHardcodedIgnoredDirectory', () => {
   });
 });
 
-// ─── .gitnexusignore negation can override hardcoded list (#771) ────
+// ─── .yummygraphignore negation can override hardcoded list (#771) ────
 //
-// Per @magyargergo's review: `.gitnexusignore` should honour
+// Per @magyargergo's review: `.yummygraphignore` should honour
 // `.gitignore`-style negation against the hardcoded DEFAULT_IGNORE_LIST.
-// A `!__tests__/` line in `.gitnexusignore` must re-enable indexing of
+// A `!__tests__/` line in `.yummygraphignore` must re-enable indexing of
 // `__tests__/` even though the hardcoded list would normally block it.
 // These tests exercise the full `createIgnoreFilter` surface with real
 // temp files (the negation logic lives in `createIgnoreFilter`, not in
@@ -246,7 +246,7 @@ describe('isHardcodedIgnoredDirectory', () => {
 // the wiki generator that don't have per-repo config context).
 //
 // Locks in:
-//   1. Default (no .gitnexusignore) — hardcoded list still blocks
+//   1. Default (no .yummygraphignore) — hardcoded list still blocks
 //      __tests__ / __mocks__ / node_modules (byte-identical pre-#771).
 //   2. `!__tests__/` negation — __tests__ and its descendants are
 //      indexed; other hardcoded entries (node_modules, .git) stay
@@ -258,7 +258,7 @@ describe('isHardcodedIgnoredDirectory', () => {
 //   5. `shouldIgnorePath` pure-hardcoded contract is preserved — the
 //      wiki generator and other callers without per-repo config get
 //      deterministic behavior.
-describe('.gitnexusignore negation overrides hardcoded DEFAULT_IGNORE_LIST (#771)', () => {
+describe('.yummygraphignore negation overrides hardcoded DEFAULT_IGNORE_LIST (#771)', () => {
   let tmpDir: string;
 
   beforeEach(async () => {
@@ -278,14 +278,14 @@ describe('.gitnexusignore negation overrides hardcoded DEFAULT_IGNORE_LIST (#771
       name: rel.split(/[/\\]/).pop() || rel,
     }) as unknown as Parameters<Awaited<ReturnType<typeof createIgnoreFilter>>['ignored']>[0];
 
-  it('default (no .gitnexusignore): __tests__ still blocked by hardcoded list', async () => {
+  it('default (no .yummygraphignore): __tests__ still blocked by hardcoded list', async () => {
     const filter = await createIgnoreFilter(tmpDir);
     expect(filter.ignored(mkPath('__tests__/foo.test.ts'))).toBe(true);
     expect(filter.childrenIgnored(mkPath('__tests__'))).toBe(true);
   });
 
   it('`!__tests__/` negation unlocks the directory and its descendants', async () => {
-    await fs.writeFile(path.join(tmpDir, '.gitnexusignore'), '!__tests__/\n');
+    await fs.writeFile(path.join(tmpDir, '.yummygraphignore'), '!__tests__/\n');
     const filter = await createIgnoreFilter(tmpDir);
     expect(filter.childrenIgnored(mkPath('__tests__'))).toBe(false);
     expect(filter.ignored(mkPath('__tests__/foo.test.ts'))).toBe(false);
@@ -293,7 +293,7 @@ describe('.gitnexusignore negation overrides hardcoded DEFAULT_IGNORE_LIST (#771
   });
 
   it('`!__mocks__/` negation unlocks __mocks__ but NOT __tests__', async () => {
-    await fs.writeFile(path.join(tmpDir, '.gitnexusignore'), '!__mocks__/\n');
+    await fs.writeFile(path.join(tmpDir, '.yummygraphignore'), '!__mocks__/\n');
     const filter = await createIgnoreFilter(tmpDir);
     expect(filter.ignored(mkPath('__mocks__/api.ts'))).toBe(false);
     // __tests__ not negated — hardcoded list still blocks it.
@@ -305,14 +305,14 @@ describe('.gitnexusignore negation overrides hardcoded DEFAULT_IGNORE_LIST (#771
     // The design isn't special-cased to the two names from the issue —
     // it honours any negation the user writes. Lock this in with a
     // broader example that proves the mechanism, not the dir name.
-    await fs.writeFile(path.join(tmpDir, '.gitnexusignore'), '!node_modules/\n');
+    await fs.writeFile(path.join(tmpDir, '.yummygraphignore'), '!node_modules/\n');
     const filter = await createIgnoreFilter(tmpDir);
     expect(filter.childrenIgnored(mkPath('node_modules'))).toBe(false);
     expect(filter.ignored(mkPath('node_modules/express/index.js'))).toBe(false);
   });
 
   it('negation of one hardcoded entry does not leak to others', async () => {
-    await fs.writeFile(path.join(tmpDir, '.gitnexusignore'), '!__tests__/\n');
+    await fs.writeFile(path.join(tmpDir, '.yummygraphignore'), '!__tests__/\n');
     const filter = await createIgnoreFilter(tmpDir);
     // __tests__ negated → allowed.
     expect(filter.ignored(mkPath('__tests__/foo.test.ts'))).toBe(false);
@@ -325,17 +325,17 @@ describe('.gitnexusignore negation overrides hardcoded DEFAULT_IGNORE_LIST (#771
   });
 
   it('explicit negation can still opt into generated Monaco worker bundles', async () => {
-    await fs.writeFile(path.join(tmpDir, '.gitnexusignore'), '!public/monaco-workers/\n');
+    await fs.writeFile(path.join(tmpDir, '.yummygraphignore'), '!public/monaco-workers/\n');
     const filter = await createIgnoreFilter(tmpDir);
     expect(filter.childrenIgnored(mkPath('public/monaco-workers'))).toBe(false);
     expect(filter.ignored(mkPath('public/monaco-workers/json.worker.js'))).toBe(false);
   });
 
   it('standard `.gitignore` rules (no negation) still layer on top of hardcoded', async () => {
-    // Pre-#771 behaviour: if .gitnexusignore says `my-dir/`, that dir
+    // Pre-#771 behaviour: if .yummygraphignore says `my-dir/`, that dir
     // is ignored in addition to the hardcoded list. Non-negation
     // rules are unaffected by this PR.
-    await fs.writeFile(path.join(tmpDir, '.gitnexusignore'), 'my-dir/\n');
+    await fs.writeFile(path.join(tmpDir, '.yummygraphignore'), 'my-dir/\n');
     const filter = await createIgnoreFilter(tmpDir);
     expect(filter.ignored(mkPath('my-dir/file.ts'))).toBe(true);
     expect(filter.childrenIgnored(mkPath('my-dir'))).toBe(true);
@@ -351,7 +351,7 @@ describe('.gitnexusignore negation overrides hardcoded DEFAULT_IGNORE_LIST (#771
     // `__tests__/generated/foo.ts` stays blocked. This locks in the
     // guarantee the design comment makes about "standard rules still
     // layer on top" for the compound case.
-    await fs.writeFile(path.join(tmpDir, '.gitnexusignore'), '!__tests__/\n__tests__/generated/\n');
+    await fs.writeFile(path.join(tmpDir, '.yummygraphignore'), '!__tests__/\n__tests__/generated/\n');
     const filter = await createIgnoreFilter(tmpDir);
     // Parent negation still in effect: top-level tests allowed.
     expect(filter.ignored(mkPath('__tests__/foo.test.ts'))).toBe(false);
@@ -364,7 +364,7 @@ describe('.gitnexusignore negation overrides hardcoded DEFAULT_IGNORE_LIST (#771
 
   it('shouldIgnorePath (raw hardcoded check) is unchanged — wiki / external callers unaffected', async () => {
     // `shouldIgnorePath` is called from `core/wiki/generator.ts` and
-    // doesn't have access to per-repo `.gitnexusignore` config. Its
+    // doesn't have access to per-repo `.yummygraphignore` config. Its
     // contract stays "is this path in the hardcoded list?". The #771
     // negation override lives only inside `createIgnoreFilter`, which
     // IS called with config context. This asymmetry is deliberate.
@@ -407,26 +407,26 @@ describe('loadIgnoreRules', () => {
     await fs.unlink(path.join(tmpDir, '.gitignore'));
   });
 
-  it('parses .gitnexusignore file', async () => {
-    await fs.writeFile(path.join(tmpDir, '.gitnexusignore'), 'vendor/\n*.test.ts\n');
+  it('parses .yummygraphignore file', async () => {
+    await fs.writeFile(path.join(tmpDir, '.yummygraphignore'), 'vendor/\n*.test.ts\n');
     const ig = await loadIgnoreRules(tmpDir);
     expect(ig).not.toBeNull();
     expect(ig!.ignores('vendor/lib.js')).toBe(true);
     expect(ig!.ignores('src/app.test.ts')).toBe(true);
     expect(ig!.ignores('src/app.ts')).toBe(false);
-    await fs.unlink(path.join(tmpDir, '.gitnexusignore'));
+    await fs.unlink(path.join(tmpDir, '.yummygraphignore'));
   });
 
   it('combines both files', async () => {
     await fs.writeFile(path.join(tmpDir, '.gitignore'), 'data/\n');
-    await fs.writeFile(path.join(tmpDir, '.gitnexusignore'), 'vendor/\n');
+    await fs.writeFile(path.join(tmpDir, '.yummygraphignore'), 'vendor/\n');
     const ig = await loadIgnoreRules(tmpDir);
     expect(ig).not.toBeNull();
     expect(ig!.ignores('data/file.txt')).toBe(true);
     expect(ig!.ignores('vendor/lib.js')).toBe(true);
     expect(ig!.ignores('src/index.ts')).toBe(false);
     await fs.unlink(path.join(tmpDir, '.gitignore'));
-    await fs.unlink(path.join(tmpDir, '.gitnexusignore'));
+    await fs.unlink(path.join(tmpDir, '.yummygraphignore'));
   });
 
   it('handles comments and blank lines', async () => {
@@ -496,10 +496,10 @@ describe('createIgnoreFilter', () => {
   });
 
   it('childrenIgnored respects negation patterns (exclude-all + whitelist)', async () => {
-    // Reproduces https://github.com/abhigyanpatwari/GitNexus/issues/596
+    // Reproduces https://github.com/abhigyanpatwari/YummyGraph/issues/596
     // Pattern: `*` (exclude all) + `!iOS/` + `!iOS/**` (whitelist iOS)
     await fs.writeFile(
-      path.join(tmpDir, '.gitnexusignore'),
+      path.join(tmpDir, '.yummygraphignore'),
       '*\n!iOS/\n!iOS/**\n!backend/\n!backend/living_plan/\n!backend/living_plan/**\n',
     );
     const filter = await createIgnoreFilter(tmpDir);
@@ -521,7 +521,7 @@ describe('createIgnoreFilter', () => {
     const libPath = { name: 'lib', relative: () => 'lib' } as any;
     expect(filter.childrenIgnored(libPath)).toBe(true);
 
-    await fs.unlink(path.join(tmpDir, '.gitnexusignore'));
+    await fs.unlink(path.join(tmpDir, '.yummygraphignore'));
   });
 
   it('childrenIgnored respects negation patterns without trailing slash (!dir vs !dir/)', async () => {
@@ -529,7 +529,7 @@ describe('createIgnoreFilter', () => {
     // named `iOS`, while `!iOS/` is directory-only. The `ignore` package
     // normalizes both forms so that `ig.ignores('iOS/')` returns false in either case.
     // Ref: https://github.com/kaelzhang/node-ignore#2-filenames-and-dirnames (see #596)
-    await fs.writeFile(path.join(tmpDir, '.gitnexusignore'), '*\n!iOS\n!iOS/**\n');
+    await fs.writeFile(path.join(tmpDir, '.yummygraphignore'), '*\n!iOS\n!iOS/**\n');
     const filter = await createIgnoreFilter(tmpDir);
 
     // Bare negation `!iOS` must also un-ignore the iOS/ directory
@@ -540,11 +540,11 @@ describe('createIgnoreFilter', () => {
     const srcPath = { name: 'src', relative: () => 'src' } as any;
     expect(filter.childrenIgnored(srcPath)).toBe(true);
 
-    await fs.unlink(path.join(tmpDir, '.gitnexusignore'));
+    await fs.unlink(path.join(tmpDir, '.yummygraphignore'));
   });
 
   it('ignored respects negation patterns for files under whitelisted directories', async () => {
-    await fs.writeFile(path.join(tmpDir, '.gitnexusignore'), '*\n!iOS/\n!iOS/**\n');
+    await fs.writeFile(path.join(tmpDir, '.yummygraphignore'), '*\n!iOS/\n!iOS/**\n');
     const filter = await createIgnoreFilter(tmpDir);
 
     // Files under whitelisted directory should NOT be ignored
@@ -555,7 +555,7 @@ describe('createIgnoreFilter', () => {
     const pyFile = { name: 'main.py', relative: () => 'scripts/main.py' } as any;
     expect(filter.ignored(pyFile)).toBe(true);
 
-    await fs.unlink(path.join(tmpDir, '.gitnexusignore'));
+    await fs.unlink(path.join(tmpDir, '.yummygraphignore'));
   });
 
   it('ignored returns true for file-glob patterns like *.log', async () => {
@@ -609,7 +609,7 @@ describe('loadIgnoreRules — error handling', () => {
   );
 });
 
-describe('loadIgnoreRules — GITNEXUS_NO_GITIGNORE env var', () => {
+describe('loadIgnoreRules — YUMMYGRAPH_NO_GITIGNORE env var', () => {
   let tmpDir: string;
 
   beforeAll(async () => {
@@ -620,41 +620,41 @@ describe('loadIgnoreRules — GITNEXUS_NO_GITIGNORE env var', () => {
     await fs.rm(tmpDir, { recursive: true, force: true });
   });
 
-  it('skips .gitignore when GITNEXUS_NO_GITIGNORE is set', async () => {
+  it('skips .gitignore when YUMMYGRAPH_NO_GITIGNORE is set', async () => {
     await fs.writeFile(path.join(tmpDir, '.gitignore'), 'data/\n');
 
-    const original = process.env.GITNEXUS_NO_GITIGNORE;
-    process.env.GITNEXUS_NO_GITIGNORE = '1';
+    const original = process.env.YUMMYGRAPH_NO_GITIGNORE;
+    process.env.YUMMYGRAPH_NO_GITIGNORE = '1';
     try {
       const ig = await loadIgnoreRules(tmpDir);
       // .gitignore should be skipped — no rules loaded
       expect(ig).toBeNull();
     } finally {
       if (original === undefined) {
-        delete process.env.GITNEXUS_NO_GITIGNORE;
+        delete process.env.YUMMYGRAPH_NO_GITIGNORE;
       } else {
-        process.env.GITNEXUS_NO_GITIGNORE = original;
+        process.env.YUMMYGRAPH_NO_GITIGNORE = original;
       }
       await fs.unlink(path.join(tmpDir, '.gitignore'));
     }
   });
 
-  it('still reads .gitnexusignore when GITNEXUS_NO_GITIGNORE is set', async () => {
-    await fs.writeFile(path.join(tmpDir, '.gitnexusignore'), 'vendor/\n');
+  it('still reads .yummygraphignore when YUMMYGRAPH_NO_GITIGNORE is set', async () => {
+    await fs.writeFile(path.join(tmpDir, '.yummygraphignore'), 'vendor/\n');
 
-    const original = process.env.GITNEXUS_NO_GITIGNORE;
-    process.env.GITNEXUS_NO_GITIGNORE = '1';
+    const original = process.env.YUMMYGRAPH_NO_GITIGNORE;
+    process.env.YUMMYGRAPH_NO_GITIGNORE = '1';
     try {
       const ig = await loadIgnoreRules(tmpDir);
       expect(ig).not.toBeNull();
       expect(ig!.ignores('vendor/lib.js')).toBe(true);
     } finally {
       if (original === undefined) {
-        delete process.env.GITNEXUS_NO_GITIGNORE;
+        delete process.env.YUMMYGRAPH_NO_GITIGNORE;
       } else {
-        process.env.GITNEXUS_NO_GITIGNORE = original;
+        process.env.YUMMYGRAPH_NO_GITIGNORE = original;
       }
-      await fs.unlink(path.join(tmpDir, '.gitnexusignore'));
+      await fs.unlink(path.join(tmpDir, '.yummygraphignore'));
     }
   });
 });

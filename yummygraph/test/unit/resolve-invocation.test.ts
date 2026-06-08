@@ -31,7 +31,7 @@ const PLUGIN_CJS = path.resolve(
   '..',
   '..',
   '..',
-  'gitnexus-claude-plugin',
+  'yummygraph-claude-plugin',
   'hooks',
   'resolve-analyze-cmd.cjs',
 );
@@ -47,17 +47,17 @@ interface CjsModule {
     deps?: { pnpmMajor?: number | null; pnpmMinor?: number | null },
   ) => string[];
   resolveInvocationMode: (
-    probe?: (command: string, gitnexusWrapper?: boolean) => string | null,
+    probe?: (command: string, yummygraphWrapper?: boolean) => string | null,
     deps?: { npmMajor?: number | null; pnpmMajor?: number | null; pnpmPresent?: boolean },
-  ) => 'gitnexus' | 'pnpm' | 'npx';
+  ) => 'yummygraph' | 'pnpm' | 'npx';
   resolveOnPath: (
     command: string,
     preferExecExt?: boolean,
     opts?: { platform?: NodeJS.Platform; env?: NodeJS.ProcessEnv },
   ) => string | null;
   buildRunnerArgv: (
-    mode: 'gitnexus' | 'pnpm' | 'npx',
-    gitnexusArgs: string[],
+    mode: 'yummygraph' | 'pnpm' | 'npx',
+    yummygraphArgs: string[],
     deps?: { pnpmMajor?: number | null; pnpmMinor?: number | null },
   ) => { program: string; args: string[] };
   NPX_REF: string;
@@ -70,25 +70,25 @@ interface CjsModule {
 // so the only live subprocess this module can run is probeVersion (`npm`/`pnpm
 // --version`). resolveOnPath is now spawn-free — a pure PATH scan — so tests pin
 // it by passing an injected `{ platform, env }` (never the host PATH). Mode tests
-// inject a fake `probe` or force GITNEXUS_INVOCATION; version tests inject `deps`.
+// inject a fake `probe` or force YUMMYGRAPH_INVOCATION; version tests inject `deps`.
 // Keep new tests on one of those paths so results never depend on the host.
 const cjs = cjsRequire(CANONICAL_CJS) as CjsModule;
 
 describe('resolve-analyze-cmd.cjs (canonical invocation resolver)', () => {
   afterEach(() => {
-    delete process.env.GITNEXUS_INVOCATION;
+    delete process.env.YUMMYGRAPH_INVOCATION;
   });
 
-  it('standardizes the invocation ref on gitnexus@latest', () => {
-    expect(cjs.NPX_REF).toBe('gitnexus@latest');
+  it('standardizes the invocation ref on yummygraph@latest', () => {
+    expect(cjs.NPX_REF).toBe('yummygraph@latest');
   });
 
   it('formats each forced mode, with and without --embeddings', () => {
-    const allow = '--allow-build=@ladybugdb/core --allow-build=gitnexus --allow-build=tree-sitter';
+    const allow = '--allow-build=@ladybugdb/core --allow-build=yummygraph --allow-build=tree-sitter';
     const allowEmb =
-      '--allow-build=@ladybugdb/core --allow-build=gitnexus --allow-build=tree-sitter --allow-build=onnxruntime-node';
+      '--allow-build=@ladybugdb/core --allow-build=yummygraph --allow-build=tree-sitter --allow-build=onnxruntime-node';
     const cases = [
-      ['gitnexus', 'gitnexus analyze', 'gitnexus analyze --embeddings'],
+      ['yummygraph', 'yummygraph analyze', 'yummygraph analyze --embeddings'],
       [
         'pnpm',
         `pnpm ${allow} dlx ${cjs.NPX_REF} analyze`,
@@ -97,7 +97,7 @@ describe('resolve-analyze-cmd.cjs (canonical invocation resolver)', () => {
       ['npx', `npx ${cjs.NPX_REF} analyze`, `npx ${cjs.NPX_REF} analyze --embeddings`],
     ] as const;
     for (const [mode, plain, withEmbeddings] of cases) {
-      process.env.GITNEXUS_INVOCATION = mode;
+      process.env.YUMMYGRAPH_INVOCATION = mode;
       expect(cjs.formatAnalyzeCommand(undefined, { pnpmMajor: 11 })).toBe(plain);
       expect(cjs.formatAnalyzeCommand({ embeddings: true }, { pnpmMajor: 11 })).toBe(
         withEmbeddings,
@@ -105,8 +105,8 @@ describe('resolve-analyze-cmd.cjs (canonical invocation resolver)', () => {
     }
   });
 
-  it('auto-selects global gitnexus first', () => {
-    expect(cjs.resolveInvocationMode(() => '/usr/local/bin/gitnexus')).toBe('gitnexus');
+  it('auto-selects global yummygraph first', () => {
+    expect(cjs.resolveInvocationMode(() => '/usr/local/bin/yummygraph')).toBe('yummygraph');
   });
 
   it('auto-selects pnpm on npm 11+ when pnpm is on PATH', () => {
@@ -130,7 +130,7 @@ describe('resolve-analyze-cmd.cjs (canonical invocation resolver)', () => {
     expect(cjs.resolveInvocationMode(() => null, { npmMajor: null })).toBe('npx');
   });
 
-  it('falls back to npx when neither global gitnexus nor pnpm is available', () => {
+  it('falls back to npx when neither global yummygraph nor pnpm is available', () => {
     expect(cjs.resolveInvocationMode(() => null, { npmMajor: 11 })).toBe('npx');
   });
 
@@ -147,7 +147,7 @@ describe('resolve-analyze-cmd.cjs (canonical invocation resolver)', () => {
   });
 
   it('omits --allow-build on pnpm 9 (scripts run by default)', () => {
-    process.env.GITNEXUS_INVOCATION = 'pnpm';
+    process.env.YUMMYGRAPH_INVOCATION = 'pnpm';
     expect(cjs.formatAnalyzeCommand(undefined, { pnpmMajor: 9 })).toBe(
       `pnpm dlx ${cjs.NPX_REF} analyze`,
     );
@@ -157,30 +157,30 @@ describe('resolve-analyze-cmd.cjs (canonical invocation resolver)', () => {
     // No pnpmMinor injected → minor is null → the gate cannot prove < 10.2, so
     // it conservatively emits the flags. This is the unknown-minor fallback, NOT
     // real pnpm 10.0 (which reports minor=0 and is covered separately below).
-    process.env.GITNEXUS_INVOCATION = 'pnpm';
-    const allow = '--allow-build=@ladybugdb/core --allow-build=gitnexus --allow-build=tree-sitter';
+    process.env.YUMMYGRAPH_INVOCATION = 'pnpm';
+    const allow = '--allow-build=@ladybugdb/core --allow-build=yummygraph --allow-build=tree-sitter';
     expect(cjs.formatAnalyzeCommand(undefined, { pnpmMajor: 10 })).toBe(
       `pnpm ${allow} dlx ${cjs.NPX_REF} analyze`,
     );
   });
 
   it('omits --allow-build on pnpm 10.0 (the flag did not exist until 10.2)', () => {
-    process.env.GITNEXUS_INVOCATION = 'pnpm';
+    process.env.YUMMYGRAPH_INVOCATION = 'pnpm';
     expect(cjs.formatAnalyzeCommand(undefined, { pnpmMajor: 10, pnpmMinor: 0 })).toBe(
       `pnpm dlx ${cjs.NPX_REF} analyze`,
     );
   });
 
   it('omits --allow-build on pnpm 10.1 (the flag was added in 10.2)', () => {
-    process.env.GITNEXUS_INVOCATION = 'pnpm';
+    process.env.YUMMYGRAPH_INVOCATION = 'pnpm';
     expect(cjs.formatAnalyzeCommand(undefined, { pnpmMajor: 10, pnpmMinor: 1 })).toBe(
       `pnpm dlx ${cjs.NPX_REF} analyze`,
     );
   });
 
   it('includes --allow-build on pnpm 10.2 (the first minor that accepts the flag)', () => {
-    process.env.GITNEXUS_INVOCATION = 'pnpm';
-    const allow = '--allow-build=@ladybugdb/core --allow-build=gitnexus --allow-build=tree-sitter';
+    process.env.YUMMYGRAPH_INVOCATION = 'pnpm';
+    const allow = '--allow-build=@ladybugdb/core --allow-build=yummygraph --allow-build=tree-sitter';
     expect(cjs.formatAnalyzeCommand(undefined, { pnpmMajor: 10, pnpmMinor: 2 })).toBe(
       `pnpm ${allow} dlx ${cjs.NPX_REF} analyze`,
     );
@@ -189,19 +189,19 @@ describe('resolve-analyze-cmd.cjs (canonical invocation resolver)', () => {
   it('emits --allow-build when the pnpm major is null-injected (absent/unknown)', () => {
     expect(cjs.formatPnpmAllowBuildArgs({}, { pnpmMajor: null })).toEqual([
       '--allow-build=@ladybugdb/core',
-      '--allow-build=gitnexus',
+      '--allow-build=yummygraph',
       '--allow-build=tree-sitter',
     ]);
   });
 
   it('formatDocumentationDlxCommand always includes allow-build for committed docs', () => {
     expect(cjs.formatDocumentationDlxCommand('analyze')).toContain('--allow-build=@ladybugdb/core');
-    expect(cjs.formatDocumentationDlxCommand('analyze')).toContain('gitnexus@latest analyze');
+    expect(cjs.formatDocumentationDlxCommand('analyze')).toContain('yummygraph@latest analyze');
   });
 
-  it('lets GITNEXUS_INVOCATION override the probe without consulting it', () => {
-    process.env.GITNEXUS_INVOCATION = 'pnpm';
-    const probe = vi.fn(() => '/usr/local/bin/gitnexus');
+  it('lets YUMMYGRAPH_INVOCATION override the probe without consulting it', () => {
+    process.env.YUMMYGRAPH_INVOCATION = 'pnpm';
+    const probe = vi.fn(() => '/usr/local/bin/yummygraph');
     expect(cjs.resolveInvocationMode(probe)).toBe('pnpm');
     expect(probe).not.toHaveBeenCalled();
   });
@@ -210,7 +210,7 @@ describe('resolve-analyze-cmd.cjs (canonical invocation resolver)', () => {
 describe('warnIfNpm11NpxRisk (#1939 npm-11 nudge)', () => {
   afterEach(() => {
     vi.clearAllMocks();
-    delete process.env.GITNEXUS_INVOCATION;
+    delete process.env.YUMMYGRAPH_INVOCATION;
   });
 
   it('exposes the resolver contract the load-time guard enforces', () => {
@@ -275,19 +275,19 @@ describe('warnIfNpm11NpxRisk (#1939 npm-11 nudge)', () => {
   });
 
   it('warns on the npm 11+ npx path', () => {
-    process.env.GITNEXUS_INVOCATION = 'npx';
+    process.env.YUMMYGRAPH_INVOCATION = 'npx';
     mockedExec.mockReturnValue('11.0.0\n');
     const write = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
     warnIfNpm11NpxRisk();
     expect(write).toHaveBeenCalledTimes(1);
     expect(String(write.mock.calls[0]?.[0])).toContain('node.target is null');
     expect(String(write.mock.calls[0]?.[0])).toContain('--allow-build=@ladybugdb/core');
-    expect(String(write.mock.calls[0]?.[0])).toContain(`gitnexus@latest analyze`);
+    expect(String(write.mock.calls[0]?.[0])).toContain(`yummygraph@latest analyze`);
     write.mockRestore();
   });
 
-  it('does not warn when a global gitnexus or pnpm is preferred', () => {
-    process.env.GITNEXUS_INVOCATION = 'pnpm';
+  it('does not warn when a global yummygraph or pnpm is preferred', () => {
+    process.env.YUMMYGRAPH_INVOCATION = 'pnpm';
     mockedExec.mockReturnValue('11.0.0\n');
     const write = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
     warnIfNpm11NpxRisk();
@@ -295,8 +295,8 @@ describe('warnIfNpm11NpxRisk (#1939 npm-11 nudge)', () => {
     write.mockRestore();
   });
 
-  it('does not warn when a global gitnexus is preferred', () => {
-    process.env.GITNEXUS_INVOCATION = 'gitnexus';
+  it('does not warn when a global yummygraph is preferred', () => {
+    process.env.YUMMYGRAPH_INVOCATION = 'yummygraph';
     mockedExec.mockReturnValue('11.0.0\n');
     const write = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
     warnIfNpm11NpxRisk();
@@ -305,7 +305,7 @@ describe('warnIfNpm11NpxRisk (#1939 npm-11 nudge)', () => {
   });
 
   it('does not warn when npm is older than 11', () => {
-    process.env.GITNEXUS_INVOCATION = 'npx';
+    process.env.YUMMYGRAPH_INVOCATION = 'npx';
     mockedExec.mockReturnValue('10.9.0\n');
     const write = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
     warnIfNpm11NpxRisk();
@@ -314,7 +314,7 @@ describe('warnIfNpm11NpxRisk (#1939 npm-11 nudge)', () => {
   });
 
   it('does not warn when npm is absent', () => {
-    process.env.GITNEXUS_INVOCATION = 'npx';
+    process.env.YUMMYGRAPH_INVOCATION = 'npx';
     mockedExec.mockImplementation(() => {
       throw new Error('missing');
     });
@@ -326,9 +326,9 @@ describe('warnIfNpm11NpxRisk (#1939 npm-11 nudge)', () => {
 });
 
 describe('buildRunnerArgv (project-local runner exec, #1945)', () => {
-  it('passes gitnexus args straight through for the global-binary mode', () => {
-    expect(cjs.buildRunnerArgv('gitnexus', ['group', 'list'])).toEqual({
-      program: 'gitnexus',
+  it('passes yummygraph args straight through for the global-binary mode', () => {
+    expect(cjs.buildRunnerArgv('yummygraph', ['group', 'list'])).toEqual({
+      program: 'yummygraph',
       args: ['group', 'list'],
     });
   });
@@ -336,7 +336,7 @@ describe('buildRunnerArgv (project-local runner exec, #1945)', () => {
   it('prefixes the registry ref for npx mode', () => {
     expect(cjs.buildRunnerArgv('npx', ['analyze'])).toEqual({
       program: 'npx',
-      args: ['gitnexus@latest', 'analyze'],
+      args: ['yummygraph@latest', 'analyze'],
     });
   });
 
@@ -353,10 +353,10 @@ describe('buildRunnerArgv (project-local runner exec, #1945)', () => {
     expect(dlxIdx).toBeGreaterThan(0);
     expect(args.slice(0, dlxIdx)).toEqual([
       '--allow-build=@ladybugdb/core',
-      '--allow-build=gitnexus',
+      '--allow-build=yummygraph',
       '--allow-build=tree-sitter',
     ]);
-    expect(args.slice(dlxIdx)).toEqual(['dlx', 'gitnexus@latest', 'analyze']);
+    expect(args.slice(dlxIdx)).toEqual(['dlx', 'yummygraph@latest', 'analyze']);
   });
 
   it('widens the pnpm allow-build set when --embeddings is requested', () => {
@@ -394,10 +394,10 @@ describe('resolveOnPath — pure-Node PATH scan (#1938, all-OS, spawn-free)', ()
 
   it('finds an executable launcher on a POSIX PATH', () => {
     const dir = mkBinDir();
-    const bin = path.join(dir, 'gitnexus');
+    const bin = path.join(dir, 'yummygraph');
     writeFileSync(bin, '#!/bin/sh\nexit 0\n');
     chmodSync(bin, 0o755);
-    expect(cjs.resolveOnPath('gitnexus', true, { platform: 'linux', env: { PATH: dir } })).toBe(
+    expect(cjs.resolveOnPath('yummygraph', true, { platform: 'linux', env: { PATH: dir } })).toBe(
       bin,
     );
   });
@@ -408,9 +408,9 @@ describe('resolveOnPath — pure-Node PATH scan (#1938, all-OS, spawn-free)', ()
     'skips a non-executable file on POSIX (requires X_OK)',
     () => {
       const dir = mkBinDir();
-      writeFileSync(path.join(dir, 'gitnexus'), 'not executable'); // intentionally no chmod +x
+      writeFileSync(path.join(dir, 'yummygraph'), 'not executable'); // intentionally no chmod +x
       expect(
-        cjs.resolveOnPath('gitnexus', true, { platform: 'linux', env: { PATH: dir } }),
+        cjs.resolveOnPath('yummygraph', true, { platform: 'linux', env: { PATH: dir } }),
       ).toBeNull();
     },
   );
@@ -418,20 +418,20 @@ describe('resolveOnPath — pure-Node PATH scan (#1938, all-OS, spawn-free)', ()
   it('returns null when the launcher is absent or PATH is empty', () => {
     const dir = mkBinDir();
     expect(
-      cjs.resolveOnPath('gitnexus', true, { platform: 'linux', env: { PATH: dir } }),
+      cjs.resolveOnPath('yummygraph', true, { platform: 'linux', env: { PATH: dir } }),
     ).toBeNull();
-    expect(cjs.resolveOnPath('gitnexus', true, { platform: 'linux', env: {} })).toBeNull();
+    expect(cjs.resolveOnPath('yummygraph', true, { platform: 'linux', env: {} })).toBeNull();
   });
 
   it('honors PATHEXT on Windows (a .cmd shim is detected)', () => {
     const dir = mkBinDir();
-    const bin = path.join(dir, 'gitnexus.cmd');
+    const bin = path.join(dir, 'yummygraph.cmd');
     writeFileSync(bin, '@echo off\r\n');
     // The PATHEXT entry case matches the fixture so the assertion is deterministic
     // on case-sensitive CI filesystems; real Windows is case-insensitive, so the
     // casing of PATHEXT vs the on-disk shim never matters there.
     expect(
-      cjs.resolveOnPath('gitnexus', true, {
+      cjs.resolveOnPath('yummygraph', true, {
         platform: 'win32',
         env: { PATH: dir, PATHEXT: '.COM;.EXE;.BAT;.cmd' },
       }),
@@ -439,13 +439,13 @@ describe('resolveOnPath — pure-Node PATH scan (#1938, all-OS, spawn-free)', ()
   });
 
   it('does not treat a .ps1-only shim as on PATH when PATHEXT excludes .PS1', () => {
-    // A .ps1 is not launchable as `gitnexus` without a shell and is absent from
+    // A .ps1 is not launchable as `yummygraph` without a shell and is absent from
     // default PATHEXT, so mirroring `where`/cmd.exe (PATHEXT-driven) avoids a hint
     // that would fail when run.
     const dir = mkBinDir();
-    writeFileSync(path.join(dir, 'gitnexus.ps1'), 'exit 0');
+    writeFileSync(path.join(dir, 'yummygraph.ps1'), 'exit 0');
     expect(
-      cjs.resolveOnPath('gitnexus', true, {
+      cjs.resolveOnPath('yummygraph', true, {
         platform: 'win32',
         env: { PATH: dir, PATHEXT: '.COM;.EXE;.BAT;.CMD' },
       }),
@@ -453,15 +453,15 @@ describe('resolveOnPath — pure-Node PATH scan (#1938, all-OS, spawn-free)', ()
   });
 
   it('on Windows ignores a bare extensionless file and returns the PATHEXT shim', () => {
-    // Windows matches PATHEXT extensions only — an extensionless `gitnexus` is not
-    // launchable as `gitnexus` from a shell, so when both exist the .cmd shim wins
+    // Windows matches PATHEXT extensions only — an extensionless `yummygraph` is not
+    // launchable as `yummygraph` from a shell, so when both exist the .cmd shim wins
     // and the bare file is never the result (it would be an un-spawnable hint).
     const dir = mkBinDir();
-    writeFileSync(path.join(dir, 'gitnexus'), 'not a shim');
-    const cmd = path.join(dir, 'gitnexus.cmd');
+    writeFileSync(path.join(dir, 'yummygraph'), 'not a shim');
+    const cmd = path.join(dir, 'yummygraph.cmd');
     writeFileSync(cmd, '@echo off\r\n');
     expect(
-      cjs.resolveOnPath('gitnexus', true, {
+      cjs.resolveOnPath('yummygraph', true, {
         platform: 'win32',
         env: { PATH: dir, PATHEXT: '.COM;.EXE;.BAT;.cmd' },
       }),
@@ -470,9 +470,9 @@ describe('resolveOnPath — pure-Node PATH scan (#1938, all-OS, spawn-free)', ()
 
   it('on Windows returns null for an extensionless-only file (not in PATHEXT)', () => {
     const dir = mkBinDir();
-    writeFileSync(path.join(dir, 'gitnexus'), 'not a shim');
+    writeFileSync(path.join(dir, 'yummygraph'), 'not a shim');
     expect(
-      cjs.resolveOnPath('gitnexus', true, {
+      cjs.resolveOnPath('yummygraph', true, {
         platform: 'win32',
         env: { PATH: dir, PATHEXT: '.COM;.EXE;.BAT;.CMD' },
       }),
@@ -484,21 +484,21 @@ describe('resolveOnPath — pure-Node PATH scan (#1938, all-OS, spawn-free)', ()
     // .cmd/.bat/.exe wins over a .COM, yet a lone .COM is still detected (better a
     // resolvable hint than none). Fixture/PATHEXT cases match for CI determinism.
     const both = mkBinDir();
-    writeFileSync(path.join(both, 'gitnexus.com'), 'x');
-    const cmd = path.join(both, 'gitnexus.cmd');
+    writeFileSync(path.join(both, 'yummygraph.com'), 'x');
+    const cmd = path.join(both, 'yummygraph.cmd');
     writeFileSync(cmd, '@echo off\r\n');
     expect(
-      cjs.resolveOnPath('gitnexus', true, {
+      cjs.resolveOnPath('yummygraph', true, {
         platform: 'win32',
         env: { PATH: both, PATHEXT: '.com;.cmd' },
       }),
     ).toBe(cmd);
 
     const comOnly = mkBinDir();
-    const com = path.join(comOnly, 'gitnexus.com');
+    const com = path.join(comOnly, 'yummygraph.com');
     writeFileSync(com, 'x');
     expect(
-      cjs.resolveOnPath('gitnexus', true, {
+      cjs.resolveOnPath('yummygraph', true, {
         platform: 'win32',
         env: { PATH: comOnly, PATHEXT: '.com;.cmd' },
       }),
@@ -508,8 +508,8 @@ describe('resolveOnPath — pure-Node PATH scan (#1938, all-OS, spawn-free)', ()
 
 describe('formatAnalyzeCommand end-to-end via the pure scan (#1938)', () => {
   // Exercises the public entry through resolveOnPath against a real PATH (no
-  // mocks, no GITNEXUS_INVOCATION): with a launcher on PATH the hint resolves to
-  // `gitnexus analyze`. Because resolveOnPath is now spawn-free, this works
+  // mocks, no YUMMYGRAPH_INVOCATION): with a launcher on PATH the hint resolves to
+  // `yummygraph analyze`. Because resolveOnPath is now spawn-free, this works
   // identically on every OS — there is no `where`/`which` reachability caveat.
   const savedPath = process.env.PATH;
   let binDir: string | undefined;
@@ -518,19 +518,19 @@ describe('formatAnalyzeCommand end-to-end via the pure scan (#1938)', () => {
     else process.env.PATH = savedPath;
     if (binDir) rmSync(binDir, { recursive: true, force: true });
     binDir = undefined;
-    delete process.env.GITNEXUS_INVOCATION;
+    delete process.env.YUMMYGRAPH_INVOCATION;
   });
 
-  it('resolves `gitnexus analyze` when a launcher is the only thing on PATH', () => {
+  it('resolves `yummygraph analyze` when a launcher is the only thing on PATH', () => {
     binDir = mkdtempSync(path.join(os.tmpdir(), 'gn-e2e-'));
     const isWin = process.platform === 'win32';
-    const launcher = path.join(binDir, isWin ? 'gitnexus.cmd' : 'gitnexus');
+    const launcher = path.join(binDir, isWin ? 'yummygraph.cmd' : 'yummygraph');
     writeFileSync(launcher, isWin ? '@echo off\r\nexit /b 0\r\n' : '#!/bin/sh\nexit 0\n');
     if (!isWin) chmodSync(launcher, 0o755);
     // PATH reduced to just the launcher dir — the former `where`/`which` resolver
     // would have ENOENT'd here; the pure scan finds the launcher directly.
     process.env.PATH = binDir;
-    expect(cjs.formatAnalyzeCommand()).toBe('gitnexus analyze');
+    expect(cjs.formatAnalyzeCommand()).toBe('yummygraph analyze');
   });
 });
 
@@ -545,7 +545,7 @@ describe('CLI module-load posture (R3/R4 regression guard)', () => {
 
   it('does not probe invocation hints at index.ts module load (#207/#1383)', () => {
     const indexSrc = readFileSync(path.join(cliDir, 'index.ts'), 'utf-8');
-    // Every command — including the `gitnexus mcp` stdio server — pays index.ts
+    // Every command — including the `yummygraph mcp` stdio server — pays index.ts
     // module load. warnIfNpm11NpxRisk()/PATH probing must stay out of module
     // scope, or it reintroduces the startup-spawn regression (#207, #1383).
     expect(indexSrc).not.toMatch(/warnIfNpm11NpxRisk/);

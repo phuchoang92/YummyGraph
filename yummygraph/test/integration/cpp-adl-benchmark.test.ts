@@ -7,7 +7,7 @@
  * reproduces the pathological shape (many unresolved ADL sites) and asserts the
  * scope-resolution EMIT phase scales sub-quadratically.
  *
- * Run: GITNEXUS_BENCH=1 npx vitest run test/integration/cpp-adl-benchmark.test.ts
+ * Run: YUMMYGRAPH_BENCH=1 npx vitest run test/integration/cpp-adl-benchmark.test.ts
  *
  * WHY EMIT MS, NOT WALL TIME: parse dominates total wall time — masking the ADL
  * cost — so we isolate the scope-resolution `emit` ms from the profiler log
@@ -30,7 +30,7 @@ import path from 'node:path';
 import { runPipelineFromRepo } from '../../src/core/ingestion/pipeline.js';
 import { _captureLogger } from '../../src/core/logger.js';
 
-const BENCH_ENABLED = process.env.GITNEXUS_BENCH === '1';
+const BENCH_ENABLED = process.env.YUMMYGRAPH_BENCH === '1';
 
 interface BenchResult {
   fileCount: number;

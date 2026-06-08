@@ -21,7 +21,7 @@ export const TINY_ORPHAN_WAL_BYTES = 4 * 1024;
  *
  * The previous design (`warnedKeys: Set<string>`) warned exactly once per key
  * per process and silently downgraded all subsequent occurrences to debug. In
- * a long-lived `gitnexus serve` process touching the same dbPath repeatedly,
+ * a long-lived `yummygraph serve` process touching the same dbPath repeatedly,
  * a persistent condition produced one warn at the first occurrence and then
  * 99+ silent debug lines — invisible to operators reading warn-level logs.
  *
@@ -56,7 +56,7 @@ export const isMissingFsError = (err: unknown): boolean =>
 const missing = isMissingFsError;
 
 const sidecarPreflightDisabled = (): boolean =>
-  /^(1|true|yes|on)$/i.test(process.env.GITNEXUS_DISABLE_LBUG_SIDECAR_PREFLIGHT ?? '');
+  /^(1|true|yes|on)$/i.test(process.env.YUMMYGRAPH_DISABLE_LBUG_SIDECAR_PREFLIGHT ?? '');
 
 export const statIfExists = async (filePath: string): Promise<{ size: number } | null> => {
   try {
@@ -128,7 +128,7 @@ export const shadowSidecarRecoveryMessage = (dbPath: string, err: unknown): stri
   const msg = err instanceof Error ? err.message : String(err);
   return (
     `LadybugDB checkpoint sidecar is missing for ${dbPath}. ` +
-    'Rebuild the index with `gitnexus analyze --force <repo-path> --index-only` and restart `gitnexus serve`.' +
+    'Rebuild the index with `yummygraph analyze --force <repo-path> --index-only` and restart `yummygraph serve`.' +
     `\n  Original error: ${msg.slice(0, 200)}`
   );
 };
@@ -160,7 +160,7 @@ export const renameFailureMessage = (dbPath: string, err: unknown): string => {
     const code = (err as NodeJS.ErrnoException).code;
     const msg = err instanceof Error ? err.message : String(err);
     return (
-      `GitNexus could not move the LadybugDB WAL sidecar at ${dbPath}.wal because of a ` +
+      `YummyGraph could not move the LadybugDB WAL sidecar at ${dbPath}.wal because of a ` +
       `filesystem permission or file-lock error (${code}). ` +
       'Check filesystem ACLs, antivirus exclusions for the index directory, and ' +
       'whether another process holds an open handle on the file. ' +
@@ -206,7 +206,7 @@ export async function quarantineWalForMissingShadow(
   await fs.rename(walPath, quarantinePath);
 
   const message =
-    `GitNexus: quarantined WAL ${path.basename(quarantinePath)} because LadybugDB shadow sidecar was missing; ` +
+    `YummyGraph: quarantined WAL ${path.basename(quarantinePath)} because LadybugDB shadow sidecar was missing; ` +
     `continuing from last checkpoint${options.reason ? ` (${options.reason})` : ''}`;
 
   if (options.level === 'warn') {
@@ -234,7 +234,7 @@ export async function preflightLbugSidecars(
   } catch (err) {
     logDebug(
       options.logger,
-      `GitNexus: unable to inspect LadybugDB sidecars before ${options.mode} open; continuing without preflight repair: ${(err as Error).message}`,
+      `YummyGraph: unable to inspect LadybugDB sidecars before ${options.mode} open; continuing without preflight repair: ${(err as Error).message}`,
     );
     return { kind: 'clean', dbPath };
   }
@@ -253,7 +253,7 @@ export async function preflightLbugSidecars(
     warnOnce(
       options.logger,
       `${dbPath}:orphan-wal-preflight:${options.mode}`,
-      `GitNexus: found ${state.walBytes} byte lbug.wal without lbug.shadow before ${options.mode} open; ` +
+      `YummyGraph: found ${state.walBytes} byte lbug.wal without lbug.shadow before ${options.mode} open; ` +
         'will rely on LadybugDB replay/recovery instead of deleting pending WAL data.',
     );
   }
@@ -273,7 +273,7 @@ export async function finalizeLbugSidecarsAfterClose(
   } catch (err) {
     logDebug(
       options.logger,
-      `GitNexus: unable to inspect LadybugDB sidecars after close; skipping post-close repair: ${(err as Error).message}`,
+      `YummyGraph: unable to inspect LadybugDB sidecars after close; skipping post-close repair: ${(err as Error).message}`,
     );
     return;
   }
@@ -286,7 +286,7 @@ export async function finalizeLbugSidecarsAfterClose(
     } catch (err) {
       logDebug(
         options.logger,
-        `GitNexus: unable to inspect LadybugDB sidecars after close; skipping post-close repair: ${(err as Error).message}`,
+        `YummyGraph: unable to inspect LadybugDB sidecars after close; skipping post-close repair: ${(err as Error).message}`,
       );
       return;
     }
@@ -305,7 +305,7 @@ export async function finalizeLbugSidecarsAfterClose(
         warnOnce(
           options.logger,
           `${dbPath}:post-close-tiny-quarantine-failed`,
-          `GitNexus: failed to quarantine tiny orphan WAL after close (${(err as Error).message}); next read may recover reactively.`,
+          `YummyGraph: failed to quarantine tiny orphan WAL after close (${(err as Error).message}); next read may recover reactively.`,
         );
       }
     }
@@ -316,8 +316,8 @@ export async function finalizeLbugSidecarsAfterClose(
     warnOnce(
       options.logger,
       `${dbPath}:post-close-orphan-wal`,
-      `GitNexus: lbug.wal (${state.walBytes} bytes) remains without lbug.shadow after close; ` +
-        'keeping it for recovery. If this repeats, run `gitnexus analyze --force --index-only` or the sidecar repair command.',
+      `YummyGraph: lbug.wal (${state.walBytes} bytes) remains without lbug.shadow after close; ` +
+        'keeping it for recovery. If this repeats, run `yummygraph analyze --force --index-only` or the sidecar repair command.',
     );
   }
 }

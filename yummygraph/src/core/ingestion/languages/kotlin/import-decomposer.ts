@@ -1,4 +1,4 @@
-import type { Capture, CaptureMatch } from 'gitnexus-shared';
+import type { Capture, CaptureMatch } from 'yummygraph-shared';
 import { nodeToCapture, syntheticCapture, type SyntaxNode } from '../../utils/ast-helpers.js';
 
 type KotlinImportKind = 'named' | 'alias' | 'wildcard';

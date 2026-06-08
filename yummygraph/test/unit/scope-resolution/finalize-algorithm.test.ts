@@ -17,7 +17,7 @@ import {
   type BindingRef,
   type SymbolDefinition,
   type ScopeId,
-} from 'gitnexus-shared';
+} from 'yummygraph-shared';
 
 // ─── Test helpers ───────────────────────────────────────────────────────────
 

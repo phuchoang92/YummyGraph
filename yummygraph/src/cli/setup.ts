@@ -3,7 +3,7 @@
  *
  * One-time global MCP configuration writer.
  * Detects installed AI editors and writes the appropriate MCP config
- * so the GitNexus MCP server is available in all projects.
+ * so the YummyGraph MCP server is available in all projects.
  */
 
 import fs from 'fs/promises';
@@ -25,18 +25,18 @@ const execFileAsync = promisify(execFile);
 // connect. Pinning to the installed version means subsequent invocations
 // skip the npm-registry metadata roundtrip (and stay reproducible until
 // the user upgrades). Static configs and READMEs intentionally use
-// `gitnexus@latest` since they're quickstart docs, not persisted state.
+// `yummygraph@latest` since they're quickstart docs, not persisted state.
 const _require = createRequire(import.meta.url);
 const _pkg = _require('../../package.json') as { version?: unknown };
 if (typeof _pkg.version !== 'string' || !_pkg.version) {
   throw new Error(
-    'gitnexus/package.json#version is missing or not a string — cannot generate MCP fallback config.',
+    'yummygraph/package.json#version is missing or not a string — cannot generate MCP fallback config.',
   );
 }
 // Version-pinned ref for the persisted MCP entry — deliberately distinct from
-// the cjs's exported `gitnexus@latest` hint ref (resolve-analyze-cmd.cjs); the
+// the cjs's exported `yummygraph@latest` hint ref (resolve-analyze-cmd.cjs); the
 // two are not unified (see the comment above and that file's MCP_PINNED_REF).
-const MCP_PINNED_REF = `gitnexus@${_pkg.version}`;
+const MCP_PINNED_REF = `yummygraph@${_pkg.version}`;
 
 /**
  * Build the `command` string written into an editor's hook settings, which the
@@ -79,14 +79,14 @@ interface SetupResult {
 }
 
 /**
- * Resolve the absolute path to the `gitnexus` binary if it's installed
+ * Resolve the absolute path to the `yummygraph` binary if it's installed
  * globally (or via npm -g / yarn global). Returns null when not found.
  */
-function resolveGitnexusBin(): string | null {
+function resolveYummygraphBin(): string | null {
   try {
     const isWin = process.platform === 'win32';
     const cmd = isWin ? 'where' : 'which';
-    const output = execFileSync(cmd, ['gitnexus'], {
+    const output = execFileSync(cmd, ['yummygraph'], {
       encoding: 'utf-8',
       timeout: 5000,
       stdio: ['ignore', 'pipe', 'ignore'],
@@ -116,17 +116,17 @@ function resolveGitnexusBin(): string | null {
 /**
  * The MCP server entry for all editors.
  *
- * Prefers the globally-installed `gitnexus` binary (starts in ~1 s) over
- * `npx -y gitnexus@<version>` (cold-cache install of native deps can take
+ * Prefers the globally-installed `yummygraph` binary (starts in ~1 s) over
+ * `npx -y yummygraph@<version>` (cold-cache install of native deps can take
  * >60 s, exceeding Claude Code's 30 s MCP connection timeout). The fallback
- * version is read from gitnexus/package.json#version at module load so the
+ * version is read from yummygraph/package.json#version at module load so the
  * persisted user config matches the installed package.
  *
  * Falls back to npx when the binary isn't on PATH — e.g. first-time
- * users who ran `npx gitnexus analyze` but haven't done `npm i -g`.
+ * users who ran `npx yummygraph analyze` but haven't done `npm i -g`.
  */
 function getMcpEntry() {
-  const bin = resolveGitnexusBin();
+  const bin = resolveYummygraphBin();
 
   if (bin) {
     return { command: bin, args: ['mcp'] };
@@ -150,7 +150,7 @@ function getMcpEntry() {
  * where command is a flat array (command + args combined).
  */
 function getOpenCodeMcpEntry() {
-  const bin = resolveGitnexusBin();
+  const bin = resolveYummygraphBin();
 
   if (bin) {
     return { type: 'local', command: [bin, 'mcp'] };
@@ -235,7 +235,7 @@ async function setupCursor(result: SetupResult): Promise<void> {
 
   const mcpPath = path.join(cursorDir, 'mcp.json');
   try {
-    const ok = await mergeJsoncFile(mcpPath, ['mcpServers', 'gitnexus'], getMcpEntry());
+    const ok = await mergeJsoncFile(mcpPath, ['mcpServers', 'yummygraph'], getMcpEntry());
     if (ok) {
       result.configured.push('Cursor');
     } else {
@@ -256,7 +256,7 @@ async function setupClaudeCode(result: SetupResult): Promise<void> {
   // Claude Code stores MCP config in ~/.claude.json
   const mcpPath = path.join(os.homedir(), '.claude.json');
   try {
-    const ok = await mergeJsoncFile(mcpPath, ['mcpServers', 'gitnexus'], getMcpEntry());
+    const ok = await mergeJsoncFile(mcpPath, ['mcpServers', 'yummygraph'], getMcpEntry());
     if (ok) {
       result.configured.push('Claude Code');
     } else {
@@ -270,7 +270,7 @@ async function setupClaudeCode(result: SetupResult): Promise<void> {
 }
 
 /**
- * Install GitNexus skills to ~/.claude/skills/ for Claude Code.
+ * Install YummyGraph skills to ~/.claude/skills/ for Claude Code.
  */
 async function installClaudeCodeSkills(result: SetupResult): Promise<void> {
   const claudeDir = path.join(os.homedir(), '.claude');
@@ -288,12 +288,12 @@ async function installClaudeCodeSkills(result: SetupResult): Promise<void> {
 }
 
 /**
- * Check whether an event array already contains a gitnexus-hook entry.
+ * Check whether an event array already contains a yummygraph-hook entry.
  */
-function hasGitnexusHook(
+function hasYummygraphHook(
   hooksObj: any,
   eventName: string,
-  commandFragment = 'gitnexus-hook',
+  commandFragment = 'yummygraph-hook',
 ): boolean {
   const entries = hooksObj?.[eventName];
   if (!Array.isArray(entries)) return false;
@@ -414,7 +414,7 @@ export async function copyHookHelpers(
 }
 
 /**
- * Install GitNexus hooks to ~/.claude/settings.json for Claude Code.
+ * Install YummyGraph hooks to ~/.claude/settings.json for Claude Code.
  * Merges hook config without overwriting existing hooks, preserving
  * comments and formatting in the JSONC file.
  */
@@ -424,17 +424,17 @@ async function installClaudeCodeHooks(result: SetupResult): Promise<void> {
 
   const settingsPath = path.join(claudeDir, 'settings.json');
 
-  // Source hooks bundled within the gitnexus package (hooks/claude/)
+  // Source hooks bundled within the yummygraph package (hooks/claude/)
   const pluginHooksPath = path.join(__dirname, '..', '..', 'hooks', 'claude');
 
-  // Copy unified hook script to ~/.claude/hooks/gitnexus/
-  const destHooksDir = path.join(claudeDir, 'hooks', 'gitnexus');
+  // Copy unified hook script to ~/.claude/hooks/yummygraph/
+  const destHooksDir = path.join(claudeDir, 'hooks', 'yummygraph');
 
   try {
     await fs.mkdir(destHooksDir, { recursive: true });
 
-    const src = path.join(pluginHooksPath, 'gitnexus-hook.cjs');
-    const dest = path.join(destHooksDir, 'gitnexus-hook.cjs');
+    const src = path.join(pluginHooksPath, 'yummygraph-hook.cjs');
+    const dest = path.join(destHooksDir, 'yummygraph-hook.cjs');
     try {
       let content = await fs.readFile(src, 'utf-8');
       const resolvedCli = path.join(__dirname, '..', 'cli', 'index.js');
@@ -442,7 +442,7 @@ async function installClaudeCodeHooks(result: SetupResult): Promise<void> {
       const jsonCli = JSON.stringify(normalizedCli);
       if (!content.includes(CLI_PATH_SOURCE_LITERAL)) {
         result.errors.push(
-          'Claude Code hooks: gitnexus-hook.cjs no longer contains the cliPath literal to patch — the installed hook may fail to resolve the CLI. Update CLI_PATH_SOURCE_LITERAL in setup.ts.',
+          'Claude Code hooks: yummygraph-hook.cjs no longer contains the cliPath literal to patch — the installed hook may fail to resolve the CLI. Update CLI_PATH_SOURCE_LITERAL in setup.ts.',
         );
       }
       content = content.replace(CLI_PATH_SOURCE_LITERAL, `let cliPath = ${jsonCli};`);
@@ -476,7 +476,7 @@ async function installClaudeCodeHooks(result: SetupResult): Promise<void> {
       return;
     }
 
-    const hookPath = path.join(destHooksDir, 'gitnexus-hook.cjs').replace(/\\/g, '/');
+    const hookPath = path.join(destHooksDir, 'yummygraph-hook.cjs').replace(/\\/g, '/');
     const hookCmd = formatHookCommand(hookPath);
 
     // Check which hook events need entries (idempotent: skip if already registered)
@@ -494,7 +494,7 @@ async function installClaudeCodeHooks(result: SetupResult): Promise<void> {
     // NOTE: SessionStart hooks are broken on Windows (Claude Code bug #23576).
     // Session context is delivered via CLAUDE.md / skills instead.
 
-    if (!hasGitnexusHook(parsed?.hooks, 'PreToolUse')) {
+    if (!hasYummygraphHook(parsed?.hooks, 'PreToolUse')) {
       hookEntries.push({
         eventName: 'PreToolUse',
         value: {
@@ -504,13 +504,13 @@ async function installClaudeCodeHooks(result: SetupResult): Promise<void> {
               type: 'command',
               command: hookCmd,
               timeout: 10,
-              statusMessage: 'Enriching with GitNexus graph context...',
+              statusMessage: 'Enriching with YummyGraph graph context...',
             },
           ],
         },
       });
     }
-    if (!hasGitnexusHook(parsed?.hooks, 'PostToolUse')) {
+    if (!hasYummygraphHook(parsed?.hooks, 'PostToolUse')) {
       hookEntries.push({
         eventName: 'PostToolUse',
         value: {
@@ -520,7 +520,7 @@ async function installClaudeCodeHooks(result: SetupResult): Promise<void> {
               type: 'command',
               command: hookCmd,
               timeout: 10,
-              statusMessage: 'Checking GitNexus index freshness...',
+              statusMessage: 'Checking YummyGraph index freshness...',
             },
           ],
         },
@@ -568,7 +568,7 @@ async function setupAntigravity(result: SetupResult): Promise<void> {
 
   const mcpPath = path.join(antigravityDir, 'mcp_config.json');
   try {
-    const ok = await mergeJsoncFile(mcpPath, ['mcpServers', 'gitnexus'], getMcpEntry());
+    const ok = await mergeJsoncFile(mcpPath, ['mcpServers', 'yummygraph'], getMcpEntry());
     if (ok) {
       result.configured.push('Antigravity');
     } else {
@@ -582,7 +582,7 @@ async function setupAntigravity(result: SetupResult): Promise<void> {
 }
 
 /**
- * Install GitNexus skills to ~/.gemini/antigravity/skills/ (global scope,
+ * Install YummyGraph skills to ~/.gemini/antigravity/skills/ (global scope,
  * per https://codelabs.developers.google.com/getting-started-with-antigravity-skills).
  * Each skill is laid out as {skillName}/SKILL.md just like the other editors.
  */
@@ -605,7 +605,7 @@ async function installAntigravitySkills(result: SetupResult): Promise<void> {
 
 /**
  * Install the Antigravity/Gemini-CLI hook adapter to
- * ~/.gemini/config/hooks/gitnexus/ and register an AfterTool entry in
+ * ~/.gemini/config/hooks/yummygraph/ and register an AfterTool entry in
  * ~/.gemini/settings.json under `hooks.AfterTool`.
  *
  * Why AfterTool (and not BeforeTool): the Gemini hooks reference
@@ -620,11 +620,11 @@ async function installAntigravityHooks(result: SetupResult): Promise<void> {
 
   const geminiDir = path.join(os.homedir(), '.gemini');
   const settingsPath = path.join(geminiDir, 'settings.json');
-  const destHooksDir = path.join(geminiDir, 'config', 'hooks', 'gitnexus');
+  const destHooksDir = path.join(geminiDir, 'config', 'hooks', 'yummygraph');
 
   // The antigravity adapter shares its lock/probe helpers with the claude
   // adapter — same DB, same concurrency rules — so we reuse those CJS files
-  // from gitnexus/hooks/claude/ rather than duplicating them.
+  // from yummygraph/hooks/claude/ rather than duplicating them.
   const pluginAntigravityDir = path.join(__dirname, '..', '..', 'hooks', 'antigravity');
   const pluginClaudeDir = path.join(__dirname, '..', '..', 'hooks', 'claude');
 
@@ -632,9 +632,9 @@ async function installAntigravityHooks(result: SetupResult): Promise<void> {
     await fs.mkdir(destHooksDir, { recursive: true });
 
     // Adapter script: rewrite the dist path baked into the file so it resolves
-    // to the installed gitnexus CLI rather than the cwd-relative dev path.
-    const adapterSrc = path.join(pluginAntigravityDir, 'gitnexus-antigravity-hook.cjs');
-    const adapterDest = path.join(destHooksDir, 'gitnexus-antigravity-hook.cjs');
+    // to the installed yummygraph CLI rather than the cwd-relative dev path.
+    const adapterSrc = path.join(pluginAntigravityDir, 'yummygraph-antigravity-hook.cjs');
+    const adapterDest = path.join(destHooksDir, 'yummygraph-antigravity-hook.cjs');
     try {
       let content = await fs.readFile(adapterSrc, 'utf-8');
       const resolvedCli = path.join(__dirname, '..', 'cli', 'index.js');
@@ -642,7 +642,7 @@ async function installAntigravityHooks(result: SetupResult): Promise<void> {
       const jsonCli = JSON.stringify(normalizedCli);
       if (!content.includes(CLI_PATH_SOURCE_LITERAL)) {
         result.errors.push(
-          'Antigravity hooks: gitnexus-antigravity-hook.cjs no longer contains the cliPath literal to patch — the installed hook may fail to resolve the CLI. Update CLI_PATH_SOURCE_LITERAL in setup.ts.',
+          'Antigravity hooks: yummygraph-antigravity-hook.cjs no longer contains the cliPath literal to patch — the installed hook may fail to resolve the CLI. Update CLI_PATH_SOURCE_LITERAL in setup.ts.',
         );
       }
       content = content.replace(CLI_PATH_SOURCE_LITERAL, `let cliPath = ${jsonCli};`);
@@ -680,7 +680,7 @@ async function installAntigravityHooks(result: SetupResult): Promise<void> {
       return;
     }
 
-    const hookPath = path.join(destHooksDir, 'gitnexus-antigravity-hook.cjs').replace(/\\/g, '/');
+    const hookPath = path.join(destHooksDir, 'yummygraph-antigravity-hook.cjs').replace(/\\/g, '/');
     const hookCmd = formatHookCommand(hookPath);
 
     const parsed = await (async () => {
@@ -694,7 +694,7 @@ async function installAntigravityHooks(result: SetupResult): Promise<void> {
 
     const hookEntries: Array<{ eventName: string; value: unknown }> = [];
 
-    if (!hasGitnexusHook(parsed?.hooks, 'AfterTool', 'gitnexus-antigravity-hook')) {
+    if (!hasYummygraphHook(parsed?.hooks, 'AfterTool', 'yummygraph-antigravity-hook')) {
       // Matcher follows the Gemini CLI built-in tool naming (snake_case).
       // search_file_content / glob cover content + filename search; run_shell_command
       // catches rg/grep invocations and the git commit family for stale-index hints.
@@ -706,11 +706,11 @@ async function installAntigravityHooks(result: SetupResult): Promise<void> {
             {
               type: 'command',
               command: hookCmd,
-              name: 'gitnexus',
+              name: 'yummygraph',
               // ms — Gemini CLI uses milliseconds (default 60000); Claude Code
               // uses seconds. 10000 ms = 10 s.
               timeout: 10000,
-              description: 'GitNexus graph context + stale-index hints',
+              description: 'YummyGraph graph context + stale-index hints',
             },
           ],
         },
@@ -744,7 +744,7 @@ async function setupOpenCode(result: SetupResult): Promise<void> {
 
   const configPath = path.join(opencodeDir, 'opencode.json');
   try {
-    const ok = await mergeJsoncFile(configPath, ['mcp', 'gitnexus'], getOpenCodeMcpEntry());
+    const ok = await mergeJsoncFile(configPath, ['mcp', 'yummygraph'], getOpenCodeMcpEntry());
     if (ok) {
       result.configured.push('OpenCode');
     } else {
@@ -764,11 +764,11 @@ function getCodexMcpTomlSection(): string {
   const entry = getMcpEntry();
   const command = JSON.stringify(entry.command);
   const args = `[${entry.args.map((arg) => JSON.stringify(arg)).join(', ')}]`;
-  return `[mcp_servers.gitnexus]\ncommand = ${command}\nargs = ${args}\n`;
+  return `[mcp_servers.yummygraph]\ncommand = ${command}\nargs = ${args}\n`;
 }
 
 /**
- * Append GitNexus MCP server config to Codex's config.toml if missing.
+ * Append YummyGraph MCP server config to Codex's config.toml if missing.
  */
 async function upsertCodexConfigToml(configPath: string): Promise<void> {
   let existing = '';
@@ -778,7 +778,7 @@ async function upsertCodexConfigToml(configPath: string): Promise<void> {
     existing = '';
   }
 
-  if (existing.includes('[mcp_servers.gitnexus]')) {
+  if (existing.includes('[mcp_servers.yummygraph]')) {
     return;
   }
 
@@ -798,7 +798,7 @@ async function setupCodex(result: SetupResult): Promise<void> {
 
   try {
     const entry = getMcpEntry();
-    await execFileAsync('codex', ['mcp', 'add', 'gitnexus', '--', entry.command, ...entry.args], {
+    await execFileAsync('codex', ['mcp', 'add', 'yummygraph', '--', entry.command, ...entry.args], {
       shell: process.platform === 'win32',
       windowsHide: true,
     });
@@ -820,8 +820,8 @@ async function setupCodex(result: SetupResult): Promise<void> {
 // ─── Skill Installation ───────────────────────────────────────────
 
 /**
- * Install GitNexus skills to a target directory.
- * Each skill is installed as {targetDir}/gitnexus-{skillName}/SKILL.md
+ * Install YummyGraph skills to a target directory.
+ * Each skill is installed as {targetDir}/yummygraph-{skillName}/SKILL.md
  * following the Agent Skills standard (Cursor, Claude Code, and Codex).
  *
  * Supports two source layouts:
@@ -830,10 +830,10 @@ async function setupCodex(result: SetupResult): Promise<void> {
  */
 async function installSkillsTo(targetDir: string): Promise<string[]> {
   const installed: string[] = [];
-  // GITNEXUS_TEST_SKILLS_ROOT lets tests stage a fixture skills tree without
+  // YUMMYGRAPH_TEST_SKILLS_ROOT lets tests stage a fixture skills tree without
   // depending on __dirname resolution under Vitest.
   const skillsRoot =
-    process.env.GITNEXUS_TEST_SKILLS_ROOT ?? path.join(__dirname, '..', '..', 'skills');
+    process.env.YUMMYGRAPH_TEST_SKILLS_ROOT ?? path.join(__dirname, '..', '..', 'skills');
 
   // Was glob('*.md') + glob('*/SKILL.md'); replaced with fs.readdir because
   // glob v13's cwd handling did not match the fixture path on Windows runners
@@ -914,7 +914,7 @@ async function copyDirRecursive(src: string, dest: string): Promise<void> {
 }
 
 /**
- * Install global Cursor skills to ~/.cursor/skills/gitnexus/
+ * Install global Cursor skills to ~/.cursor/skills/yummygraph/
  */
 async function installCursorSkills(result: SetupResult): Promise<void> {
   const cursorDir = path.join(os.homedir(), '.cursor');
@@ -932,7 +932,7 @@ async function installCursorSkills(result: SetupResult): Promise<void> {
 }
 
 /**
- * Install global OpenCode skills to ~/.config/opencode/skills/gitnexus/
+ * Install global OpenCode skills to ~/.config/opencode/skills/yummygraph/
  */
 async function installOpenCodeSkills(result: SetupResult): Promise<void> {
   const opencodeDir = path.join(os.homedir(), '.config', 'opencode');
@@ -952,7 +952,7 @@ async function installOpenCodeSkills(result: SetupResult): Promise<void> {
 }
 
 /**
- * Install global Codex skills to ~/.agents/skills/gitnexus/
+ * Install global Codex skills to ~/.agents/skills/yummygraph/
  */
 async function installCodexSkills(result: SetupResult): Promise<void> {
   const codexDir = path.join(os.homedir(), '.codex');
@@ -973,7 +973,7 @@ async function installCodexSkills(result: SetupResult): Promise<void> {
 
 export const setupCommand = async () => {
   console.log('');
-  console.log('  GitNexus Setup');
+  console.log('  YummyGraph Setup');
   console.log('  ==============');
   console.log('');
 
@@ -1038,7 +1038,7 @@ export const setupCommand = async () => {
   console.log('');
   console.log('  Next steps:');
   console.log('    1. cd into any git repo');
-  console.log('    2. Run: gitnexus analyze');
+  console.log('    2. Run: yummygraph analyze');
   console.log('    3. Open the repo in your editor — MCP is ready!');
   console.log('');
 };

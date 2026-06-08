@@ -9,10 +9,10 @@ afterEach(() => {
 
 describe('resolveEmbeddingConfig', () => {
   it('applies env overrides for local resource controls', () => {
-    process.env.GITNEXUS_EMBEDDING_THREADS = '3';
-    process.env.GITNEXUS_EMBEDDING_BATCH_SIZE = '7';
-    process.env.GITNEXUS_EMBEDDING_SUB_BATCH_SIZE = '5';
-    process.env.GITNEXUS_EMBEDDING_DEVICE = 'cpu';
+    process.env.YUMMYGRAPH_EMBEDDING_THREADS = '3';
+    process.env.YUMMYGRAPH_EMBEDDING_BATCH_SIZE = '7';
+    process.env.YUMMYGRAPH_EMBEDDING_SUB_BATCH_SIZE = '5';
+    process.env.YUMMYGRAPH_EMBEDDING_DEVICE = 'cpu';
 
     const config = resolveEmbeddingConfig();
 
@@ -23,8 +23,8 @@ describe('resolveEmbeddingConfig', () => {
   });
 
   it('rejects invalid numeric env values', () => {
-    process.env.GITNEXUS_EMBEDDING_THREADS = '0';
+    process.env.YUMMYGRAPH_EMBEDDING_THREADS = '0';
 
-    expect(() => resolveEmbeddingConfig()).toThrow('GITNEXUS_EMBEDDING_THREADS');
+    expect(() => resolveEmbeddingConfig()).toThrow('YUMMYGRAPH_EMBEDDING_THREADS');
   });
 });

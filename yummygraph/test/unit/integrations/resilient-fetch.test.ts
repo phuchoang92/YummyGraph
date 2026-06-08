@@ -6,8 +6,8 @@ import {
   resilientFetch,
   ResilientFetchExhaustedError,
   RETRY_AFTER_CAP_MS,
-} from 'gitnexus-shared';
-import { __resetBreakerRegistry__, classifyOutcome } from 'gitnexus-shared/test-helpers';
+} from 'yummygraph-shared';
+import { __resetBreakerRegistry__, classifyOutcome } from 'yummygraph-shared/test-helpers';
 
 describe('parseRetryAfter', () => {
   it('parses delta-seconds form', () => {

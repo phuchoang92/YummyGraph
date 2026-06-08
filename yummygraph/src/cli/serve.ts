@@ -14,13 +14,13 @@ import { isWalCorruptionError, WAL_RECOVERY_SUGGESTION } from '../core/lbug/lbug
 // We pass the Error itself in `{ err }` so pino's built-in err serializer
 // captures `type`, `message`, and `stack` as structured fields.
 process.on('uncaughtException', (err) => {
-  logger.error({ err }, '[gitnexus serve] Uncaught exception');
+  logger.error({ err }, '[yummygraph serve] Uncaught exception');
   flushLoggerSync();
   process.exit(1);
 });
 process.on('unhandledRejection', (reason) => {
   const err = reason instanceof Error ? reason : new Error(String(reason));
-  logger.error({ err }, '[gitnexus serve] Unhandled rejection');
+  logger.error({ err }, '[yummygraph serve] Unhandled rejection');
   flushLoggerSync();
   process.exit(1);
 });
@@ -29,7 +29,7 @@ export const serveCommand = async (options?: { port?: string; host?: string }) =
   const port = Number(options?.port ?? 4747);
   // Default to 'localhost' so the OS decides whether to bind to 127.0.0.1 or
   // ::1 based on system configuration, avoiding spurious CORS errors when the
-  // hosted frontend at gitnexus.vercel.app connects to localhost.
+  // hosted frontend at yummygraph.vercel.app connects to localhost.
   const host = options?.host ?? 'localhost';
 
   try {

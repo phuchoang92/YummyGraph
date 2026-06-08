@@ -1,9 +1,9 @@
 ---
-name: gitnexus-debugging
+name: yummygraph-debugging
 description: Trace bugs through call chains using knowledge graph
 ---
 
-# Debugging with GitNexus
+# Debugging with YummyGraph
 
 ## When to Use
 - "Why is this function failing?"
@@ -17,11 +17,11 @@ description: Trace bugs through call chains using knowledge graph
 ```
 1. query({query: "<error or symptom>"})            → Find related execution flows
 2. context({name: "<suspect>"})                    → See callers/callees/processes
-3. READ gitnexus://repo/{name}/process/{name}                → Trace execution flow
+3. READ yummygraph://repo/{name}/process/{name}                → Trace execution flow
 4. cypher({query: "MATCH path..."})                 → Custom traces if needed
 ```
 
-> If "Index is stale" → run `node .gitnexus/run.cjs analyze` in terminal.
+> If "Index is stale" → run `node .yummygraph/run.cjs analyze` in terminal.
 
 ## Checklist
 
@@ -37,7 +37,7 @@ description: Trace bugs through call chains using knowledge graph
 
 ## Debugging Patterns
 
-| Symptom | GitNexus Approach |
+| Symptom | YummyGraph Approach |
 |---------|-------------------|
 | Error message | `query` for error text → `context` on throw sites |
 | Wrong return value | `context` on the function → trace callees for data flow |
@@ -78,7 +78,7 @@ RETURN [n IN nodes(path) | n.name] AS chain
 2. context({name: "validatePayment"})
    → Outgoing calls: verifyCard, fetchRates (external API!)
 
-3. READ gitnexus://repo/my-app/process/CheckoutFlow
+3. READ yummygraph://repo/my-app/process/CheckoutFlow
    → Step 3: validatePayment → calls fetchRates (external)
 
 4. Root cause: fetchRates calls external API without proper timeout

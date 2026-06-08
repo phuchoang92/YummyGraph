@@ -63,15 +63,15 @@ const invokeHandler = async (app: MockApp, method: string, reqPath: string) => {
 describe('landingPageHtml', () => {
   const html = landingPageHtml();
 
-  it('contains void background colour from gitnexus-web design tokens', () => {
+  it('contains void background colour from yummygraph-web design tokens', () => {
     expect(html).toContain('#06060a');
   });
 
-  it('contains surface card colour from gitnexus-web design tokens', () => {
+  it('contains surface card colour from yummygraph-web design tokens', () => {
     expect(html).toContain('#101018');
   });
 
-  it('contains accent colour from gitnexus-web design tokens', () => {
+  it('contains accent colour from yummygraph-web design tokens', () => {
     expect(html).toContain('#7c3aed');
   });
 
@@ -81,12 +81,12 @@ describe('landingPageHtml', () => {
   });
 
   it('contains the build command in a terminal-style block', () => {
-    expect(html).toContain('cd gitnexus-web');
+    expect(html).toContain('cd yummygraph-web');
     expect(html).toContain('npm run build');
   });
 
   it('contains the Vercel link with safe external attributes', () => {
-    expect(html).toContain('https://gitnexus.vercel.app');
+    expect(html).toContain('https://yummygraph.vercel.app');
     expect(html).toContain('target="_blank"');
     expect(html).toContain('rel="noopener noreferrer"');
   });
@@ -236,9 +236,9 @@ describe('resolveWebDistDir', () => {
     cap.restore();
   });
 
-  it('prefers GITNEXUS_WEB_DIST env var when set', async () => {
-    const original = process.env.GITNEXUS_WEB_DIST;
-    process.env.GITNEXUS_WEB_DIST = '/env/dist';
+  it('prefers YUMMYGRAPH_WEB_DIST env var when set', async () => {
+    const original = process.env.YUMMYGRAPH_WEB_DIST;
+    process.env.YUMMYGRAPH_WEB_DIST = '/env/dist';
     try {
       accessMock.mockImplementation(async (p: string) => {
         const normalized = p.split(path.sep).join('/');
@@ -249,16 +249,16 @@ describe('resolveWebDistDir', () => {
       expect(result).toBe('/env/dist');
     } finally {
       if (original === undefined) {
-        delete process.env.GITNEXUS_WEB_DIST;
+        delete process.env.YUMMYGRAPH_WEB_DIST;
       } else {
-        process.env.GITNEXUS_WEB_DIST = original;
+        process.env.YUMMYGRAPH_WEB_DIST = original;
       }
     }
   });
 
-  it('falls back to primary when GITNEXUS_WEB_DIST dir missing', async () => {
-    const original = process.env.GITNEXUS_WEB_DIST;
-    process.env.GITNEXUS_WEB_DIST = '/env/dist';
+  it('falls back to primary when YUMMYGRAPH_WEB_DIST dir missing', async () => {
+    const original = process.env.YUMMYGRAPH_WEB_DIST;
+    process.env.YUMMYGRAPH_WEB_DIST = '/env/dist';
     try {
       accessMock.mockImplementation(async (p: string) => {
         const normalized = p.split(path.sep).join('/');
@@ -271,9 +271,9 @@ describe('resolveWebDistDir', () => {
       expect(result).toBe('/primary');
     } finally {
       if (original === undefined) {
-        delete process.env.GITNEXUS_WEB_DIST;
+        delete process.env.YUMMYGRAPH_WEB_DIST;
       } else {
-        process.env.GITNEXUS_WEB_DIST = original;
+        process.env.YUMMYGRAPH_WEB_DIST = original;
       }
     }
   });

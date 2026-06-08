@@ -12,7 +12,7 @@ import { _captureLogger } from '../../src/core/logger.js';
 import {
   getStoragePath,
   getStoragePaths,
-  ensureGitNexusIgnored,
+  ensureYummyGraphIgnored,
   readRegistry,
   loadCLIConfig,
   registerRepo,
@@ -34,10 +34,10 @@ import { createTempDir } from '../helpers/test-db.js';
 // ─── getStoragePath ──────────────────────────────────────────────────
 
 describe('getStoragePath', () => {
-  it('appends .gitnexus to resolved repo path', () => {
+  it('appends .yummygraph to resolved repo path', () => {
     const result = getStoragePath('/home/user/project');
-    expect(result).toContain('.gitnexus');
-    expect(path.basename(result)).toBe('.gitnexus');
+    expect(result).toContain('.yummygraph');
+    expect(path.basename(result)).toBe('.yummygraph');
   });
 
   it('resolves relative paths', () => {
@@ -52,7 +52,7 @@ describe('getStoragePath', () => {
 describe('getStoragePaths', () => {
   it('returns storagePath, lbugPath, metaPath', () => {
     const paths = getStoragePaths('/home/user/project');
-    expect(paths.storagePath).toContain('.gitnexus');
+    expect(paths.storagePath).toContain('.yummygraph');
     expect(paths.lbugPath).toContain('lbug');
     expect(paths.metaPath).toContain('meta.json');
   });
@@ -64,13 +64,13 @@ describe('getStoragePaths', () => {
   });
 });
 
-// ─── GitNexus ignore rules (#1233) ─────────────────────────────────────
+// ─── YummyGraph ignore rules (#1233) ─────────────────────────────────────
 
-describe('ensureGitNexusIgnored (#1233)', () => {
+describe('ensureYummyGraphIgnored (#1233)', () => {
   let tmpRepo: Awaited<ReturnType<typeof createTempDir>>;
 
   beforeEach(async () => {
-    tmpRepo = await createTempDir('gitnexus-internal-gitignore-');
+    tmpRepo = await createTempDir('yummygraph-internal-gitignore-');
   });
 
   afterEach(async () => {
@@ -78,11 +78,11 @@ describe('ensureGitNexusIgnored (#1233)', () => {
     await tmpRepo.cleanup();
   });
 
-  it('creates .gitnexus/.gitignore containing a catch-all ignore rule', async () => {
-    await ensureGitNexusIgnored(tmpRepo.dbPath);
+  it('creates .yummygraph/.gitignore containing a catch-all ignore rule', async () => {
+    await ensureYummyGraphIgnored(tmpRepo.dbPath);
 
     await expect(
-      fs.readFile(path.join(tmpRepo.dbPath, '.gitnexus', '.gitignore'), 'utf-8'),
+      fs.readFile(path.join(tmpRepo.dbPath, '.yummygraph', '.gitignore'), 'utf-8'),
     ).resolves.toBe('*\n');
   });
 
@@ -90,50 +90,50 @@ describe('ensureGitNexusIgnored (#1233)', () => {
     const rootGitignorePath = path.join(tmpRepo.dbPath, '.gitignore');
     await fs.writeFile(rootGitignorePath, 'node_modules/\n');
 
-    await ensureGitNexusIgnored(tmpRepo.dbPath);
+    await ensureYummyGraphIgnored(tmpRepo.dbPath);
 
     await expect(fs.readFile(rootGitignorePath, 'utf-8')).resolves.toBe('node_modules/\n');
   });
 
-  it('adds .gitnexus/ to .git/info/exclude when the repo has a real .git directory', async () => {
+  it('adds .yummygraph/ to .git/info/exclude when the repo has a real .git directory', async () => {
     const excludePath = path.join(tmpRepo.dbPath, '.git', 'info', 'exclude');
     await fs.mkdir(path.dirname(excludePath), { recursive: true });
 
-    await ensureGitNexusIgnored(tmpRepo.dbPath);
+    await ensureYummyGraphIgnored(tmpRepo.dbPath);
 
-    await expect(fs.readFile(excludePath, 'utf-8')).resolves.toBe('.gitnexus/\n');
+    await expect(fs.readFile(excludePath, 'utf-8')).resolves.toBe('.yummygraph/\n');
   });
 
-  it('appends .gitnexus/ to .git/info/exclude once without disturbing existing rules', async () => {
+  it('appends .yummygraph/ to .git/info/exclude once without disturbing existing rules', async () => {
     const excludePath = path.join(tmpRepo.dbPath, '.git', 'info', 'exclude');
     await fs.mkdir(path.dirname(excludePath), { recursive: true });
     await fs.writeFile(excludePath, '# local excludes\nnode_modules/\n');
 
-    await ensureGitNexusIgnored(tmpRepo.dbPath);
-    await ensureGitNexusIgnored(tmpRepo.dbPath);
+    await ensureYummyGraphIgnored(tmpRepo.dbPath);
+    await ensureYummyGraphIgnored(tmpRepo.dbPath);
 
     await expect(fs.readFile(excludePath, 'utf-8')).resolves.toBe(
-      '# local excludes\nnode_modules/\n.gitnexus/\n',
+      '# local excludes\nnode_modules/\n.yummygraph/\n',
     );
   });
 
   it('does not create .git/info/exclude when .git is not a directory', async () => {
     await fs.writeFile(path.join(tmpRepo.dbPath, '.git'), 'gitdir: ../real-git-dir\n');
 
-    await ensureGitNexusIgnored(tmpRepo.dbPath);
+    await ensureYummyGraphIgnored(tmpRepo.dbPath);
 
     await expect(fs.access(path.join(tmpRepo.dbPath, '.git', 'info', 'exclude'))).rejects.toThrow();
   });
 
-  it('keeps generated .gitnexus files out of git status', async () => {
+  it('keeps generated .yummygraph files out of git status', async () => {
     execSync('git init', { cwd: tmpRepo.dbPath, stdio: 'pipe' });
     execSync('git -c user.name=test -c user.email=test@test commit --allow-empty -m init', {
       cwd: tmpRepo.dbPath,
       stdio: 'pipe',
     });
 
-    await ensureGitNexusIgnored(tmpRepo.dbPath);
-    await fs.writeFile(path.join(tmpRepo.dbPath, '.gitnexus', 'meta.json'), '{}\n');
+    await ensureYummyGraphIgnored(tmpRepo.dbPath);
+    await fs.writeFile(path.join(tmpRepo.dbPath, '.yummygraph', 'meta.json'), '{}\n');
 
     const status = execSync('git status --short', {
       cwd: tmpRepo.dbPath,
@@ -144,8 +144,8 @@ describe('ensureGitNexusIgnored (#1233)', () => {
 
   // ─ Read-only workspace tolerance (#1549) ────────────────────────────
   // The documented Docker workflow mounts the host workspace at /workspace:ro
-  // and runs `gitnexus index /workspace/<repo>`. The host has already created
-  // the .gitnexus dir during a prior `analyze`, so the gitignore file already
+  // and runs `yummygraph index /workspace/<repo>`. The host has already created
+  // the .yummygraph dir during a prior `analyze`, so the gitignore file already
   // exists with the correct content — there's no real work to do. The tests
   // below pin two pieces of behaviour that make that workflow work:
   //   (a) the function short-circuits when the file is already correct
@@ -154,28 +154,28 @@ describe('ensureGitNexusIgnored (#1233)', () => {
   //       (EROFS / EACCES / EPERM), the function logs and continues instead of
   //       throwing — so the caller's `registerRepo` work stays committed.
 
-  it('does not re-write .gitnexus/.gitignore when it already has the desired content', async () => {
-    await ensureGitNexusIgnored(tmpRepo.dbPath);
-    const gitignorePath = path.join(tmpRepo.dbPath, '.gitnexus', '.gitignore');
+  it('does not re-write .yummygraph/.gitignore when it already has the desired content', async () => {
+    await ensureYummyGraphIgnored(tmpRepo.dbPath);
+    const gitignorePath = path.join(tmpRepo.dbPath, '.yummygraph', '.gitignore');
     const before = await fs.stat(gitignorePath);
 
     await new Promise((resolve) => setTimeout(resolve, 25));
 
-    await ensureGitNexusIgnored(tmpRepo.dbPath);
+    await ensureYummyGraphIgnored(tmpRepo.dbPath);
 
     const after = await fs.stat(gitignorePath);
     expect(after.mtimeMs).toBe(before.mtimeMs);
   });
 
   it.skipIf(process.platform === 'win32' || process.getuid?.() === 0)(
-    'does not throw when .gitnexus/.gitignore is already correct and the storage dir is read-only',
+    'does not throw when .yummygraph/.gitignore is already correct and the storage dir is read-only',
     async () => {
-      await ensureGitNexusIgnored(tmpRepo.dbPath);
-      const storagePath = path.join(tmpRepo.dbPath, '.gitnexus');
+      await ensureYummyGraphIgnored(tmpRepo.dbPath);
+      const storagePath = path.join(tmpRepo.dbPath, '.yummygraph');
 
       await fs.chmod(storagePath, 0o555);
       try {
-        await expect(ensureGitNexusIgnored(tmpRepo.dbPath)).resolves.not.toThrow();
+        await expect(ensureYummyGraphIgnored(tmpRepo.dbPath)).resolves.not.toThrow();
       } finally {
         await fs.chmod(storagePath, 0o755);
       }
@@ -185,13 +185,13 @@ describe('ensureGitNexusIgnored (#1233)', () => {
   it.skipIf(process.platform === 'win32' || process.getuid?.() === 0)(
     'warns and continues when the storage dir is read-only and the file does not yet exist',
     async () => {
-      const storagePath = path.join(tmpRepo.dbPath, '.gitnexus');
+      const storagePath = path.join(tmpRepo.dbPath, '.yummygraph');
       await fs.mkdir(storagePath, { recursive: true });
       await fs.chmod(storagePath, 0o555);
 
       const cap = _captureLogger();
       try {
-        await expect(ensureGitNexusIgnored(tmpRepo.dbPath)).resolves.not.toThrow();
+        await expect(ensureYummyGraphIgnored(tmpRepo.dbPath)).resolves.not.toThrow();
         expect(
           cap
             .records()
@@ -199,8 +199,8 @@ describe('ensureGitNexusIgnored (#1233)', () => {
               (r) =>
                 r.level === 40 &&
                 (r.code === 'EACCES' || r.code === 'EPERM') &&
-                String(r.msg ?? '').includes('.gitnexus/.gitignore') &&
-                String(r.path ?? '').includes('.gitnexus'),
+                String(r.msg ?? '').includes('.yummygraph/.gitignore') &&
+                String(r.path ?? '').includes('.yummygraph'),
             ),
         ).toBe(true);
       } finally {
@@ -215,7 +215,7 @@ describe('ensureGitNexusIgnored (#1233)', () => {
 
 describe('readRegistry', () => {
   it('returns empty array when registry does not exist', async () => {
-    // readRegistry reads from ~/.gitnexus/registry.json
+    // readRegistry reads from ~/.yummygraph/registry.json
     // If the file doesn't exist, it should return []
     // This test exercises the catch path
     const result = await readRegistry();
@@ -231,7 +231,7 @@ describe('saveCLIConfig / loadCLIConfig', () => {
   let originalHomedir: typeof os.homedir;
 
   beforeEach(async () => {
-    tmpHandle = await createTempDir('gitnexus-config-test-');
+    tmpHandle = await createTempDir('yummygraph-config-test-');
     originalHomedir = os.homedir;
     // Mock os.homedir to point to our temp dir
     // Note: This won't fully work because repo-manager uses its own import of os
@@ -298,16 +298,16 @@ describe('API key file permissions', () => {
 
 // ─── analyze --name <alias> + duplicate-name guard (#829) ────────────
 //
-// Each test isolates the global registry by pointing GITNEXUS_HOME at a
+// Each test isolates the global registry by pointing YUMMYGRAPH_HOME at a
 // per-test tmpdir. `getGlobalDir()` honors that env var, so registerRepo
 // writes/reads a sandboxed registry.json without touching the user's
-// real ~/.gitnexus.
+// real ~/.yummygraph.
 
 describe('registerRepo name override + collision guard (#829)', () => {
   let tmpHome: Awaited<ReturnType<typeof createTempDir>>;
   let tmpRepoA: Awaited<ReturnType<typeof createTempDir>>;
   let tmpRepoB: Awaited<ReturnType<typeof createTempDir>>;
-  let savedGitnexusHome: string | undefined;
+  let savedYummygraphHome: string | undefined;
 
   const meta: RepoMeta = {
     repoPath: '',
@@ -317,16 +317,16 @@ describe('registerRepo name override + collision guard (#829)', () => {
   };
 
   beforeEach(async () => {
-    tmpHome = await createTempDir('gitnexus-registry-home-');
-    tmpRepoA = await createTempDir('gitnexus-repo-a-');
-    tmpRepoB = await createTempDir('gitnexus-repo-b-');
-    savedGitnexusHome = process.env.GITNEXUS_HOME;
-    process.env.GITNEXUS_HOME = tmpHome.dbPath;
+    tmpHome = await createTempDir('yummygraph-registry-home-');
+    tmpRepoA = await createTempDir('yummygraph-repo-a-');
+    tmpRepoB = await createTempDir('yummygraph-repo-b-');
+    savedYummygraphHome = process.env.YUMMYGRAPH_HOME;
+    process.env.YUMMYGRAPH_HOME = tmpHome.dbPath;
   });
 
   afterEach(async () => {
-    if (savedGitnexusHome === undefined) delete process.env.GITNEXUS_HOME;
-    else process.env.GITNEXUS_HOME = savedGitnexusHome;
+    if (savedYummygraphHome === undefined) delete process.env.YUMMYGRAPH_HOME;
+    else process.env.YUMMYGRAPH_HOME = savedYummygraphHome;
     await tmpHome.cleanup();
     await tmpRepoA.cleanup();
     await tmpRepoB.cleanup();
@@ -407,8 +407,8 @@ describe('registerRepo name override + collision guard (#829)', () => {
     // Create two sibling dirs whose basenames collide. Neither caller
     // passes { name }, so the guard must NOT fire — this preserves the
     // pre-#829 behaviour for users who don't know about --name yet.
-    const parentA = await createTempDir('gitnexus-collide-parent-a-');
-    const parentB = await createTempDir('gitnexus-collide-parent-b-');
+    const parentA = await createTempDir('yummygraph-collide-parent-a-');
+    const parentB = await createTempDir('yummygraph-collide-parent-b-');
     const sharedBasename = 'app';
     const pathA = path.join(parentA.dbPath, sharedBasename);
     const pathB = path.join(parentB.dbPath, sharedBasename);
@@ -467,7 +467,7 @@ describe('parseRepoNameFromUrl', () => {
 
 describe('getInferredRepoName + registerRepo (#979 — git remote inference)', () => {
   let tmpHome: Awaited<ReturnType<typeof createTempDir>>;
-  let savedGitnexusHome: string | undefined;
+  let savedYummygraphHome: string | undefined;
 
   const meta: RepoMeta = {
     repoPath: '',
@@ -487,19 +487,19 @@ describe('getInferredRepoName + registerRepo (#979 — git remote inference)', (
   };
 
   beforeEach(async () => {
-    tmpHome = await createTempDir('gitnexus-registry-home-979-');
-    savedGitnexusHome = process.env.GITNEXUS_HOME;
-    process.env.GITNEXUS_HOME = tmpHome.dbPath;
+    tmpHome = await createTempDir('yummygraph-registry-home-979-');
+    savedYummygraphHome = process.env.YUMMYGRAPH_HOME;
+    process.env.YUMMYGRAPH_HOME = tmpHome.dbPath;
   });
 
   afterEach(async () => {
-    if (savedGitnexusHome === undefined) delete process.env.GITNEXUS_HOME;
-    else process.env.GITNEXUS_HOME = savedGitnexusHome;
+    if (savedYummygraphHome === undefined) delete process.env.YUMMYGRAPH_HOME;
+    else process.env.YUMMYGRAPH_HOME = savedYummygraphHome;
     await tmpHome.cleanup();
   });
 
   it('getInferredRepoName returns null when there is no .git directory', async () => {
-    const tmp = await createTempDir('gitnexus-no-git-');
+    const tmp = await createTempDir('yummygraph-no-git-');
     try {
       expect(getInferredRepoName(tmp.dbPath)).toBeNull();
     } finally {
@@ -508,7 +508,7 @@ describe('getInferredRepoName + registerRepo (#979 — git remote inference)', (
   });
 
   it('getInferredRepoName returns null when origin is unset', async () => {
-    const tmp = await createTempDir('gitnexus-no-origin-');
+    const tmp = await createTempDir('yummygraph-no-origin-');
     try {
       initGitRepo(tmp.dbPath, null);
       expect(getInferredRepoName(tmp.dbPath)).toBeNull();
@@ -518,7 +518,7 @@ describe('getInferredRepoName + registerRepo (#979 — git remote inference)', (
   });
 
   it('getInferredRepoName returns the remote repo name when origin is set', async () => {
-    const tmp = await createTempDir('gitnexus-with-origin-');
+    const tmp = await createTempDir('yummygraph-with-origin-');
     try {
       initGitRepo(tmp.dbPath, 'https://github.com/owner/lume_spark.git');
       expect(getInferredRepoName(tmp.dbPath)).toBe('lume_spark');
@@ -531,7 +531,7 @@ describe('getInferredRepoName + registerRepo (#979 — git remote inference)', (
     // Reproduce <rig>/refinery/rig/.git layout: leaf basename is "rig",
     // but origin URL says "lume_spark". The new precedence MUST pick up
     // the remote-derived name instead of the basename.
-    const root = await createTempDir('gitnexus-gastown-');
+    const root = await createTempDir('yummygraph-gastown-');
     try {
       const rigPath = path.join(root.dbPath, 'lume_spark', 'refinery', 'rig');
       await fs.mkdir(rigPath, { recursive: true });
@@ -552,7 +552,7 @@ describe('getInferredRepoName + registerRepo (#979 — git remote inference)', (
   it('two analyze calls of differently-remoted "rig" leaves no longer collide', async () => {
     // Without the remote inference both would register as "rig"; with
     // inference they pick up their distinct remotes — the original issue.
-    const root = await createTempDir('gitnexus-gastown-2-');
+    const root = await createTempDir('yummygraph-gastown-2-');
     try {
       const rigA = path.join(root.dbPath, 'lume_spark', 'refinery', 'rig');
       const rigB = path.join(root.dbPath, 'gemba', 'refinery', 'rig');
@@ -574,7 +574,7 @@ describe('getInferredRepoName + registerRepo (#979 — git remote inference)', (
   });
 
   it('explicit --name still wins over remote inference', async () => {
-    const tmp = await createTempDir('gitnexus-name-wins-');
+    const tmp = await createTempDir('yummygraph-name-wins-');
     try {
       initGitRepo(tmp.dbPath, 'https://github.com/owner/from-remote.git');
       const name = await registerRepo(tmp.dbPath, meta, { name: 'user-alias' });
@@ -585,7 +585,7 @@ describe('getInferredRepoName + registerRepo (#979 — git remote inference)', (
   });
 
   it('preserved alias still wins over remote inference on re-analyze', async () => {
-    const tmp = await createTempDir('gitnexus-preserve-alias-');
+    const tmp = await createTempDir('yummygraph-preserve-alias-');
     try {
       initGitRepo(tmp.dbPath, 'https://github.com/owner/from-remote.git');
       // First analyze sets the alias…
@@ -600,7 +600,7 @@ describe('getInferredRepoName + registerRepo (#979 — git remote inference)', (
   });
 
   it('falls back to basename when no .git / no remote is available', async () => {
-    const tmp = await createTempDir('gitnexus-fallback-basename-');
+    const tmp = await createTempDir('yummygraph-fallback-basename-');
     try {
       const name = await registerRepo(tmp.dbPath, meta);
       expect(name).toBe(path.basename(tmp.dbPath));
@@ -610,11 +610,11 @@ describe('getInferredRepoName + registerRepo (#979 — git remote inference)', (
   });
 });
 
-// ─── resolveRegistryEntry (#664 — gitnexus remove <target>) ──────────
+// ─── resolveRegistryEntry (#664 — yummygraph remove <target>) ──────────
 //
 // The resolver is a pure function over a `RegistryEntry[]` snapshot, so
 // these tests build synthetic entries inline and do NOT touch
-// ~/.gitnexus. No GITNEXUS_HOME sandboxing needed. This also means the
+// ~/.yummygraph. No YUMMYGRAPH_HOME sandboxing needed. This also means the
 // tests are platform-portable on Windows where realpath semantics on
 // tmpdirs can diverge between runs (see the #955 CI pivot).
 
@@ -632,21 +632,21 @@ describe('resolveRegistryEntry (#664)', () => {
     {
       name: 'app',
       path: pathA,
-      storagePath: `${pathA}${path.sep}.gitnexus`,
+      storagePath: `${pathA}${path.sep}.yummygraph`,
       indexedAt: '2026-04-18T00:00:00.000Z',
       lastCommit: 'aaaaaaa',
     },
     {
       name: 'app',
       path: pathB,
-      storagePath: `${pathB}${path.sep}.gitnexus`,
+      storagePath: `${pathB}${path.sep}.yummygraph`,
       indexedAt: '2026-04-18T00:00:00.000Z',
       lastCommit: 'bbbbbbb',
     },
     {
       name: 'website',
       path: pathW,
-      storagePath: `${pathW}${path.sep}.gitnexus`,
+      storagePath: `${pathW}${path.sep}.yummygraph`,
       indexedAt: '2026-04-18T00:00:00.000Z',
       lastCommit: 'ccccccc',
     },
@@ -744,7 +744,7 @@ describe('resolveRegistryEntry (#664)', () => {
       {
         name: pathW, // degenerate: name equals another entry's path
         path: `${prefix}elsewhere${path.sep}odd`,
-        storagePath: `${prefix}elsewhere${path.sep}odd${path.sep}.gitnexus`,
+        storagePath: `${prefix}elsewhere${path.sep}odd${path.sep}.yummygraph`,
         indexedAt: '2026-04-18T00:00:00.000Z',
         lastCommit: 'ddddddd',
       },
@@ -822,7 +822,7 @@ describe('resolveRegistryEntry backward-compat with non-canonical stored paths (
     // we build the string by raw concat to keep it string-unequal to
     // `realDir` until `canonicalizePath` runs.
     const realDir = process.cwd();
-    const nonCanonical = realDir + path.sep + '.'; // e.g. /work/gitnexus/.
+    const nonCanonical = realDir + path.sep + '.'; // e.g. /work/yummygraph/.
     // Sanity: these are string-unequal before canonicalisation.
     expect(nonCanonical).not.toBe(realDir);
 
@@ -830,7 +830,7 @@ describe('resolveRegistryEntry backward-compat with non-canonical stored paths (
       {
         name: 'stored-under-noncanonical-form',
         path: nonCanonical,
-        storagePath: path.join(nonCanonical, '.gitnexus'),
+        storagePath: path.join(nonCanonical, '.yummygraph'),
         indexedAt: '2026-04-20T00:00:00.000Z',
         lastCommit: 'deadbee',
       },
@@ -844,8 +844,8 @@ describe('resolveRegistryEntry backward-compat with non-canonical stored paths (
 
 // ─── assertSafeStoragePath (#1003 review — @magyargergo) ─────────────
 //
-// Guard rail against destroying more than the `.gitnexus/` subfolder.
-// `~/.gitnexus/registry.json` is user-writable plain text, so a
+// Guard rail against destroying more than the `.yummygraph/` subfolder.
+// `~/.yummygraph/registry.json` is user-writable plain text, so a
 // corrupted or hand-edited entry could put storagePath anywhere.
 // These tests use synthetic `RegistryEntry` fixtures (no disk I/O)
 // because the guard is a pure string check — it must not depend on
@@ -861,10 +861,10 @@ describe('assertSafeStoragePath (#1003)', () => {
     lastCommit: 'deadbee',
   };
 
-  it('accepts the canonical <repo>/.gitnexus storage path', () => {
+  it('accepts the canonical <repo>/.yummygraph storage path', () => {
     const entry: RegistryEntry = {
       ...base,
-      storagePath: path.join(repoPath, '.gitnexus'),
+      storagePath: path.join(repoPath, '.yummygraph'),
     };
     expect(() => assertSafeStoragePath(entry)).not.toThrow();
   });
@@ -901,10 +901,10 @@ describe('assertSafeStoragePath (#1003)', () => {
     expect(() => assertSafeStoragePath(entry)).toThrow(UnsafeStoragePathError);
   });
 
-  it('rejects when storagePath is a sibling .gitnexus (right basename, wrong parent)', () => {
+  it('rejects when storagePath is a sibling .yummygraph (right basename, wrong parent)', () => {
     const entry: RegistryEntry = {
       ...base,
-      storagePath: path.join(`${prefix}different${path.sep}repo`, '.gitnexus'),
+      storagePath: path.join(`${prefix}different${path.sep}repo`, '.yummygraph'),
     };
     expect(() => assertSafeStoragePath(entry)).toThrow(UnsafeStoragePathError);
   });
@@ -921,8 +921,8 @@ describe('assertSafeStoragePath (#1003)', () => {
       const err = e as UnsafeStoragePathError;
       expect(err.kind).toBe('UnsafeStoragePathError');
       expect(err.entry).toBe(entry);
-      // Expected path is the canonical `<repo>/.gitnexus`.
-      expect(err.expectedStoragePath).toBe(path.join(path.resolve(repoPath), '.gitnexus'));
+      // Expected path is the canonical `<repo>/.yummygraph`.
+      expect(err.expectedStoragePath).toBe(path.join(path.resolve(repoPath), '.yummygraph'));
       // Actual path is the corrupted value (resolved).
       expect(err.actualStoragePath).toBe(path.resolve(entry.storagePath));
       // Message must suggest the recovery action.
@@ -934,7 +934,7 @@ describe('assertSafeStoragePath (#1003)', () => {
     if (process.platform !== 'win32') return;
     const entry: RegistryEntry = {
       ...base,
-      storagePath: path.join(repoPath.toUpperCase(), '.GITNEXUS'),
+      storagePath: path.join(repoPath.toUpperCase(), '.YUMMYGRAPH'),
     };
     // Should accept because Windows paths are case-insensitive.
     expect(() => assertSafeStoragePath(entry)).not.toThrow();
@@ -955,7 +955,7 @@ describe('assertSafeStoragePath (#1003)', () => {
 describe('registerRepo worktree-aware basename fallback (#1259)', () => {
   let tmpHome: Awaited<ReturnType<typeof createTempDir>>;
   let tmpRepo: Awaited<ReturnType<typeof createTempDir>>;
-  let savedGitnexusHome: string | undefined;
+  let savedYummygraphHome: string | undefined;
 
   const meta: RepoMeta = {
     repoPath: '',
@@ -965,15 +965,15 @@ describe('registerRepo worktree-aware basename fallback (#1259)', () => {
   };
 
   beforeEach(async () => {
-    tmpHome = await createTempDir('gitnexus-registry-home-');
-    tmpRepo = await createTempDir('gitnexus-canonical-repo-');
-    savedGitnexusHome = process.env.GITNEXUS_HOME;
-    process.env.GITNEXUS_HOME = tmpHome.dbPath;
+    tmpHome = await createTempDir('yummygraph-registry-home-');
+    tmpRepo = await createTempDir('yummygraph-canonical-repo-');
+    savedYummygraphHome = process.env.YUMMYGRAPH_HOME;
+    process.env.YUMMYGRAPH_HOME = tmpHome.dbPath;
   });
 
   afterEach(async () => {
-    if (savedGitnexusHome === undefined) delete process.env.GITNEXUS_HOME;
-    else process.env.GITNEXUS_HOME = savedGitnexusHome;
+    if (savedYummygraphHome === undefined) delete process.env.YUMMYGRAPH_HOME;
+    else process.env.YUMMYGRAPH_HOME = savedYummygraphHome;
     await tmpHome.cleanup();
     await tmpRepo.cleanup();
   });

@@ -17,7 +17,7 @@ import {
   phpReceiverBinding,
 } from './php/index.js';
 
-import { SupportedLanguages } from 'gitnexus-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 import { createClassExtractor } from '../class-extractors/generic.js';
 import { phpClassConfig } from '../class-extractors/configs/php.js';
 import { defineLanguage, type AstFrameworkPatternConfig } from '../language-provider.js';
@@ -27,7 +27,7 @@ import { createImportResolver } from '../import-resolvers/resolver-factory.js';
 import { phpImportConfig } from '../import-resolvers/configs/php.js';
 import { PHP_QUERIES } from '../tree-sitter-queries.js';
 import { findDescendant, extractStringContent, type SyntaxNode } from '../utils/ast-helpers.js';
-import type { NodeLabel } from 'gitnexus-shared';
+import type { NodeLabel } from 'yummygraph-shared';
 import { createFieldExtractor } from '../field-extractors/generic.js';
 import { phpConfig as phpFieldConfig } from '../field-extractors/configs/php.js';
 import { createMethodExtractor } from '../method-extractors/generic.js';

@@ -20,7 +20,7 @@
  * as-is for TypeScript, Java, Kotlin, Ruby, etc.
  */
 
-import type { BindingRef, ParsedFile, ScopeId, SymbolDefinition, TypeRef } from 'gitnexus-shared';
+import type { BindingRef, ParsedFile, ScopeId, SymbolDefinition, TypeRef } from 'yummygraph-shared';
 import type { ScopeResolutionIndexes } from '../../model/scope-resolution-indexes.js';
 import type { SemanticModel } from '../../model/semantic-model.js';
 import type { WorkspaceResolutionIndex } from '../workspace-index.js';

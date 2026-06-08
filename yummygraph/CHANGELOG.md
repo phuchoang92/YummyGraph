@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to GitNexus will be documented in this file.
+All notable changes to YummyGraph will be documented in this file.
 
 ## [Unreleased]
 
@@ -13,11 +13,11 @@ All notable changes to GitNexus will be documented in this file.
 - **C++ overload & template resolution** — operator-call resolution (#1754), template partial ordering (#1885), user-defined conversion ranking (#1829), nullptr/ellipsis pointer conversion ranks (#1708), SFINAE filter (#1623), expanded `type_traits` constraint registry (#1648), structured resolver-suppression outcomes (#1785), function-type ADL entities (#1822), and a parameter-type class sidecar (#1642)
 - **Go enhancements** — structural interface implementation inference (#1966) and a `builtInNames` set for the Go language provider (#1886)
 - **Self-healing worker pool** — automatic worker replacement plus deferred-resolution observability and verbose progress logging (#1741, #1773, #1947)
-- **`.gitnexusrc` config file and `gitnexus analyze --default-branch`** (#243, #1996)
+- **`.yummygraphrc` config file and `yummygraph analyze --default-branch`** (#243, #1996)
 - **CLI / MCP impact ergonomics** — `--uid/--file/--kind` disambiguation flags (#1907, #1914), `limit/offset/summaryOnly` pagination on the impact tool (#1818), and a per-symbol `processes` field on `byDepth` items (#1867)
-- **`gitnexus analyze --repair-fts`** — enforces FTS verification with hardened repair safeguards (#1720)
-- **Web viewer** — Tree View and Circles View (#1799), GitLab repository URLs (#1565), `GITNEXUS_BACKEND_URL` env var for Docker deployments (#1286), and web + CLI internationalization (#1748)
-- **Wiki** — local Claude/Codex providers (#1769), an opencode local provider (#2039), and `gitnexus wiki --lang <lang>` for multilanguage wiki generation (#1613)
+- **`yummygraph analyze --repair-fts`** — enforces FTS verification with hardened repair safeguards (#1720)
+- **Web viewer** — Tree View and Circles View (#1799), GitLab repository URLs (#1565), `YUMMYGRAPH_BACKEND_URL` env var for Docker deployments (#1286), and web + CLI internationalization (#1748)
+- **Wiki** — local Claude/Codex providers (#1769), an opencode local provider (#2039), and `yummygraph wiki --lang <lang>` for multilanguage wiki generation (#1613)
 - **`detect-changes` git-worktree support** (#1654)
 - **DeepSeek V4 API support** (#1594)
 - **Devcontainer for the Claude / Codex / Cursor CLIs** (#1875) and antigravity integration setup + hook adapter (#1730)
@@ -37,14 +37,14 @@ All notable changes to GitNexus will be documented in this file.
 - **Rust / PHP / Vue / Java parsing** — Rust `struct_expression` name pattern split (#2051); PHP import decomposition, namespace-less `.phtml` module scopes, and Blade-template exclusion (#1801, #1790, #1989); Vue JSDoc, dual-script merge, and lang plumbing F89/F90/F92 (#1936, #2050); Java inherited `RequestMapping` prefix deduplication (#2057) and same-module type resolution for duplicate FQNs (#1712)
 - **TypeScript** — HOC pattern false positives fixed with `export default` HOC support (#1943) and suffix-index reuse in the scope resolver (#1840)
 - **Inheritance on the worker path** — all languages' inheritance migrated to scope-resolution in worker mode (#1951, #1956); centralized heritage supertype matching (#1921, #1922, #1940); `File->Member` `DEFINES` edges skipped for class members (#1949); phantom `Function` defs for array-method callbacks no longer emitted (#1906)
-- **MCP** — sibling-clone repo-ID collisions prevented and generated MCP tool names corrected (#2067); orphan processes avoided by handling stdin close/end and the startup race (#2049); duplicate-name repo resolution disambiguated for worktrees (#1753); Windows setup fallback when global `gitnexus` resolves to a non-spawnable shim (#1694)
+- **MCP** — sibling-clone repo-ID collisions prevented and generated MCP tool names corrected (#2067); orphan processes avoided by handling stdin close/end and the startup race (#2049); duplicate-name repo resolution disambiguated for worktrees (#1753); Windows setup fallback when global `yummygraph` resolves to a non-spawnable shim (#1694)
 - **Worker pool** — resilient zero-copy ingestion worker pool prevents analyze hangs on TS-root-scale loads (#1693); cache-hit native workers no longer abort (#1751, #1833); worker-pool docs drift corrected and worker-side stack surfaced on crash (#2068, #2070)
 - **LadybugDB** — FTS loaded in the Windows read pool (#2040) and probed-then-loaded on Windows (#1690, #1692); non-ASCII KuzuDB paths resolved on Windows (#1811, #1817); WAL corruption detected in schema init with recovery surfaced (#1647, #1650); WAL checkpoint-threshold control (#1772); init lock skipped for read-only opens (#1783, #1784); `serve` kept stable when sidecars are missing (#1747)
-- **Server / API** — `gitnexus serve` startup restored under Express 5 (#1749); `/api/graph`, `/api/search`, `/api/grep` opened read-only (#1686); native read-only enforcement and prepared statements for Cypher query paths (#1655); `eval-server` localhost binding left to the OS (#1722)
+- **Server / API** — `yummygraph serve` startup restored under Express 5 (#1749); `/api/graph`, `/api/search`, `/api/grep` opened read-only (#1686); native read-only enforcement and prepared statements for Cypher query paths (#1655); `eval-server` localhost binding left to the OS (#1722)
 - **Embeddings** — local ONNX runtime guarded on macOS Intel before the transformers.js import (#1987)
 - **Web agent** — Nexus AI agent system prompt aligned with registered tools (#1984) and the agent stopped cleanly on user Stop (#1820)
 - **Group / contracts** — HTTP graph and source contracts unioned (#1709); `httpx` `AsyncClient` alias imports detected (#1687); Node gRPC `loadPackageDefinition` gate no longer matches every member call (#1916); manifest/workspace extraction moved before `closeLbug` (#1802, #1807)
-- **Hooks / install** — `gitnexus` resolved on `PATH` via a pure-Node, all-OS scan (#1938, #1980); offline-first extension installs (#1161); actionable error and docs for the `pnpm dlx`/`pnpx` native-load crash (#307, #1967); `onnxruntime-common` declared as a runtime dependency (#2074); vendored grammars materialized to fix Windows EPERM (#1728, #1729)
+- **Hooks / install** — `yummygraph` resolved on `PATH` via a pure-Node, all-OS scan (#1938, #1980); offline-first extension installs (#1161); actionable error and docs for the `pnpm dlx`/`pnpx` native-load crash (#307, #1967); `onnxruntime-common` declared as a runtime dependency (#2074); vendored grammars materialized to fix Windows EPERM (#1728, #1729)
 - **CLI** — missing LadybugDB native binary detected at startup with actionable guidance (#835, #1837); `--no-stats` applied to the keep-marker stats line (#1706, #1765); skipped large-file paths surfaced by default (#1659, #1661); build.js skipped when running outside the monorepo (#1795, #1816); auto-heap raised to 16 GB with tightened cross-platform OOM guidance for UE5-scale repos (#1652)
 - **Wiki** — hidden 60s default timeout removed with timeout/retry flag validation and surfaced timeout errors (#1651); budget-aware grouping to prevent context overflow on large repos (#627, #1832)
 - **`detect-changes`** — `resolveWorktreeCwd` guarded against overriding a separately-indexed worktree (#1691)
@@ -65,9 +65,9 @@ All notable changes to GitNexus will be documented in this file.
 
 ### Chore / Dependencies
 
-- `@ladybugdb/core` bump in /gitnexus (#2056)
-- Routine dependency bumps across /gitnexus, /gitnexus-web, /eval, and GitHub Actions — incl. `hono`, `vitest`, `@vitest/coverage-v8`, `tsx`, `lru-cache`, `express`/`@types/express`, `express-rate-limit`, `qs`, `node-addon-api`, `brace-expansion`, `langchain`, `i18next`, `dompurify`, `lucide-react`, `axios`, `zod`, `@langchain/langgraph`, `@vercel/node`, `langsmith`, `aiohttp`, `idna`, and the `docker/*` / `github/codeql-action` / `release-drafter` / `dependency-review-action` actions (#2056, #2044, #2043, #2042, #2016, #2015, #2013, #2012, #2011, #2010, #2009, #2008, #2018, #2019, #2017, #2020, #1986, #1911, #1864, #1863, #1861, #1860, #1866, #1844, #1845, #1826, #1825, #1824, #1791, #1789, #1768, #1767, #1739, #1740, #1738, #1736, #1735, #1734, #1731, #1713, #1698, #1697, #1696, #1689, #1604, #1552, #1464, #872)
-- **Security** — `@vercel/node` upgraded in /gitnexus-web with transitive advisories remediated (#1705)
+- `@ladybugdb/core` bump in /yummygraph (#2056)
+- Routine dependency bumps across /yummygraph, /yummygraph-web, /eval, and GitHub Actions — incl. `hono`, `vitest`, `@vitest/coverage-v8`, `tsx`, `lru-cache`, `express`/`@types/express`, `express-rate-limit`, `qs`, `node-addon-api`, `brace-expansion`, `langchain`, `i18next`, `dompurify`, `lucide-react`, `axios`, `zod`, `@langchain/langgraph`, `@vercel/node`, `langsmith`, `aiohttp`, `idna`, and the `docker/*` / `github/codeql-action` / `release-drafter` / `dependency-review-action` actions (#2056, #2044, #2043, #2042, #2016, #2015, #2013, #2012, #2011, #2010, #2009, #2008, #2018, #2019, #2017, #2020, #1986, #1911, #1864, #1863, #1861, #1860, #1866, #1844, #1845, #1826, #1825, #1824, #1791, #1789, #1768, #1767, #1739, #1740, #1738, #1736, #1735, #1734, #1731, #1713, #1698, #1697, #1696, #1689, #1604, #1552, #1464, #872)
+- **Security** — `@vercel/node` upgraded in /yummygraph-web with transitive advisories remediated (#1705)
 
 ## [1.6.5] - 2026-05-16
 
@@ -79,10 +79,10 @@ All notable changes to GitNexus will be documented in this file.
 - **PHP scope-resolution migration** — PHP moved to scope-based resolution (#938, #1497, supersedes #1124)
 - **Java scope-resolution migration** — RFC #909 Ring 3 (#1482)
 - **C scope-resolution migration** — RFC #909 Ring 3 (#1481)
-- **Incremental indexing** — `gitnexus analyze` now reuses a parse cache, writes back to DB, and short-circuits scope resolution when nothing changed (#1479)
-- **`gitnexus:keep` marker** — preserves custom context sections (#605, #1508)
-- **`gitnexus analyze --skip-skills` and `--index-only`** flags (#742, #1485)
-- **`gitnexus wiki --timeout` and `--retries` flags** — mitigate timeout aborts on large module pages (#1543)
+- **Incremental indexing** — `yummygraph analyze` now reuses a parse cache, writes back to DB, and short-circuits scope resolution when nothing changed (#1479)
+- **`yummygraph:keep` marker** — preserves custom context sections (#605, #1508)
+- **`yummygraph analyze --skip-skills` and `--index-only`** flags (#742, #1485)
+- **`yummygraph wiki --timeout` and `--retries` flags** — mitigate timeout aborts on large module pages (#1543)
 - **HTTP embedding `dimensions` parameter** — now forwarded to the embedding endpoint (#1498)
 - **Cursor 2.4 `postToolUse` hooks** — upgraded for Read/Grep/Shell coverage (#1467)
 
@@ -93,15 +93,15 @@ All notable changes to GitNexus will be documented in this file.
 - **Parse cache persistence** — sharded on large repos to avoid corruption (#1580)
 - **TypeScript ESM `.js` extension** — fallback applied to tsconfig path-alias resolution (#1530) and `.js` → `.ts` source resolution (#1525)
 - **Markdown CRLF line endings** — section heading parser now handles them (#1469)
-- **`gitnexus analyze --no-stats`** — actually omits volatile counts (#1477, #1478)
-- **`ensureGitNexusIgnored`** — tolerate read-only workspaces (#1549, #1550)
-- **Claude augment hook** — skipped when GitNexus server owns the DB (#1493)
-- **Docker runtime image** — symlink `gitnexus` binary onto `$PATH` (#1551); install `ca-certificates` for TLS verification (#1545, #1547); include duckdb installer script (#1502)
+- **`yummygraph analyze --no-stats`** — actually omits volatile counts (#1477, #1478)
+- **`ensureYummyGraphIgnored`** — tolerate read-only workspaces (#1549, #1550)
+- **Claude augment hook** — skipped when YummyGraph server owns the DB (#1493)
+- **Docker runtime image** — symlink `yummygraph` binary onto `$PATH` (#1551); install `ca-certificates` for TLS verification (#1545, #1547); include duckdb installer script (#1502)
 - **Windows reliability** — fix 32767-char tree-sitter crash and VECTOR-extension SIGSEGV (#1433); platform-aware `tsc` build command for win32 (#1531)
 - **Search / FTS** — guard against undefined `bm25Results` when FTS is unavailable (#1489, #1540); CONTAINS fallback in augment when FTS indexes unavailable (#1476)
 - **Wiki** — sanitize generated mermaid diagrams (#1539)
 - **Hooks** — cap concurrent augment subprocesses to prevent runaway fan-out (#1486, #1510)
-- **LadybugDB** — drain checkpoint result before close (#1506); recover `gitnexus analyze` from orphan sidecars when the main DB file is missing (#1622)
+- **LadybugDB** — drain checkpoint result before close (#1506); recover `yummygraph analyze` from orphan sidecars when the main DB file is missing (#1622)
 - **Group / contracts** — detect `httpx` async consumers (#1408)
 - **Server hardening** — sanitize repo name to prevent argument injection on `/api/analyze` (#1305)
 
@@ -115,11 +115,11 @@ All notable changes to GitNexus will be documented in this file.
 
 ### Chore / Dependencies
 
-- `vitest` 4.1.5 → 4.1.6 in /gitnexus (#1605)
-- `@langchain/google-genai` bump in /gitnexus-web (#1554)
-- `vite` 8.0.10 → 8.0.11 in /gitnexus-web (#1555)
+- `vitest` 4.1.5 → 4.1.6 in /yummygraph (#1605)
+- `@langchain/google-genai` bump in /yummygraph-web (#1554)
+- `vite` 8.0.10 → 8.0.11 in /yummygraph-web (#1555)
 - `mermaid` bump (#1514)
-- `protobufjs` 7.5.5 → 7.5.8 + `@protobufjs/utf8` in /gitnexus (#1535, #1536)
+- `protobufjs` 7.5.5 → 7.5.8 + `@protobufjs/utf8` in /yummygraph (#1535, #1536)
 - `urllib3` bump in /eval uv group (#1512)
 - GitHub Actions: `sigstore/cosign-installer` 4.1.1 → 4.1.2 (#1557)
 
@@ -127,7 +127,7 @@ All notable changes to GitNexus will be documented in this file.
 
 ### Added
 
-- **`gitnexus publish`** — opt-in command to push your indexed graph to the understand-quickly registry for shareable browsing (#1425)
+- **`yummygraph publish`** — opt-in command to push your indexed graph to the understand-quickly registry for shareable browsing (#1425)
 - **`IncludeExtractor` for C++** — cross-repo include tracking joins the group contract pipeline (#1156)
 - **Unreal Engine C++ support** — strips reflection macros (`UCLASS`, `UFUNCTION`, `UPROPERTY`, etc.) before tree-sitter parses, so UE projects index cleanly (#1439)
 - **Thrift contracts extractor** — group-mode contract detection for Apache Thrift IDL (#1234)
@@ -158,9 +158,9 @@ All notable changes to GitNexus will be documented in this file.
 - **Go** — loose equality for `Array.find()` null checks (#1384)
 - **Swift** — switched to the official prebuilt parser runtime (#1130)
 - **Server hardening cluster (U2–U8)** — JS path-injection on `/api/file` + docker-server (U2, #1322); git-clone path/CLI-injection / ReDoS hardening (U3, #1325); per-route rate limiting on FS-touching endpoints (U4, #1327); URL/regex/tag-filter sanitization (U7, #1330); ReDoS in cobol-preprocessor + rust-workspace + cross-impact resource exhaustion (U8, #1331); critical type-confusion + validation helper (#1317); rate-limit `/api/analyze` and `/api/embed` (closes #1328, #1339); IPv6 ipKeyGenerator (closes #1360, #1374); IPv4-compatible IPv6 / NAT64 SSRF bypasses in `validateGitUrl` (closes #1148, 95814847); predictable tempfile names → `crypto.randomBytes` (#1387); log-injection / http-to-file-access / client-side request forgery (#1456); pin Docker Node base images + Trivy verification + Dependabot policy (#1455)
-- **Group / contracts** — `runExactMatch` honours `.gitnexusignore` via shared `IgnoreService` (closes #1185, #1247); custom manifest links resolved against graph symbols (#1254); `IgnoreService` EACCES test under uid=0 (#1108)
+- **Group / contracts** — `runExactMatch` honours `.yummygraphignore` via shared `IgnoreService` (closes #1185, #1247); custom manifest links resolved against graph symbols (#1254); `IgnoreService` EACCES test under uid=0 (#1108)
 - **MCP** — close MCP server timeout via stdout discipline + cold-start friction (#1383); avoid `git` from non-repo cwd in sibling-cwd match (closes #1138, #1293); start MCP bridge correctly when using `npx` (#1114); project `tool_map` flows from handlers (#1113); parallelize staleness checks in `list_repos` (#1416)
-- **Storage / CLI** — derive registry name from canonical repo root, not worktree slug (closes #1259, #1296); `--skip-git` treats cwd as index root (#1245); keep GitNexus ignores inside `.gitnexus/` (#1248); surface silent finalize-skips so `analyze` cannot exit 0 without persisting (closes #1169, #1237); ignore global registry during staleness checks (#1141); use `os.homedir()` instead of `process.env.HOME` for HF cache dir (#1078); correct OpenCode skills install path in status message (#1386)
+- **Storage / CLI** — derive registry name from canonical repo root, not worktree slug (closes #1259, #1296); `--skip-git` treats cwd as index root (#1245); keep YummyGraph ignores inside `.yummygraph/` (#1248); surface silent finalize-skips so `analyze` cannot exit 0 without persisting (closes #1169, #1237); ignore global registry during staleness checks (#1141); use `os.homedir()` instead of `process.env.HOME` for HF cache dir (#1078); correct OpenCode skills install path in status message (#1386)
 - **Docker / server** — dedicated health endpoint for container healthcheck (closes #1147, #1355); HEAD probe so SSE heartbeat doesn't time out healthcheck (#1182); flush WAL after `/api/embed` so search sees new embeddings (closes #1149, #1359); platform-aware semantic fallback (#1150); skip vector index query on unsupported platforms (closes #1178, #1181); serve web UI at root path instead of 404 (#1048)
 - **Worker pool** — wait for replacement worker online before dispatch (#1324); prevent premature pool resolution in worker split-and-retry path (#1321); recover worker parse stalls (#1121); widened CI flake-tolerant timeouts (#1323, #1347, #1354)
 - **Embeddings storage** — CHECKPOINT before closing DB to prevent WAL corruption (#1314)
@@ -170,22 +170,22 @@ All notable changes to GitNexus will be documented in this file.
 - **Search** — load FTS during core DB init (#1123); create FTS indexes during `analyze` (#1107); surface warning when FTS indexes are missing (#1418)
 - **Hooks** — clarify `PostToolUse` hook is notification-only, not auto-reindex (#1070)
 - **Docs** — README Web UI section corrected (closes #1110, #1159, #2ff3e64f); Goliath capitalisation typo (#1126)
-- **CI** — fork-safe PR autofix pipeline (#1446); consolidated Claude review workflow (#1258); fine-grained PAT for RC tag push (#1407); handle expired artifacts in base coverage fetch (#1410, #1412); allow expected legacy parity failures (#1099); avoid duplicate main push checks; isolate native LadybugDB / CLI e2e flakes; seed e2e with a small fixture repo (#1249); configure e2e GitNexus home at runtime; widen rate-limit test window for Windows CI (#1347)
+- **CI** — fork-safe PR autofix pipeline (#1446); consolidated Claude review workflow (#1258); fine-grained PAT for RC tag push (#1407); handle expired artifacts in base coverage fetch (#1410, #1412); allow expected legacy parity failures (#1099); avoid duplicate main push checks; isolate native LadybugDB / CLI e2e flakes; seed e2e with a small fixture repo (#1249); configure e2e YummyGraph home at runtime; widen rate-limit test window for Windows CI (#1347)
 
 ### Changed
 
-- **`gitnexus publish` artefact contract** — universal opt-in publish format introduced (#1425, #1458)
+- **`yummygraph publish` artefact contract** — universal opt-in publish format introduced (#1425, #1458)
 - **Refactor: per-language patterns consolidated into `LanguageProvider`** (#1279)
 - **Refactor: `safeClose` helper** consolidates WAL flush across LadybugDB call sites (#1377)
 - **Quality: exclude `test/fixtures` from CodeQL, ESLint, and Prettier** (#1313)
-- **Regression coverage** for `.gitnexusignore` behaviour with `--skip-git` (#1450)
+- **Regression coverage** for `.yummygraphignore` behaviour with `--skip-git` (#1450)
 
 ### Chore / Dependencies
 
 - `@ladybugdb/core` 0.16.0 → 0.16.1 (#1235, #1326)
 - `@anthropic-ai/sdk` (#1442), `@langchain/anthropic` (#1389), `@langchain/core` (#1394), `@langchain/openai` (#1215)
 - `hono` 4.12.9 → 4.12.18 + `@hono/node-server` (#1310, #1311, #1443)
-- `axios` (#1345), `fast-uri` 3.1.0 → 3.1.2 (#1441), `lru-cache` 11.3.5 → 11.3.6 (#1344), `mnemonist` 0.40.3 → 0.40.4 (#1239), `express-rate-limit` (#1343, #1397), `onnxruntime-node` (#1213, #1435), `uuid` 13 → 14 in /gitnexus-web (#1211, after revert #1222 / re-land #1250 + #1208)
+- `axios` (#1345), `fast-uri` 3.1.0 → 3.1.2 (#1441), `lru-cache` 11.3.5 → 11.3.6 (#1344), `mnemonist` 0.40.3 → 0.40.4 (#1239), `express-rate-limit` (#1343, #1397), `onnxruntime-node` (#1213, #1435), `uuid` 13 → 14 in /yummygraph-web (#1211, after revert #1222 / re-land #1250 + #1208)
 - `react`/`@types/react` (#1210), `react-dom` 19.2.5 → 19.2.6 (#1396), `react-zoom-pan-pinch` (#1214), `jsdom` 29.0.2 → 29.1.1 (#1395)
 - npm_and_yarn group bump (#1312), uv group bump (#1315), `python-dotenv` (#1320), `@types/node` (#1212, #1421, #1436)
 - GitHub Actions: `docker/build-push-action` 6.19.2 → 7.1.0 (#1391), `github/codeql-action` 3.35.3 → 4.35.3 (#1390)
@@ -212,12 +212,12 @@ All notable changes to GitNexus will be documented in this file.
   - Per-language `resolveImportTarget` adapter (#922, #971)
   - `REGISTRY_PRIMARY_<LANG>` per-language flag reader (#924, #968)
   - `emit-references` drains `ReferenceIndex` to graph edges (#925, #973)
-- **`gitnexus analyze --name <alias>`** with duplicate-name guard in the repo registry (#955)
-- **`gitnexus remove <target>`** unindexes a registered repo by name or path (#664, #1003)
+- **`yummygraph analyze --name <alias>`** with duplicate-name guard in the repo registry (#955)
+- **`yummygraph remove <target>`** unindexes a registered repo by name or path (#664, #1003)
 - **Auto-infer registry name** from `git remote.origin.url` when `--name` is omitted (#981)
 - **Sibling-clone drift detection** — indexed repos are fingerprinted by remote URL so duplicate registrations are caught before graph divergence (#982)
-- **Configurable large-file skip threshold** — the walker's 512 KB default is now overridable via `GITNEXUS_MAX_FILE_SIZE` (KB) or `gitnexus analyze --max-file-size <kb>`. Values are clamped to the 32 MB tree-sitter ceiling, invalid inputs fall back to the default with a one-time warning, and the CLI banner reports the effective post-clamp threshold when an override is active (#991, #1044, #1045)
-- **`GITNEXUS_INDEX_TEST_DIRS` opt-in** for `__tests__` / `__mocks__` traversal (#771, #1046)
+- **Configurable large-file skip threshold** — the walker's 512 KB default is now overridable via `YUMMYGRAPH_MAX_FILE_SIZE` (KB) or `yummygraph analyze --max-file-size <kb>`. Values are clamped to the 32 MB tree-sitter ceiling, invalid inputs fall back to the default with a one-time warning, and the CLI banner reports the effective post-clamp threshold when an override is active (#991, #1044, #1045)
+- **`YUMMYGRAPH_INDEX_TEST_DIRS` opt-in** for `__tests__` / `__mocks__` traversal (#771, #1046)
 - **`analyze` embedding preservation** — existing embeddings are preserved by default, `--force` regenerates them, `--drop-embeddings` opts out entirely (CLI + HTTP API) (#1055)
 - **Structural embedding chunking** with data-driven `CHUNKING_RULES` dispatch, replacing the flat line-based split (#987)
 - **PHP HTTP consumer detection** for the extractor catalogue (#993)
@@ -238,11 +238,11 @@ All notable changes to GitNexus will be documented in this file.
 - **React component path detection** runs before lowercasing, so mixed-case `.jsx`/`.tsx` files are recognised (#260)
 - **`detect-changes` ENOBUFS** by setting `maxBuffer` on `git` / `rg` `execFileSync` invocations (#957)
 - **`detect-changes` in direct CLI** — command was wired to MCP only; now exposed on the CLI as well (#892)
-- **CLI gitnexus markers** — `<!-- gitnexus:* -->` is only matched at section position, no longer inside code/prose (#1041, #1042)
+- **CLI yummygraph markers** — `<!-- yummygraph:* -->` is only matched at section position, no longer inside code/prose (#1041, #1042)
 - **`opencode.json` setup** preserves existing comments and config during install (#998)
 - **Sequential parser logging** — skipped languages are now logged instead of silently dropped (#1021)
 - **`cli-e2e` fixture isolation** from the shared mini-repo, plus stabilised `rel-csv-split` stream teardown on Windows via `expect.poll` (#954, #1052)
-- **Docker** — RC build guarded against empty `vtag`, `inputs.tag` used to detect `workflow_call` context, web builder stage now copies `gitnexus/package.json`, base image switched from alpine to debian (#983, #996, #997, #1014)
+- **Docker** — RC build guarded against empty `vtag`, `inputs.tag` used to detect `workflow_call` context, web builder stage now copies `yummygraph/package.json`, base image switched from alpine to debian (#983, #996, #997, #1014)
 - **CI** — reusable `docker.yml` now inherits secrets from `release-candidate.yml` (#1054)
 
 ### Changed
@@ -253,8 +253,8 @@ All notable changes to GitNexus will be documented in this file.
 ### Chore / Dependencies
 
 - Dependency bumps: `graphology` 0.25.4 → 0.26.0 (#1001), `uuid` 13 → 14 (#1000), `@huggingface/transformers` (#1035), `@types/node` (#1002), `@types/uuid` (#1016), `vitest` 4.1.4 → 4.1.5 (#1017), `@vitest/coverage-v8` (#1018)
-- gitnexus-web dependency bumps: `vite` 5.4.21 → 6.4.2 → 7.3.2 → 8.0.10 + `vitest` 4 (#1061, #1062, #1063), `lucide-react` 0.562.0 → 1.11.0 with local GitHub SVG fallback (#1038), `@langchain/anthropic` 1.3.10 → 1.3.27 (#1039), `@babel/types` (#1037)
-- gitnexus-shared dependency bumps: `typescript` (#1034)
+- yummygraph-web dependency bumps: `vite` 5.4.21 → 6.4.2 → 7.3.2 → 8.0.10 + `vitest` 4 (#1061, #1062, #1063), `lucide-react` 0.562.0 → 1.11.0 with local GitHub SVG fallback (#1038), `@langchain/anthropic` 1.3.10 → 1.3.27 (#1039), `@babel/types` (#1037)
+- yummygraph-shared dependency bumps: `typescript` (#1034)
 - GitHub Actions bumps: `actions/setup-node` 6.3.0 → 6.4.0 (#1033)
 - Documentation: repo-wide `DoD.md` Definition of Done (#1032), gRPC microservices group guide (#906, #994), `group add` / `group remove` README fixes (#1020), CLI docs include `--skip-git` (#750), README Discord link updated
 
@@ -273,7 +273,7 @@ All notable changes to GitNexus will be documented in this file.
 
 - **Python external dotted imports** — avoid spurious same-file matches when an import path like `foo.bar.baz` refers to a third-party module (#899)
 - **Worker warnings no longer terminate ingestion** — non-fatal parser warnings keep the pipeline running instead of aborting the run (#900, #261)
-- **Global-install upgrade `ENOTEMPTY`** — devendored `tree-sitter-proto` install lifecycle + preinstall cleanup so `npm i -g gitnexus@latest` succeeds on top of an older install (#843, #846)
+- **Global-install upgrade `ENOTEMPTY`** — devendored `tree-sitter-proto` install lifecycle + preinstall cleanup so `npm i -g yummygraph@latest` succeeds on top of an older install (#843, #846)
 - **`env.cacheDir`** now defaults to a user-writable location, unblocking ingestion on systems where the install directory is read-only (#845)
 - **Content-hash staleness detection for embeddings** — zero-node rebuilds no longer skip vector-index creation, fixing semantic search after selective re-analysis (#831)
 - **`tree-sitter-c-sharp` version pin** — locked to 0.23.1 to avoid a breaking change in a transitive prerelease (#834)
@@ -295,7 +295,7 @@ All notable changes to GitNexus will be documented in this file.
 
 - **tree-sitter 0.25 upgrade readiness** — daily Dependabot monitor for the upcoming major-version bump (#847)
 - Dependency bumps: `glob` 11.1.0 → 13.0.6 (#867), `commander` 12.1.0 → 14.0.3 (#868), `@huggingface/transformers` (#869), `@modelcontextprotocol/sdk` (#866), `lru-cache` 11.2.7 → 11.3.5 (#870), `mnemonist` 0.39.8 → 0.40.3 (#871), `@ladybugdb/core` (#873)
-- gitnexus-web dependency bumps: `mermaid` 11.12.2 → 11.14.0 (#860), `tailwindcss` (#861), `jsdom` 29.0.0 → 29.0.2 (#863), `wait-on` 8.0.5 → 9.0.5 (#859), `@vitest/coverage-v8` (#864)
+- yummygraph-web dependency bumps: `mermaid` 11.12.2 → 11.14.0 (#860), `tailwindcss` (#861), `jsdom` 29.0.0 → 29.0.2 (#863), `wait-on` 8.0.5 → 9.0.5 (#859), `@vitest/coverage-v8` (#864)
 - GitHub Actions bumps: `actions/checkout` 4.3.1 → 6.0.2 (#842), `actions/upload-artifact` 4.6.2 → 7.0.1 (#838), `actions/setup-node` 4.4.0 → 6.3.0 (#841), `actions/cache` 5.0.4 → 5.0.5 (#840), `actions/github-script` 7.0.1 → 9.0.0 (#850), `dorny/paths-filter` 3.0.2 → 4.0.1 (#839), `amannn/action-semantic-pull-request` 6.1.1 (#853), `release-drafter/release-drafter` 6.0.0 → 7.2.0 (#852), `marocchino/sticky-pull-request-comment` 3.0.4 (#851), `softprops/action-gh-release` 2.5.0 → 3.0.0 (#849)
 
 ## [1.6.1] - 2026-04-13
@@ -308,7 +308,7 @@ All notable changes to GitNexus will be documented in this file.
 - **Stack overflow and memory exhaustion** on large repository analysis (#814)
 - **`tree-sitter-dart` install crash** — switched from git URL to npm tarball (#811)
 - **Generic TypeScript awaited function calls** missing from the call graph (#804)
-- **Runtime dependency on `file:../gitnexus-shared`** removed from the published package (#803)
+- **Runtime dependency on `file:../yummygraph-shared`** removed from the published package (#803)
 - **Ruby `singleton_class` context** preserved during sequential parsing (#774)
 
 ### Changed
@@ -333,7 +333,7 @@ All notable changes to GitNexus will be documented in this file.
 - **MethodExtractor configs** for Python, PHP, Swift, Dart, Rust, Ruby (#624)
 - **METHOD_IMPLEMENTS edges** with overload disambiguation and MethodExtractor unification (#642)
 - **Same-arity overload disambiguation** via type-hash suffix (#658)
-- **`GITNEXUS_HOME` env var** to customize global directory (#746)
+- **`YUMMYGRAPH_HOME` env var** to customize global directory (#746)
 - **Verbose analyze output** prints skipped large file paths (#745)
 - **Class name lookup index** for O(1) qualified lookups (#707, #716)
 - **`lookupMethodByOwner` index** for O(1) cross-class chain resolution (#665)
@@ -350,8 +350,8 @@ All notable changes to GitNexus will be documented in this file.
 - **tree-sitter-c** peer dependency conflict pinned (#723)
 - **Constructor indexing** in methodByOwner (#694, #753)
 - **Named binding processor** — `lookupExact` replaced with `lookupExactAll` (#755)
-- **`.gitnexusignore` negation patterns** now respected (#654)
-- **MCP setup** prefers global gitnexus binary over npx (#653)
+- **`.yummygraphignore` negation patterns** now respected (#654)
+- **MCP setup** prefers global yummygraph binary over npx (#653)
 - **CORS rejection** returns clean error instead of 500 (#646)
 - **Array.push stack overflow** — replaced spread with loop (#650)
 - **MCP stdout silencing** prevents embedder/pool-adapter conflicts (#645)
@@ -376,19 +376,19 @@ All notable changes to GitNexus will be documented in this file.
 ## [1.5.2] - 2026-04-01
 
 ### Fixed
-- **`gitnexus-shared` module not found** — `gitnexus-shared` was a `file:` workspace dependency never published to npm, causing `ERR_MODULE_NOT_FOUND` when installing `gitnexus` globally. The build now bundles shared code into `dist/_shared/` and rewrites imports to relative paths (#613)
+- **`yummygraph-shared` module not found** — `yummygraph-shared` was a `file:` workspace dependency never published to npm, causing `ERR_MODULE_NOT_FOUND` when installing `yummygraph` globally. The build now bundles shared code into `dist/_shared/` and rewrites imports to relative paths (#613)
 - **v1.5.1 publish regression** — npm's `prepare` lifecycle ran `tsc` after `prepack`, overwriting the rewritten imports before packing; both scripts now run the full build so the final tarball is always correct
 
 ## [1.5.1] - 2026-04-01 [YANKED]
 
 ### Fixed
-- Incomplete fix for `gitnexus-shared` bundling — `prepare` script overwrote rewritten imports during publish
+- Incomplete fix for `yummygraph-shared` bundling — `prepare` script overwrote rewritten imports during publish
 
 ## [1.5.0] - 2026-04-01
 
 ### Added
 - **Repo landing screen** — when the backend detects indexed repositories, the web UI now shows a landing page with selectable repo cards (name, stats, indexed date) instead of auto-loading the first repo; users can also analyze new repos directly from the landing screen (#607)
-- **Unified web & CLI ingestion pipeline** — complete architectural migration of the web app from a self-contained WASM browser app to a thin client backed by the CLI server; new `gitnexus-shared` package for cross-package type unification (#536)
+- **Unified web & CLI ingestion pipeline** — complete architectural migration of the web app from a self-contained WASM browser app to a thin client backed by the CLI server; new `yummygraph-shared` package for cross-package type unification (#536)
   - New server endpoints: `/api/heartbeat` (SSE liveness), `/api/info`, `/api/repos`, `/api/file`, `/api/grep`, `/api/analyze` (SSE progress), `/api/embed`, `/api/mcp` (MCP-over-StreamableHTTP)
   - Onboarding flow: auto-detect server → connect → repo landing or analyze
   - Header repo dropdown: switch, re-analyze, or delete repos
@@ -397,7 +397,7 @@ All notable changes to GitNexus will be documented in this file.
 - **MethodExtractor abstraction** — structured method metadata extraction (isAbstract, isFinal, annotations, visibility, parameter types) with config-driven factory pattern (#576)
   - Java and Kotlin configs with overload-safe `methodInfoCache` keyed by `name:line`
   - C# config with `sealed`, `params`/`out`/`ref`/optional parameters, `[Attribute]` syntax, `internal` visibility (#582)
-- **`--skip-agents-md` CLI flag** — opt out of overwriting GitNexus-managed sections in AGENTS.md and CLAUDE.md during `gitnexus analyze` (#517)
+- **`--skip-agents-md` CLI flag** — opt out of overwriting YummyGraph-managed sections in AGENTS.md and CLAUDE.md during `yummygraph analyze` (#517)
 - **Prettier** — monorepo-wide code formatter with lint-staged + Husky pre-commit hook, `.prettierrc` config, Tailwind CSS v4 plugin, `endOfLine: "lf"` + `.gitattributes` for Windows consistency (#563)
 - **ESLint v9** — flat config with `unused-imports` auto-removal, `@typescript-eslint` rules, React hooks rules, CI `lint` job (#564)
 
@@ -409,13 +409,13 @@ All notable changes to GitNexus will be documented in this file.
 - **Reduced explicit `any` types** — 128 `no-explicit-any` warnings eliminated (689 → 561, 19% reduction) across `NodeProperties` index signature, ~80 `SyntaxNode` substitutions, typed worker protocol, and graphology community detection (#566)
 
 ### Docs
-- Added `gitnexus-shared` build step to web UI quick start instructions (#585)
+- Added `yummygraph-shared` build step to web UI quick start instructions (#585)
 - Added enterprise offering section to README (#579)
 
 ## [1.4.10] - 2026-03-27
 
 ### Fixed
-- **MCP server install via npx** — resolve tree-sitter peer dependency conflicts that broke `npx -y gitnexus@latest mcp` (#537, #538)
+- **MCP server install via npx** — resolve tree-sitter peer dependency conflicts that broke `npx -y yummygraph@latest mcp` (#537, #538)
   - Downgrade tree-sitter from ^0.25.0 to ^0.21.1 (only npm version where all 14 parsers agree)
   - Align all parser versions to their highest ^0.21.x-compatible releases
   - Remove tree-sitter override (only applies to root packages, ignored by npx)
@@ -512,7 +512,7 @@ All notable changes to GitNexus will be documented in this file.
 - Added positive and negative tests for all 4 bug fixes
 - E2e tests for stale detection, sequential enrichment, stability (#396)
 - Integration tests for Milestone D across all 11 languages
-- `gitnexus-stable-ops` added to community integrations
+- `yummygraph-stable-ops` added to community integrations
 - `.env.example` added for embedding backend configuration
 
 ## [1.4.7] - 2026-03-19
@@ -587,7 +587,7 @@ All notable changes to GitNexus will be documented in this file.
   - Java `this.data.values()` field access patterns
   - Position-indexed when/is bindings for branch-local narrowing
 - **Type resolution system documentation** with architecture guide and roadmap
-- `.gitignore` and `.gitnexusignore` support during file discovery (#231)
+- `.gitignore` and `.yummygraphignore` support during file discovery (#231)
 - Codex MCP configuration documentation in README (#236)
 - `skipGraphPhases` pipeline option to skip MRO/community/process phases for faster test runs
 - `hookTimeout: 120000` in vitest config for CI beforeAll hooks

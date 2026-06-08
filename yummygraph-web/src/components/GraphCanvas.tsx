@@ -23,7 +23,7 @@ import {
   SigmaNodeAttributes,
   SigmaEdgeAttributes,
 } from '../lib/graph-adapter';
-import type { GraphNode } from 'gitnexus-shared';
+import type { GraphNode } from 'yummygraph-shared';
 import { QueryFAB } from './QueryFAB';
 import Graph from 'graphology';
 import { useTranslation } from 'react-i18next';

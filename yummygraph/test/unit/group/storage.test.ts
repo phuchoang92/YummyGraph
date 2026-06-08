@@ -14,7 +14,7 @@ import {
 import type { ContractRegistry } from '../../../src/core/group/types.js';
 
 describe('Group storage', () => {
-  const tmpDir = path.join(os.tmpdir(), `gitnexus-test-storage-${Date.now()}`);
+  const tmpDir = path.join(os.tmpdir(), `yummygraph-test-storage-${Date.now()}`);
 
   beforeEach(() => {
     fs.mkdirSync(tmpDir, { recursive: true });
@@ -24,7 +24,7 @@ describe('Group storage', () => {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   });
 
-  it('getGroupsBaseDir returns ~/.gitnexus/groups/', () => {
+  it('getGroupsBaseDir returns ~/.yummygraph/groups/', () => {
     const base = getGroupsBaseDir(tmpDir);
     expect(base).toBe(path.join(tmpDir, 'groups'));
   });

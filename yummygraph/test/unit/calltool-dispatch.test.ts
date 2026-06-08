@@ -102,7 +102,7 @@ import {
 const MOCK_REPO_ENTRY = {
   name: 'test-project',
   path: '/tmp/test-project',
-  storagePath: '/tmp/.gitnexus/test-project',
+  storagePath: '/tmp/.yummygraph/test-project',
   indexedAt: '2024-06-01T12:00:00Z',
   lastCommit: 'abc1234567890',
   stats: { files: 10, nodes: 50, edges: 100, communities: 3, processes: 5 },
@@ -119,7 +119,7 @@ function setupMultipleRepos() {
       ...MOCK_REPO_ENTRY,
       name: 'other-project',
       path: '/tmp/other-project',
-      storagePath: '/tmp/.gitnexus/other-project',
+      storagePath: '/tmp/.yummygraph/other-project',
     },
   ]);
 }
@@ -135,7 +135,7 @@ function makeDuplicateNameFixture() {
   const wtDir = mkdtempSync(path.join(os.tmpdir(), 'gnx-shared-wt-'));
   duplicateFixtureDirs.push(mainDir, wtDir);
   for (const dir of [mainDir, wtDir]) {
-    const storagePath = path.join(dir, '.gitnexus');
+    const storagePath = path.join(dir, '.yummygraph');
     mkdirSync(path.join(storagePath, 'lbug'), { recursive: true });
     writeFileSync(path.join(storagePath, 'meta.json'), '{}');
   }
@@ -147,13 +147,13 @@ function makeDuplicateNameFixture() {
         ...MOCK_REPO_ENTRY,
         name: 'shared',
         path: mainDir,
-        storagePath: path.join(mainDir, '.gitnexus'),
+        storagePath: path.join(mainDir, '.yummygraph'),
       },
       {
         ...MOCK_REPO_ENTRY,
         name: 'shared',
         path: wtDir,
-        storagePath: path.join(wtDir, '.gitnexus'),
+        storagePath: path.join(wtDir, '.yummygraph'),
       },
     ],
   };
@@ -164,7 +164,7 @@ function makeSharedPrefixFixture(nameA: string, nameB: string) {
   const dirB = mkdtempSync(path.join(os.tmpdir(), `gnx-${nameB}-`));
   duplicateFixtureDirs.push(dirA, dirB);
   for (const dir of [dirA, dirB]) {
-    const storagePath = path.join(dir, '.gitnexus');
+    const storagePath = path.join(dir, '.yummygraph');
     mkdirSync(path.join(storagePath, 'lbug'), { recursive: true });
     writeFileSync(path.join(storagePath, 'meta.json'), '{}');
   }
@@ -172,8 +172,8 @@ function makeSharedPrefixFixture(nameA: string, nameB: string) {
     dirA,
     dirB,
     entries: [
-      { ...MOCK_REPO_ENTRY, name: nameA, path: dirA, storagePath: path.join(dirA, '.gitnexus') },
-      { ...MOCK_REPO_ENTRY, name: nameB, path: dirB, storagePath: path.join(dirB, '.gitnexus') },
+      { ...MOCK_REPO_ENTRY, name: nameA, path: dirA, storagePath: path.join(dirA, '.yummygraph') },
+      { ...MOCK_REPO_ENTRY, name: nameB, path: dirB, storagePath: path.join(dirB, '.yummygraph') },
     ],
   };
 }
@@ -202,7 +202,7 @@ function makeSiblingClonesFixture(count: number, remoteUrl = 'git@github.com:MYC
   const dirs: string[] = [];
   const entries = folders.map((folder) => {
     const dir = path.join(parent, folder);
-    const storagePath = path.join(dir, '.gitnexus');
+    const storagePath = path.join(dir, '.yummygraph');
     mkdirSync(path.join(storagePath, 'lbug'), { recursive: true });
     writeFileSync(path.join(storagePath, 'meta.json'), '{}');
     dirs.push(dir);
@@ -302,7 +302,7 @@ describe('LocalBackend.callTool', () => {
     const result = await backend.callTool('query', { query: 'ProcessActivity' });
 
     expect(result).toHaveProperty('warning');
-    expect((result as any).warning).toMatch(/gitnexus analyze --repair-fts/);
+    expect((result as any).warning).toMatch(/yummygraph analyze --repair-fts/);
   });
 
   it('does not include warning when ftsAvailable is true with zero results', async () => {
@@ -357,7 +357,7 @@ describe('LocalBackend.callTool', () => {
           .records()
           .some((r) =>
             String(r.msg ?? '').includes(
-              'GitNexus [query:vector]: VECTOR extension not supported on this platform',
+              'YummyGraph [query:vector]: VECTOR extension not supported on this platform',
             ),
           ),
       ).toBe(true);
@@ -1511,15 +1511,15 @@ describe('LocalBackend repo-id collisions (#2054)', () => {
     duplicateFixtureDirs.push(parent);
     const a = path.join(parent, 'A'); // 'A' sorts before 'B'
     const b = path.join(parent, 'B');
-    const lbug = (dir: string) => path.join(dir, '.gitnexus', 'lbug');
+    const lbug = (dir: string) => path.join(dir, '.yummygraph', 'lbug');
     const mk = (dir: string) => {
       mkdirSync(lbug(dir), { recursive: true });
-      writeFileSync(path.join(dir, '.gitnexus', 'meta.json'), '{}');
+      writeFileSync(path.join(dir, '.yummygraph', 'meta.json'), '{}');
       return {
         ...MOCK_REPO_ENTRY,
         name: 'dup',
         path: dir,
-        storagePath: path.join(dir, '.gitnexus'),
+        storagePath: path.join(dir, '.yummygraph'),
       };
     };
     const entryA = mk(a);
@@ -1557,14 +1557,14 @@ describe('LocalBackend repo-id collisions (#2054)', () => {
     const parent = mkdtempSync(path.join(os.tmpdir(), 'gnx-vanish-'));
     duplicateFixtureDirs.push(parent);
     const dir = path.join(parent, 'solo');
-    const lbugPath = path.join(dir, '.gitnexus', 'lbug');
+    const lbugPath = path.join(dir, '.yummygraph', 'lbug');
     mkdirSync(lbugPath, { recursive: true });
-    writeFileSync(path.join(dir, '.gitnexus', 'meta.json'), '{}');
+    writeFileSync(path.join(dir, '.yummygraph', 'meta.json'), '{}');
     const entry = {
       ...MOCK_REPO_ENTRY,
       name: 'solo',
       path: dir,
-      storagePath: path.join(dir, '.gitnexus'),
+      storagePath: path.join(dir, '.yummygraph'),
     };
 
     (listRegisteredRepos as any).mockResolvedValue([entry]);
@@ -1590,13 +1590,13 @@ describe('LocalBackend repo-id collisions (#2054)', () => {
     const a = path.join(parent, 'A'); // 'A' sorts before 'B'
     const b = path.join(parent, 'B');
     const mk = (dir: string) => {
-      mkdirSync(path.join(dir, '.gitnexus', 'lbug'), { recursive: true });
-      writeFileSync(path.join(dir, '.gitnexus', 'meta.json'), '{}');
+      mkdirSync(path.join(dir, '.yummygraph', 'lbug'), { recursive: true });
+      writeFileSync(path.join(dir, '.yummygraph', 'meta.json'), '{}');
       return {
         ...MOCK_REPO_ENTRY,
         name: 'dup',
         path: dir,
-        storagePath: path.join(dir, '.gitnexus'),
+        storagePath: path.join(dir, '.yummygraph'),
       };
     };
     const entryA = mk(a);
@@ -1617,7 +1617,7 @@ describe('LocalBackend repo-id collisions (#2054)', () => {
     // (pool keyed by B's lbugPath), never A's.
     (initLbug as any).mockClear();
     await (backend as any).ensureInitialized(resolvedB);
-    const lbug = (dir: string) => path.join(dir, '.gitnexus', 'lbug');
+    const lbug = (dir: string) => path.join(dir, '.yummygraph', 'lbug');
     expect(initLbug).toHaveBeenCalledWith(lbug(b), lbug(b));
     expect(initLbug).not.toHaveBeenCalledWith(lbug(a), lbug(a));
   });

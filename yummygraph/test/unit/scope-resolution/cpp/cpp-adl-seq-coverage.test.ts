@@ -14,7 +14,7 @@ import {
   validateAdlSeqCoverage,
   type AdlCandidateIndex,
 } from '../../../../src/core/ingestion/languages/cpp/adl.js';
-import type { SymbolDefinition } from 'gitnexus-shared';
+import type { SymbolDefinition } from 'yummygraph-shared';
 
 function def(nodeId: string): SymbolDefinition {
   return { nodeId } as unknown as SymbolDefinition;

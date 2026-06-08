@@ -8,7 +8,7 @@ describe('ElixirWorkspaceExtractor', () => {
   let tmpDir: string;
 
   beforeEach(async () => {
-    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'gitnexus-ex-ws-'));
+    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'yummygraph-ex-ws-'));
   });
 
   afterEach(async () => {

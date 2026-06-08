@@ -1,8 +1,8 @@
 {
   "mcpServers": {
-    "gitnexus": {
+    "yummygraph": {
       "command": "npx",
-      "args": ["-y", "gitnexus@latest", "mcp"]
+      "args": ["-y", "yummygraph@latest", "mcp"]
     }
   }
 }

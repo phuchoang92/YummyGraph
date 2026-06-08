@@ -10,7 +10,7 @@
  * Returns `null` for unresolvable / JDK imports.
  */
 
-import type { ParsedImport, WorkspaceIndex } from 'gitnexus-shared';
+import type { ParsedImport, WorkspaceIndex } from 'yummygraph-shared';
 
 export interface JavaResolveContext {
   readonly fromFile: string;

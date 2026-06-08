@@ -15,7 +15,7 @@ const fixturesDir = path.resolve(__dirname, '../../fixtures/group');
 let tmpHome: string;
 
 beforeAll(() => {
-  tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-grp-impact-int-'));
+  tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-grp-impact-int-'));
   const groupDir = path.join(tmpHome, 'groups', 'test-group');
   fs.mkdirSync(groupDir, { recursive: true });
   fs.copyFileSync(path.join(fixturesDir, 'group.yaml'), path.join(groupDir, 'group.yaml'));
@@ -31,7 +31,7 @@ function stubPort(): GroupToolPort {
       id: 'stub',
       name: 'stub',
       repoPath: '/tmp/repo',
-      storagePath: '/tmp/.gitnexus',
+      storagePath: '/tmp/.yummygraph',
     })),
     impact: vi.fn(async () => ({
       target: {},
@@ -53,8 +53,8 @@ describe('group impact integration', () => {
   });
 
   it('runs happy-path stub against fixture group (stops before bridge when no symbol UIDs)', async () => {
-    const prev = process.env.GITNEXUS_HOME;
-    process.env.GITNEXUS_HOME = tmpHome;
+    const prev = process.env.YUMMYGRAPH_HOME;
+    process.env.YUMMYGRAPH_HOME = tmpHome;
     try {
       const svc = new GroupService(stubPort());
       const r = (await svc.groupImpact({
@@ -67,8 +67,8 @@ describe('group impact integration', () => {
       expect(r.group).toBe('test-group');
       expect(Array.isArray(r.cross)).toBe(true);
     } finally {
-      if (prev === undefined) delete process.env.GITNEXUS_HOME;
-      else process.env.GITNEXUS_HOME = prev;
+      if (prev === undefined) delete process.env.YUMMYGRAPH_HOME;
+      else process.env.YUMMYGRAPH_HOME = prev;
     }
   });
 });

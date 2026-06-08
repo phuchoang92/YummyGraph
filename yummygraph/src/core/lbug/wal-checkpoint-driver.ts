@@ -24,7 +24,7 @@
  * - The driver runs ONLY during analyze (callers opt-in explicitly). MCP
  *   and other long-lived flows continue to rely on the close-time
  *   CHECKPOINT in `safeClose`.
- * - Opt-out is via `GITNEXUS_WAL_MANUAL_CHECKPOINT=0`. Default is on.
+ * - Opt-out is via `YUMMYGRAPH_WAL_MANUAL_CHECKPOINT=0`. Default is on.
  * - Retries only fire on `isLbugCheckpointIoError` — every other error
  *   surfaces immediately. The retry budget is small (3 attempts) with
  *   jittered backoff so a chronic rename failure escalates fast.
@@ -107,7 +107,7 @@ export const runCheckpointWithRetry = async (
       const delayMs = base + Math.floor(randomImpl() * JITTER_MAX_MS);
       logger.debug(
         { attempt, totalAttempts: CHECKPOINT_RETRY_ATTEMPTS, delayMs },
-        'GitNexus: WAL checkpoint IO error — retrying',
+        'YummyGraph: WAL checkpoint IO error — retrying',
       );
       await sleepImpl(delayMs);
     }
@@ -115,7 +115,7 @@ export const runCheckpointWithRetry = async (
 
   logger.warn(
     { attempts: CHECKPOINT_RETRY_ATTEMPTS },
-    'GitNexus: manual WAL checkpoint exhausted retry budget — surfacing IO error to caller',
+    'YummyGraph: manual WAL checkpoint exhausted retry budget — surfacing IO error to caller',
   );
   throw lastError;
 };
@@ -124,7 +124,7 @@ export const runCheckpointWithRetry = async (
  * Single-shot manual checkpoint. Use this when the caller drives the
  * cadence itself (e.g. a phase boundary in `runFullAnalysis`).
  *
- * Honors the `GITNEXUS_WAL_MANUAL_CHECKPOINT=0` opt-out so operators can
+ * Honors the `YUMMYGRAPH_WAL_MANUAL_CHECKPOINT=0` opt-out so operators can
  * disable the manual path if it ever interacts badly with a future
  * Ladybug release.
  */
@@ -174,7 +174,7 @@ export const startWalCheckpointDriver = (
         // double-logging the user-facing message.
         logger.warn(
           { err: err instanceof Error ? err.message : String(err) },
-          'GitNexus: manual WAL checkpoint failed after retries',
+          'YummyGraph: manual WAL checkpoint failed after retries',
         );
       });
     try {
@@ -215,7 +215,7 @@ export const startWalCheckpointDriver = (
 };
 
 /**
- * Reading `GITNEXUS_WAL_MANUAL_CHECKPOINT` at every call site (rather
+ * Reading `YUMMYGRAPH_WAL_MANUAL_CHECKPOINT` at every call site (rather
  * than caching at module load) keeps `analyzeCommand` env restoration
  * honest: tests that toggle the flag between invocations see the live
  * value, matching the `ANALYZE_CLI_ENV_KEYS` snapshot/restore contract
@@ -225,7 +225,7 @@ export const startWalCheckpointDriver = (
  * Anything else — including undefined — leaves the driver enabled.
  */
 export const isManualCheckpointEnabled = (): boolean => {
-  const raw = process.env.GITNEXUS_WAL_MANUAL_CHECKPOINT;
+  const raw = process.env.YUMMYGRAPH_WAL_MANUAL_CHECKPOINT;
   if (raw === undefined) return true;
   const normalized = raw.trim().toLowerCase();
   return !['0', 'false', 'off', 'no'].includes(normalized);

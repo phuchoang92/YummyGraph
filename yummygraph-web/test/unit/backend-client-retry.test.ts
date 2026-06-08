@@ -11,8 +11,8 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { getBreaker } from 'gitnexus-shared';
-import { __resetBreakerRegistry__ } from 'gitnexus-shared/test-helpers';
+import { getBreaker } from 'yummygraph-shared';
+import { __resetBreakerRegistry__ } from 'yummygraph-shared/test-helpers';
 import { fetchRepos, setBackendUrl, startAnalyze } from '../../src/services/backend-client';
 
 const BASE = 'http://localhost:4747';

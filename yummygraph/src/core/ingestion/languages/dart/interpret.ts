@@ -14,7 +14,7 @@
  *     container generics like `Future<X>`/`List<X>`, drop library prefixes).
  */
 
-import type { CaptureMatch, ParsedImport, ParsedTypeBinding, TypeRef } from 'gitnexus-shared';
+import type { CaptureMatch, ParsedImport, ParsedTypeBinding, TypeRef } from 'yummygraph-shared';
 import { HERITAGE_MARKER_PREFIX } from '../../utils/heritage-marker.js';
 
 /** Marker prefix carried on a side-effect `ParsedImport.targetRaw` for

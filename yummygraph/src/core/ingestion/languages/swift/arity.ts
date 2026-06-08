@@ -26,7 +26,7 @@
  * still considered when no compatible candidate exists), per RFC §4.
  */
 
-import type { Callsite, SymbolDefinition } from 'gitnexus-shared';
+import type { Callsite, SymbolDefinition } from 'yummygraph-shared';
 
 export function swiftArityCompatibility(
   def: SymbolDefinition,

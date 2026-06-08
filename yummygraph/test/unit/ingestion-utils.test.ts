@@ -4,10 +4,10 @@ import {
   getSyntaxLanguageFromFilename,
   isBladeTemplateFilename,
   SupportedLanguages,
-} from 'gitnexus-shared';
+} from 'yummygraph-shared';
 import { getProvider, getProviderForFile } from '../../src/core/ingestion/languages/index.js';
 import type { SyntaxNode } from '../../src/core/ingestion/utils/ast-helpers.js';
-import type { NodeLabel } from 'gitnexus-shared';
+import type { NodeLabel } from 'yummygraph-shared';
 import type { LanguageProvider } from '../../src/core/ingestion/language-provider.js';
 import {
   getTreeSitterBufferSize,

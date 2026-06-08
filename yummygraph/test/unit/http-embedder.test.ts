@@ -2,10 +2,10 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import { getEmbeddingDims, isEmbedderReady } from '../../src/mcp/core/embedder.js';
 
 const ENV_KEYS = [
-  'GITNEXUS_EMBEDDING_URL',
-  'GITNEXUS_EMBEDDING_MODEL',
-  'GITNEXUS_EMBEDDING_API_KEY',
-  'GITNEXUS_EMBEDDING_DIMS',
+  'YUMMYGRAPH_EMBEDDING_URL',
+  'YUMMYGRAPH_EMBEDDING_MODEL',
+  'YUMMYGRAPH_EMBEDDING_API_KEY',
+  'YUMMYGRAPH_EMBEDDING_DIMS',
 ] as const;
 
 /** 384d mock vector matching the default schema dimensions. */
@@ -38,23 +38,23 @@ describe('HTTP embedding backend', () => {
     });
 
     it('returns true when HTTP environment variables are set', async () => {
-      process.env.GITNEXUS_EMBEDDING_URL = 'http://localhost:8080/v1';
-      process.env.GITNEXUS_EMBEDDING_MODEL = 'test-model';
+      process.env.YUMMYGRAPH_EMBEDDING_URL = 'http://localhost:8080/v1';
+      process.env.YUMMYGRAPH_EMBEDDING_MODEL = 'test-model';
       const mod = await import('../../src/mcp/core/embedder.js');
       expect(mod.isEmbedderReady()).toBe(true);
     });
 
     it('reads custom dimensions from environment', async () => {
-      process.env.GITNEXUS_EMBEDDING_URL = 'http://localhost:8080/v1';
-      process.env.GITNEXUS_EMBEDDING_MODEL = 'test-model';
-      process.env.GITNEXUS_EMBEDDING_DIMS = '1024';
+      process.env.YUMMYGRAPH_EMBEDDING_URL = 'http://localhost:8080/v1';
+      process.env.YUMMYGRAPH_EMBEDDING_MODEL = 'test-model';
+      process.env.YUMMYGRAPH_EMBEDDING_DIMS = '1024';
       const mod = await import('../../src/mcp/core/embedder.js');
       expect(mod.getEmbeddingDims()).toBe(1024);
     });
 
     it('retries query on transient server error', async () => {
-      process.env.GITNEXUS_EMBEDDING_URL = 'http://test:8080/v1';
-      process.env.GITNEXUS_EMBEDDING_MODEL = 'test-model';
+      process.env.YUMMYGRAPH_EMBEDDING_URL = 'http://test:8080/v1';
+      process.env.YUMMYGRAPH_EMBEDDING_MODEL = 'test-model';
 
       const ok = { ok: true, json: async () => ({ data: [{ embedding: mockVec }] }) };
       vi.stubGlobal(
@@ -72,9 +72,9 @@ describe('HTTP embedding backend', () => {
 
   describe('core embedder HTTP path', () => {
     it('sends correct request payload', async () => {
-      process.env.GITNEXUS_EMBEDDING_URL = 'http://test:8080/v1';
-      process.env.GITNEXUS_EMBEDDING_MODEL = 'test-model';
-      process.env.GITNEXUS_EMBEDDING_API_KEY = 'test-key';
+      process.env.YUMMYGRAPH_EMBEDDING_URL = 'http://test:8080/v1';
+      process.env.YUMMYGRAPH_EMBEDDING_MODEL = 'test-model';
+      process.env.YUMMYGRAPH_EMBEDDING_API_KEY = 'test-key';
 
       const mockEmbedding = Array.from({ length: 384 }, (_, i) => i * 0.001);
       vi.stubGlobal(
@@ -96,10 +96,10 @@ describe('HTTP embedding backend', () => {
       expect(result.length).toBe(384);
     });
 
-    it('omits dimensions from request body when GITNEXUS_EMBEDDING_DIMS is unset', async () => {
-      process.env.GITNEXUS_EMBEDDING_URL = 'http://test:8080/v1';
-      process.env.GITNEXUS_EMBEDDING_MODEL = 'test-model';
-      // GITNEXUS_EMBEDDING_DIMS intentionally unset
+    it('omits dimensions from request body when YUMMYGRAPH_EMBEDDING_DIMS is unset', async () => {
+      process.env.YUMMYGRAPH_EMBEDDING_URL = 'http://test:8080/v1';
+      process.env.YUMMYGRAPH_EMBEDDING_MODEL = 'test-model';
+      // YUMMYGRAPH_EMBEDDING_DIMS intentionally unset
 
       vi.stubGlobal(
         'fetch',
@@ -118,10 +118,10 @@ describe('HTTP embedding backend', () => {
       expect('dimensions' in body).toBe(false);
     });
 
-    it('forwards GITNEXUS_EMBEDDING_DIMS as dimensions in request body', async () => {
-      process.env.GITNEXUS_EMBEDDING_URL = 'http://test:8080/v1';
-      process.env.GITNEXUS_EMBEDDING_MODEL = 'text-embedding-3-large';
-      process.env.GITNEXUS_EMBEDDING_DIMS = '1024';
+    it('forwards YUMMYGRAPH_EMBEDDING_DIMS as dimensions in request body', async () => {
+      process.env.YUMMYGRAPH_EMBEDDING_URL = 'http://test:8080/v1';
+      process.env.YUMMYGRAPH_EMBEDDING_MODEL = 'text-embedding-3-large';
+      process.env.YUMMYGRAPH_EMBEDDING_DIMS = '1024';
 
       const vec1024 = Array.from({ length: 1024 }, (_, i) => i / 1024);
       vi.stubGlobal(
@@ -142,9 +142,9 @@ describe('HTTP embedding backend', () => {
     });
 
     it('forwards dimensions on the single-query path', async () => {
-      process.env.GITNEXUS_EMBEDDING_URL = 'http://test:8080/v1';
-      process.env.GITNEXUS_EMBEDDING_MODEL = 'text-embedding-3-large';
-      process.env.GITNEXUS_EMBEDDING_DIMS = '512';
+      process.env.YUMMYGRAPH_EMBEDDING_URL = 'http://test:8080/v1';
+      process.env.YUMMYGRAPH_EMBEDDING_MODEL = 'text-embedding-3-large';
+      process.env.YUMMYGRAPH_EMBEDDING_DIMS = '512';
 
       const vec512 = Array.from({ length: 512 }, (_, i) => i / 512);
       vi.stubGlobal(
@@ -164,8 +164,8 @@ describe('HTTP embedding backend', () => {
     });
 
     it('retries on server error', async () => {
-      process.env.GITNEXUS_EMBEDDING_URL = 'http://test:8080/v1';
-      process.env.GITNEXUS_EMBEDDING_MODEL = 'test-model';
+      process.env.YUMMYGRAPH_EMBEDDING_URL = 'http://test:8080/v1';
+      process.env.YUMMYGRAPH_EMBEDDING_MODEL = 'test-model';
 
       const ok = { ok: true, json: async () => ({ data: [{ embedding: mockVec }] }) };
       vi.stubGlobal(
@@ -179,8 +179,8 @@ describe('HTTP embedding backend', () => {
     });
 
     it('retries on rate limit', async () => {
-      process.env.GITNEXUS_EMBEDDING_URL = 'http://test:8080/v1';
-      process.env.GITNEXUS_EMBEDDING_MODEL = 'test-model';
+      process.env.YUMMYGRAPH_EMBEDDING_URL = 'http://test:8080/v1';
+      process.env.YUMMYGRAPH_EMBEDDING_MODEL = 'test-model';
 
       const ok = { ok: true, json: async () => ({ data: [{ embedding: mockVec }] }) };
       vi.stubGlobal(
@@ -194,8 +194,8 @@ describe('HTTP embedding backend', () => {
     });
 
     it('throws when all retries are exhausted', async () => {
-      process.env.GITNEXUS_EMBEDDING_URL = 'http://test:8080/v1';
-      process.env.GITNEXUS_EMBEDDING_MODEL = 'test-model';
+      process.env.YUMMYGRAPH_EMBEDDING_URL = 'http://test:8080/v1';
+      process.env.YUMMYGRAPH_EMBEDDING_MODEL = 'test-model';
 
       vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 500 }));
 
@@ -204,10 +204,10 @@ describe('HTTP embedding backend', () => {
     });
 
     it('excludes API key from error messages', async () => {
-      process.env.GITNEXUS_EMBEDDING_URL = 'http://test:8080/v1';
-      process.env.GITNEXUS_EMBEDDING_MODEL = 'test-model';
+      process.env.YUMMYGRAPH_EMBEDDING_URL = 'http://test:8080/v1';
+      process.env.YUMMYGRAPH_EMBEDDING_MODEL = 'test-model';
       const redactionProbeKey = 'test-api-key-redaction-check';
-      process.env.GITNEXUS_EMBEDDING_API_KEY = redactionProbeKey;
+      process.env.YUMMYGRAPH_EMBEDDING_API_KEY = redactionProbeKey;
 
       vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 500 }));
 
@@ -221,8 +221,8 @@ describe('HTTP embedding backend', () => {
     });
 
     it('includes abort signal for timeout', async () => {
-      process.env.GITNEXUS_EMBEDDING_URL = 'http://test:8080/v1';
-      process.env.GITNEXUS_EMBEDDING_MODEL = 'test-model';
+      process.env.YUMMYGRAPH_EMBEDDING_URL = 'http://test:8080/v1';
+      process.env.YUMMYGRAPH_EMBEDDING_MODEL = 'test-model';
 
       vi.stubGlobal(
         'fetch',
@@ -240,8 +240,8 @@ describe('HTTP embedding backend', () => {
     });
 
     it('splits large inputs into batches', async () => {
-      process.env.GITNEXUS_EMBEDDING_URL = 'http://test:8080/v1';
-      process.env.GITNEXUS_EMBEDDING_MODEL = 'test-model';
+      process.env.YUMMYGRAPH_EMBEDDING_URL = 'http://test:8080/v1';
+      process.env.YUMMYGRAPH_EMBEDDING_MODEL = 'test-model';
 
       const makeResp = (n: number) => ({
         ok: true,
@@ -260,9 +260,9 @@ describe('HTTP embedding backend', () => {
     });
 
     it('forwards dimensions in every batch when splitting large inputs', async () => {
-      process.env.GITNEXUS_EMBEDDING_URL = 'http://test:8080/v1';
-      process.env.GITNEXUS_EMBEDDING_MODEL = 'test-model';
-      process.env.GITNEXUS_EMBEDDING_DIMS = '512';
+      process.env.YUMMYGRAPH_EMBEDDING_URL = 'http://test:8080/v1';
+      process.env.YUMMYGRAPH_EMBEDDING_MODEL = 'test-model';
+      process.env.YUMMYGRAPH_EMBEDDING_DIMS = '512';
 
       const vec512 = Array.from({ length: 512 }, (_, i) => i / 512);
       const makeResp = (n: number) => ({
@@ -287,10 +287,10 @@ describe('HTTP embedding backend', () => {
       expect(body1.dimensions).toBe(512);
     });
 
-    it('rejects non-numeric GITNEXUS_EMBEDDING_DIMS values', async () => {
-      process.env.GITNEXUS_EMBEDDING_URL = 'http://test:8080/v1';
-      process.env.GITNEXUS_EMBEDDING_MODEL = 'test-model';
-      process.env.GITNEXUS_EMBEDDING_DIMS = '1024abc';
+    it('rejects non-numeric YUMMYGRAPH_EMBEDDING_DIMS values', async () => {
+      process.env.YUMMYGRAPH_EMBEDDING_URL = 'http://test:8080/v1';
+      process.env.YUMMYGRAPH_EMBEDDING_MODEL = 'test-model';
+      process.env.YUMMYGRAPH_EMBEDDING_DIMS = '1024abc';
 
       vi.stubGlobal(
         'fetch',
@@ -305,24 +305,24 @@ describe('HTTP embedding backend', () => {
     });
 
     it('rejects initEmbedder when using HTTP backend', async () => {
-      process.env.GITNEXUS_EMBEDDING_URL = 'http://test:8080/v1';
-      process.env.GITNEXUS_EMBEDDING_MODEL = 'test-model';
+      process.env.YUMMYGRAPH_EMBEDDING_URL = 'http://test:8080/v1';
+      process.env.YUMMYGRAPH_EMBEDDING_MODEL = 'test-model';
 
       const { initEmbedder } = await import('../../src/core/embeddings/embedder.js');
       await expect(initEmbedder()).rejects.toThrow('HTTP mode');
     });
 
     it('rejects getEmbedder when using HTTP backend', async () => {
-      process.env.GITNEXUS_EMBEDDING_URL = 'http://test:8080/v1';
-      process.env.GITNEXUS_EMBEDDING_MODEL = 'test-model';
+      process.env.YUMMYGRAPH_EMBEDDING_URL = 'http://test:8080/v1';
+      process.env.YUMMYGRAPH_EMBEDDING_MODEL = 'test-model';
 
       const { getEmbedder } = await import('../../src/core/embeddings/embedder.js');
       expect(() => getEmbedder()).toThrow('HTTP embedding mode');
     });
 
     it('throws on empty response from endpoint', async () => {
-      process.env.GITNEXUS_EMBEDDING_URL = 'http://test:8080/v1';
-      process.env.GITNEXUS_EMBEDDING_MODEL = 'test-model';
+      process.env.YUMMYGRAPH_EMBEDDING_URL = 'http://test:8080/v1';
+      process.env.YUMMYGRAPH_EMBEDDING_MODEL = 'test-model';
 
       vi.stubGlobal(
         'fetch',
@@ -337,8 +337,8 @@ describe('HTTP embedding backend', () => {
     });
 
     it('throws when endpoint returns fewer embeddings than texts', async () => {
-      process.env.GITNEXUS_EMBEDDING_URL = 'http://test:8080/v1';
-      process.env.GITNEXUS_EMBEDDING_MODEL = 'test-model';
+      process.env.YUMMYGRAPH_EMBEDDING_URL = 'http://test:8080/v1';
+      process.env.YUMMYGRAPH_EMBEDDING_MODEL = 'test-model';
 
       vi.stubGlobal(
         'fetch',
@@ -354,10 +354,10 @@ describe('HTTP embedding backend', () => {
       );
     });
 
-    it('throws on dimension mismatch when GITNEXUS_EMBEDDING_DIMS is set', async () => {
-      process.env.GITNEXUS_EMBEDDING_URL = 'http://test:8080/v1';
-      process.env.GITNEXUS_EMBEDDING_MODEL = 'test-model';
-      process.env.GITNEXUS_EMBEDDING_DIMS = '512';
+    it('throws on dimension mismatch when YUMMYGRAPH_EMBEDDING_DIMS is set', async () => {
+      process.env.YUMMYGRAPH_EMBEDDING_URL = 'http://test:8080/v1';
+      process.env.YUMMYGRAPH_EMBEDDING_MODEL = 'test-model';
+      process.env.YUMMYGRAPH_EMBEDDING_DIMS = '512';
 
       vi.stubGlobal(
         'fetch',
@@ -379,7 +379,7 @@ describe('HTTP embedding backend', () => {
     });
 
     it('reads dimensions from environment variable', async () => {
-      process.env.GITNEXUS_EMBEDDING_DIMS = '1024';
+      process.env.YUMMYGRAPH_EMBEDDING_DIMS = '1024';
       const { EMBEDDING_DIMS } = await import('../../src/core/lbug/schema.js');
       expect(EMBEDDING_DIMS).toBe(1024);
     });
@@ -387,8 +387,8 @@ describe('HTTP embedding backend', () => {
 
   describe('timeout and network error handling', () => {
     it('does not retry on timeout', async () => {
-      process.env.GITNEXUS_EMBEDDING_URL = 'http://test:8080/v1';
-      process.env.GITNEXUS_EMBEDDING_MODEL = 'test-model';
+      process.env.YUMMYGRAPH_EMBEDDING_URL = 'http://test:8080/v1';
+      process.env.YUMMYGRAPH_EMBEDDING_MODEL = 'test-model';
 
       const timeoutErr = new DOMException(
         'The operation was aborted due to timeout',
@@ -402,8 +402,8 @@ describe('HTTP embedding backend', () => {
     });
 
     it('retries on network error then succeeds', async () => {
-      process.env.GITNEXUS_EMBEDDING_URL = 'http://test:8080/v1';
-      process.env.GITNEXUS_EMBEDDING_MODEL = 'test-model';
+      process.env.YUMMYGRAPH_EMBEDDING_URL = 'http://test:8080/v1';
+      process.env.YUMMYGRAPH_EMBEDDING_MODEL = 'test-model';
 
       const ok = { ok: true, json: async () => ({ data: [{ embedding: mockVec }] }) };
       vi.stubGlobal(
@@ -420,9 +420,9 @@ describe('HTTP embedding backend', () => {
 
   describe('dimension mismatch on query path', () => {
     it('throws on explicit dim mismatch in embedQuery', async () => {
-      process.env.GITNEXUS_EMBEDDING_URL = 'http://test:8080/v1';
-      process.env.GITNEXUS_EMBEDDING_MODEL = 'test-model';
-      process.env.GITNEXUS_EMBEDDING_DIMS = '512';
+      process.env.YUMMYGRAPH_EMBEDDING_URL = 'http://test:8080/v1';
+      process.env.YUMMYGRAPH_EMBEDDING_MODEL = 'test-model';
+      process.env.YUMMYGRAPH_EMBEDDING_DIMS = '512';
 
       vi.stubGlobal(
         'fetch',
@@ -436,9 +436,9 @@ describe('HTTP embedding backend', () => {
       await expect(mod.embedQuery('test')).rejects.toThrow('dimension mismatch');
     });
 
-    it('throws with Set hint when GITNEXUS_EMBEDDING_DIMS is unset', async () => {
-      process.env.GITNEXUS_EMBEDDING_URL = 'http://test:8080/v1';
-      process.env.GITNEXUS_EMBEDDING_MODEL = 'test-model';
+    it('throws with Set hint when YUMMYGRAPH_EMBEDDING_DIMS is unset', async () => {
+      process.env.YUMMYGRAPH_EMBEDDING_URL = 'http://test:8080/v1';
+      process.env.YUMMYGRAPH_EMBEDDING_MODEL = 'test-model';
 
       const vec768 = Array.from({ length: 768 }, (_, i) => i / 768);
       vi.stubGlobal(
@@ -450,7 +450,7 @@ describe('HTTP embedding backend', () => {
       );
 
       const { embedText } = await import('../../src/core/embeddings/embedder.js');
-      await expect(embedText('test')).rejects.toThrow('Set GITNEXUS_EMBEDDING_DIMS=768');
+      await expect(embedText('test')).rejects.toThrow('Set YUMMYGRAPH_EMBEDDING_DIMS=768');
     });
   });
 });

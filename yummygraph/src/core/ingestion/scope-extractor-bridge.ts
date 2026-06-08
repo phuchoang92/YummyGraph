@@ -24,7 +24,7 @@
  *      must not destabilize the legacy DAG.
  */
 
-import type { ParsedFile } from 'gitnexus-shared';
+import type { ParsedFile } from 'yummygraph-shared';
 import { extract as extractScope } from './scope-extractor.js';
 import type { LanguageProvider } from './language-provider.js';
 

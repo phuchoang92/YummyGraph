@@ -1,6 +1,6 @@
-// gitnexus/src/core/ingestion/class-extractors/configs/python.ts
+// yummygraph/src/core/ingestion/class-extractors/configs/python.ts
 
-import { SupportedLanguages } from 'gitnexus-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 import type { ClassExtractionConfig } from '../../class-types.js';
 
 export const pythonClassConfig: ClassExtractionConfig = {

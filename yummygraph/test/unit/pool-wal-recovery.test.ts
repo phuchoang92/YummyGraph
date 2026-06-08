@@ -38,7 +38,7 @@ vi.mock('../../src/core/lbug/lbug-config.js', () => ({
   toNativeSafePath: vi.fn((p: string) => p),
   LBUG_MAX_DB_SIZE: 1024,
   WAL_RECOVERY_SUGGESTION:
-    'WAL corruption detected. Run `gitnexus analyze --force` to rebuild the index.',
+    'WAL corruption detected. Run `yummygraph analyze --force` to rebuild the index.',
   isWalCorruptionError: vi.fn((err: unknown) => {
     const msg = err instanceof Error ? err.message : String(err ?? '');
     return /corrupt(ed)?\s+wal|invalid\s+wal\s+record/i.test(msg);
@@ -224,7 +224,7 @@ describe('WAL corruption recovery in doInitLbug (#1402)', () => {
         throw new Error('Still broken');
       });
 
-    await expect(initLbug('test-repo-fail', dbPath)).rejects.toThrow(/gitnexus analyze/);
+    await expect(initLbug('test-repo-fail', dbPath)).rejects.toThrow(/yummygraph analyze/);
     expect(createLbugDatabase).toHaveBeenCalledTimes(2);
   });
 
@@ -255,7 +255,7 @@ describe('WAL corruption recovery in doInitLbug (#1402)', () => {
       throw new Error('Corrupted wal file');
     });
 
-    await expect(initLbug('test-repo-enoent', dbPath)).rejects.toThrow(/gitnexus analyze/);
+    await expect(initLbug('test-repo-enoent', dbPath)).rejects.toThrow(/yummygraph analyze/);
   });
 });
 

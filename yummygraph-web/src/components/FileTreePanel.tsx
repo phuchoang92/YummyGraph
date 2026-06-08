@@ -21,7 +21,7 @@ import {
 import { useAppState } from '../hooks/useAppState';
 import { useTranslation } from 'react-i18next';
 import { FILTERABLE_LABELS, NODE_COLORS, ALL_EDGE_TYPES, EDGE_INFO } from '../lib/constants';
-import type { GraphNode, NodeLabel } from 'gitnexus-shared';
+import type { GraphNode, NodeLabel } from 'yummygraph-shared';
 
 // Tree node structure
 interface TreeNode {

@@ -279,8 +279,8 @@ export const initEmbedder = async (
               ? `The configured endpoint (${process.env.HF_ENDPOINT}) may be unreachable.`
               : `huggingface.co may be unreachable from your network.\n` +
                 `  Set HF_ENDPOINT to a mirror and retry:\n` +
-                `    HF_ENDPOINT=https://hf-mirror.com npx gitnexus analyze --embeddings\n` +
-                `    (Windows: set HF_ENDPOINT=https://hf-mirror.com && npx gitnexus analyze --embeddings)`;
+                `    HF_ENDPOINT=https://hf-mirror.com npx yummygraph analyze --embeddings\n` +
+                `    (Windows: set HF_ENDPOINT=https://hf-mirror.com && npx yummygraph analyze --embeddings)`;
             throw new Error(`Failed to download embedding model: ${errMsg}\n  ${endpointHint}`);
           }
           if (isDev && (device === 'cuda' || device === 'dml')) {
@@ -317,7 +317,7 @@ export const isEmbedderReady = (): boolean => {
 
 /**
  * Get the effective embedding dimensions.
- * In HTTP mode, uses GITNEXUS_EMBEDDING_DIMS if set, otherwise the default.
+ * In HTTP mode, uses YUMMYGRAPH_EMBEDDING_DIMS if set, otherwise the default.
  */
 export const getEmbeddingDimensions = (): number => {
   if (isHttpMode()) {

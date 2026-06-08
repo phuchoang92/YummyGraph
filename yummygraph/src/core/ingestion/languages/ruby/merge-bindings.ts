@@ -1,4 +1,4 @@
-import type { BindingRef } from 'gitnexus-shared';
+import type { BindingRef } from 'yummygraph-shared';
 
 const TIER: Record<BindingRef['origin'], number> = {
   local: 0,

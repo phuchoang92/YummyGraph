@@ -143,7 +143,7 @@ describe('openLbugConnection — stale-sidecar sweep (test fixtures only)', () =
   let dbPath: string;
 
   beforeEach(async () => {
-    fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'gitnexus-lbug-sweep-'));
+    fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'yummygraph-lbug-sweep-'));
     dbPath = path.join(fixtureDir, 'lbug');
   });
 
@@ -184,7 +184,7 @@ describe('openLbugConnection — stale-sidecar sweep (test fixtures only)', () =
     const stub = makeStubLbug(control);
 
     // Path is outside os.tmpdir() so the predicate must reject it.
-    await expect(openLbugConnection(stub, '/var/data/gitnexus-lbug-fake/lbug')).rejects.toThrow(
+    await expect(openLbugConnection(stub, '/var/data/yummygraph-lbug-fake/lbug')).rejects.toThrow(
       'Could not set lock on file',
     );
     expect(control.databaseCallCount).toBe(5); // no sweep retry
@@ -232,34 +232,34 @@ describe('openLbugConnection — stale-sidecar sweep (test fixtures only)', () =
 describe('isTestFixturePath — production-safety guard', () => {
   it('accepts a fixture under os.tmpdir with a recognized prefix on the immediate parent', () => {
     const tmp = os.tmpdir();
-    expect(isTestFixturePath(path.join(tmp, 'gitnexus-lbug-XXX', 'lbug'))).toBe(true);
-    expect(isTestFixturePath(path.join(tmp, 'gitnexus-test-YYY', 'lbug'))).toBe(true);
+    expect(isTestFixturePath(path.join(tmp, 'yummygraph-lbug-XXX', 'lbug'))).toBe(true);
+    expect(isTestFixturePath(path.join(tmp, 'yummygraph-test-YYY', 'lbug'))).toBe(true);
   });
 
   it('rejects production paths even with a matching prefix', () => {
-    expect(isTestFixturePath('/var/data/gitnexus-lbug-fake/lbug')).toBe(false);
-    expect(isTestFixturePath('/home/user/gitnexus-test-foo/lbug')).toBe(false);
+    expect(isTestFixturePath('/var/data/yummygraph-lbug-fake/lbug')).toBe(false);
+    expect(isTestFixturePath('/home/user/yummygraph-test-foo/lbug')).toBe(false);
   });
 
   it('rejects path traversal attempts that resolve outside tmpdir', () => {
     const tmp = os.tmpdir();
-    const traversal = path.join(tmp, 'gitnexus-lbug-x', '..', '..', 'etc', 'passwd');
+    const traversal = path.join(tmp, 'yummygraph-lbug-x', '..', '..', 'etc', 'passwd');
     expect(isTestFixturePath(traversal)).toBe(false);
   });
 
   it('rejects when the immediate parent does not match even if a deeper ancestor does', () => {
     // Tightening: ancestor walk would have allowed nested paths under
-    // `<tmp>/gitnexus-lbug-x/inner/lbug` to satisfy the predicate. We
+    // `<tmp>/yummygraph-lbug-x/inner/lbug` to satisfy the predicate. We
     // require the immediate parent to match.
     const tmp = os.tmpdir();
-    expect(isTestFixturePath(path.join(tmp, 'gitnexus-lbug-x', 'inner', 'lbug'))).toBe(false);
+    expect(isTestFixturePath(path.join(tmp, 'yummygraph-lbug-x', 'inner', 'lbug'))).toBe(false);
   });
 
   it('handles tmpdir trailing-separator gracefully', () => {
     // Some Windows TMP configs return a trailing separator; the predicate
     // strips it before the prefix check so fixtures still match.
     const tmp = os.tmpdir();
-    const fixture = path.join(tmp, 'gitnexus-lbug-trailing', 'lbug');
+    const fixture = path.join(tmp, 'yummygraph-lbug-trailing', 'lbug');
     // Whether or not os.tmpdir() itself has a trailing separator,
     // the predicate must accept legit fixtures.
     expect(isTestFixturePath(fixture)).toBe(true);
@@ -277,7 +277,7 @@ describe('waitForWindowsHandleRelease', () => {
   let dbPath: string;
 
   beforeEach(async () => {
-    fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'gitnexus-lbug-probe-'));
+    fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'yummygraph-lbug-probe-'));
     dbPath = path.join(fixtureDir, 'lbug');
   });
 

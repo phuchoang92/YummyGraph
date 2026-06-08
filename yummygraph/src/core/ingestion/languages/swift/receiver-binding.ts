@@ -24,7 +24,7 @@
  *     class_declaration.
  */
 
-import type { Capture, CaptureMatch } from 'gitnexus-shared';
+import type { Capture, CaptureMatch } from 'yummygraph-shared';
 import { nodeToCapture, syntheticCapture, type SyntaxNode } from '../../utils/ast-helpers.js';
 import { swiftQualifiedBaseTail } from './base-type.js';
 import { swiftMethodConfig } from '../../method-extractors/configs/swift.js';

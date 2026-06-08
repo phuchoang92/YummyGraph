@@ -1,6 +1,6 @@
 /**
  * Group sync integration — uses `extractorOverride` / parsed YAML only (no LadybugDB).
- * Full pipeline with indexed fixture repos is a follow-up (needs `.gitnexus/lbug`).
+ * Full pipeline with indexed fixture repos is a follow-up (needs `.yummygraph/lbug`).
  */
 import { describe, it, expect } from 'vitest';
 import * as path from 'node:path';

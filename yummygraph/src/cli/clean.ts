@@ -1,7 +1,7 @@
 /**
  * Clean Command
  *
- * Removes the .gitnexus index from the current repository.
+ * Removes the .yummygraph index from the current repository.
  * Also unregisters it from the global registry.
  */
 
@@ -79,7 +79,7 @@ export const cleanCommand = async (options?: {
     const entries = await listRegisteredRepos();
     for (const entry of entries) {
       // Safety guard (#1003 review — @magyargergo): same rationale as
-      // remove.ts. `~/.gitnexus/registry.json` is user-writable, so a
+      // remove.ts. `~/.yummygraph/registry.json` is user-writable, so a
       // corrupted or hand-edited entry could point storagePath at the
       // repo root, an empty string, or anywhere else — and
       // fs.rm(recursive: true) on any of those would be catastrophic.

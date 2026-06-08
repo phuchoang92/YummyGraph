@@ -22,10 +22,10 @@ vi.mock('@huggingface/transformers', () => {
 });
 
 const EMBED_ENV_KEYS = [
-  'GITNEXUS_EMBEDDING_URL',
-  'GITNEXUS_EMBEDDING_MODEL',
-  'GITNEXUS_EMBEDDING_API_KEY',
-  'GITNEXUS_EMBEDDING_DIMS',
+  'YUMMYGRAPH_EMBEDDING_URL',
+  'YUMMYGRAPH_EMBEDDING_MODEL',
+  'YUMMYGRAPH_EMBEDDING_API_KEY',
+  'YUMMYGRAPH_EMBEDDING_DIMS',
 ] as const;
 
 const savedEnv = Object.fromEntries(EMBED_ENV_KEYS.map((k) => [k, process.env[k]]));
@@ -80,11 +80,11 @@ describe('getLocalEmbeddingRuntimeBlocker', () => {
     expect(text).not.toMatch(/Cannot find module/);
     // Safe alternatives
     expect(text).toMatch(/without --embeddings/);
-    expect(text).toContain('GITNEXUS_EMBEDDING_URL');
+    expect(text).toContain('YUMMYGRAPH_EMBEDDING_URL');
     expect(text).toMatch(/Linux or in Docker/);
     expect(text).toMatch(/Apple Silicon/);
-    // Addresses the GitNexus device knob too, not only ONNX_WEB_BACKEND (R3 / #1987)
-    expect(text).toContain('GITNEXUS_EMBEDDING_DEVICE');
+    // Addresses the YummyGraph device knob too, not only ONNX_WEB_BACKEND (R3 / #1987)
+    expect(text).toContain('YUMMYGRAPH_EMBEDDING_DEVICE');
   });
 
   it('reads platform/arch from process when no options are given', () => {
@@ -161,7 +161,7 @@ describe('initEmbedder local-runtime guard (darwin/x64)', () => {
     }
   });
 
-  it('rejects with a clean GitNexus message, not the raw native module error', async () => {
+  it('rejects with a clean YummyGraph message, not the raw native module error', async () => {
     const restore = stubPlatform('darwin', 'x64');
     try {
       const { initEmbedder } = await import('../../src/core/embeddings/embedder.js');
@@ -188,8 +188,8 @@ describe('initEmbedder local-runtime guard (darwin/x64)', () => {
 
 describe('HTTP embedding mode on darwin/x64', () => {
   it('is not blocked by the local-runtime guard and never touches the native runtime', async () => {
-    process.env.GITNEXUS_EMBEDDING_URL = 'http://test:8080/v1';
-    process.env.GITNEXUS_EMBEDDING_MODEL = 'test-model';
+    process.env.YUMMYGRAPH_EMBEDDING_URL = 'http://test:8080/v1';
+    process.env.YUMMYGRAPH_EMBEDDING_MODEL = 'test-model';
     const mockVec = Array.from({ length: 384 }, (_, i) => i / 384);
     // Size the response to the request's `input` length so both the single
     // (embedText) and batched (embedBatch) calls get matching vector counts.
@@ -230,8 +230,8 @@ describe('HTTP embedding mode on darwin/x64', () => {
 
 describe('MCP embedQuery on darwin/x64', () => {
   it('routes HTTP mode through httpEmbedQuery without importing transformers.js', async () => {
-    process.env.GITNEXUS_EMBEDDING_URL = 'http://test:8080/v1';
-    process.env.GITNEXUS_EMBEDDING_MODEL = 'test-model';
+    process.env.YUMMYGRAPH_EMBEDDING_URL = 'http://test:8080/v1';
+    process.env.YUMMYGRAPH_EMBEDDING_MODEL = 'test-model';
     const mockVec = Array.from({ length: 384 }, (_, i) => i / 384);
     vi.stubGlobal(
       'fetch',
@@ -246,7 +246,7 @@ describe('MCP embedQuery on darwin/x64', () => {
       const { embedQuery } = await import('../../src/mcp/core/embedder.js');
       const vec = await embedQuery('query from macOS Intel');
 
-      // httpEmbedQuery validates against the default 384 dims (no GITNEXUS_EMBEDDING_DIMS
+      // httpEmbedQuery validates against the default 384 dims (no YUMMYGRAPH_EMBEDDING_DIMS
       // set), so the reused stub stays 384-length; resize the stub + DIMS together to vary it.
       expect(Array.isArray(vec)).toBe(true);
       expect(vec).toHaveLength(384);
@@ -258,7 +258,7 @@ describe('MCP embedQuery on darwin/x64', () => {
   });
 
   it('rejects local mode before importing transformers.js', async () => {
-    // No GITNEXUS_EMBEDDING_* env (cleared in beforeEach) → local mode → embedQuery
+    // No YUMMYGRAPH_EMBEDDING_* env (cleared in beforeEach) → local mode → embedQuery
     // calls initEmbedder, which throws the guard before the lazy transformers import.
     const restore = stubPlatform('darwin', 'x64');
     try {

@@ -7,7 +7,7 @@
  * interface implementation.
  */
 
-import { SupportedLanguages } from 'gitnexus-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 import { createClassExtractor } from '../class-extractors/generic.js';
 import { javaClassConfig } from '../class-extractors/configs/jvm.js';
 import { defineLanguage } from '../language-provider.js';
@@ -25,7 +25,7 @@ import { createMethodExtractor } from '../method-extractors/generic.js';
 import { javaMethodConfig } from '../method-extractors/configs/jvm.js';
 import { createVariableExtractor } from '../variable-extractors/generic.js';
 import { javaVariableConfig } from '../variable-extractors/configs/jvm.js';
-import type { SymbolDefinition } from 'gitnexus-shared';
+import type { SymbolDefinition } from 'yummygraph-shared';
 import {
   emitJavaScopeCaptures,
   interpretJavaImport,

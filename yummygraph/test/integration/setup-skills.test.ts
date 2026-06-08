@@ -57,13 +57,13 @@ describe('setupCommand skills integration', () => {
     await setupCommand();
 
     const installedSkill = await fs.readFile(
-      path.join(tempHome, '.config', 'opencode', 'skills', 'gitnexus-cli', 'SKILL.md'),
+      path.join(tempHome, '.config', 'opencode', 'skills', 'yummygraph-cli', 'SKILL.md'),
       'utf-8',
     );
 
-    expect(installedSkill).toContain('GitNexus CLI Commands');
+    expect(installedSkill).toContain('YummyGraph CLI Commands');
     await expect(
-      fs.access(path.join(tempHome, '.config', 'opencode', 'skill', 'gitnexus-cli', 'SKILL.md')),
+      fs.access(path.join(tempHome, '.config', 'opencode', 'skill', 'yummygraph-cli', 'SKILL.md')),
     ).rejects.toThrow();
   });
 
@@ -75,13 +75,13 @@ describe('setupCommand skills integration', () => {
     const skillDirs = entries.filter((e) => e.isDirectory()).map((e) => e.name);
 
     expect(skillDirs.length).toBeGreaterThan(0);
-    expect(skillDirs).toContain('gitnexus-cli');
+    expect(skillDirs).toContain('yummygraph-cli');
 
     const skillContent = await fs.readFile(
-      path.join(cursorSkillsRoot, 'gitnexus-cli', 'SKILL.md'),
+      path.join(cursorSkillsRoot, 'yummygraph-cli', 'SKILL.md'),
       'utf-8',
     );
-    expect(skillContent).toContain('GitNexus CLI Commands');
+    expect(skillContent).toContain('YummyGraph CLI Commands');
 
     // Flat file source should be installed as {name}/SKILL.md.
     const flatInstalled = await fs.readFile(
@@ -110,14 +110,14 @@ describe('setupCommand skills integration', () => {
     await setupCommand();
 
     const codexConfig = await fs.readFile(path.join(tempHome, '.codex', 'config.toml'), 'utf-8');
-    expect(codexConfig).toContain('[mcp_servers.gitnexus]');
-    expect(codexConfig).toMatch(/gitnexus@\d+\.\d+\.\d+/);
+    expect(codexConfig).toContain('[mcp_servers.yummygraph]');
+    expect(codexConfig).toMatch(/yummygraph@\d+\.\d+\.\d+/);
 
     const codexSkill = await fs.readFile(
-      path.join(tempHome, '.agents', 'skills', 'gitnexus-cli', 'SKILL.md'),
+      path.join(tempHome, '.agents', 'skills', 'yummygraph-cli', 'SKILL.md'),
       'utf-8',
     );
-    expect(codexSkill).toContain('GitNexus CLI Commands');
+    expect(codexSkill).toContain('YummyGraph CLI Commands');
   });
 
   it('does not duplicate the Codex MCP section on repeated fallback setup runs', async () => {
@@ -128,7 +128,7 @@ describe('setupCommand skills integration', () => {
     await setupCommand();
 
     const codexConfig = await fs.readFile(path.join(tempHome, '.codex', 'config.toml'), 'utf-8');
-    const sectionMatches = codexConfig.match(/\[mcp_servers\.gitnexus\]/g) ?? [];
+    const sectionMatches = codexConfig.match(/\[mcp_servers\.yummygraph\]/g) ?? [];
 
     expect(sectionMatches).toHaveLength(1);
   });

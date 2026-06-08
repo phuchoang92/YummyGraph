@@ -18,7 +18,7 @@ const CLASS_OVERLAP = 10;
 // ────────────────────────────────────────────────────────────────────────────
 
 describe('resolveEmbeddingInstallPolicy (#1153)', () => {
-  const ENV = 'GITNEXUS_LBUG_EXTENSION_INSTALL';
+  const ENV = 'YUMMYGRAPH_LBUG_EXTENSION_INSTALL';
   const original = process.env[ENV];
   const restore = () => {
     if (original === undefined) delete process.env[ENV];

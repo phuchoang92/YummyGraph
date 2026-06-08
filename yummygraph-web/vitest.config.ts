@@ -4,12 +4,12 @@ import path from 'path';
 import { createRequire } from 'module';
 
 const _require = createRequire(import.meta.url);
-const gitnexusPkg = _require('../gitnexus/package.json');
+const yummygraphPkg = _require('../yummygraph/package.json');
 
 export default defineConfig({
   plugins: [react()],
   define: {
-    __REQUIRED_NODE_VERSION__: JSON.stringify(gitnexusPkg.engines.node.replace(/[>=^~\s]/g, '')),
+    __REQUIRED_NODE_VERSION__: JSON.stringify(yummygraphPkg.engines.node.replace(/[>=^~\s]/g, '')),
   },
   resolve: {
     alias: {

@@ -49,7 +49,7 @@ import {
   clearParsedFileStore,
 } from '../../src/storage/parsedfile-store.js';
 import type { ParseWorkerResult } from '../../src/core/ingestion/workers/parse-worker.js';
-import type { ParsedFile } from 'gitnexus-shared';
+import type { ParsedFile } from 'yummygraph-shared';
 
 // A structurally-minimal ParsedFile. `loadParsedFilesForPaths` keys on
 // `filePath`; the rest are empty so a restored shard is byte-stable and

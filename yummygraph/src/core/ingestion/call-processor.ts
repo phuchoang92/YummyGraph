@@ -18,7 +18,7 @@
 import { KnowledgeGraph } from '../graph/types.js';
 import type { SemanticModel, SymbolTableReader } from './model/index.js';
 import { generateId } from '../../lib/utils.js';
-import type { SymbolDefinition } from 'gitnexus-shared';
+import type { SymbolDefinition } from 'yummygraph-shared';
 import { yieldToEventLoop } from './utils/event-loop.js';
 import type { ExtractedRoute, ExtractedFetchCall } from './workers/parse-worker.js';
 import { normalizeFetchURL, routeMatches } from './route-extractors/nextjs.js';

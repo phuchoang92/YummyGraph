@@ -2,10 +2,10 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import path from 'node:path';
 
-// Steering policy (#1939, #1945): the committed skill files route gitnexus
-// commands through the project-local runner `gitnexus analyze` drops next to the
-// index (`node .gitnexus/run.cjs <command>`). That one CLI-neutral command
-// resolves the available runner (global `gitnexus` → `pnpm dlx` → `npx`) at call
+// Steering policy (#1939, #1945): the committed skill files route yummygraph
+// commands through the project-local runner `yummygraph analyze` drops next to the
+// index (`node .yummygraph/run.cjs <command>`). That one CLI-neutral command
+// resolves the available runner (global `yummygraph` → `pnpm dlx` → `npx`) at call
 // time, so the docs make no package-manager assumption. The runner only exists
 // after the first analyze, so the cli skill documents a bootstrap path (and the
 // npm-11 `node.target is null` npx install-crash escape hatch). When the pnpm
@@ -16,14 +16,14 @@ import path from 'node:path';
 // Pure file reads resolved via path.resolve — deterministic, no host-PATH or
 // glob-CWD dependence, so this needs no cross-platform-tests.ts registration.
 
-const GITNEXUS_ROOT = path.resolve(__dirname, '..', '..'); // gitnexus/test/unit -> gitnexus/
+const YUMMYGRAPH_ROOT = path.resolve(__dirname, '..', '..'); // yummygraph/test/unit -> yummygraph/
 const REPO_ROOT = path.resolve(__dirname, '..', '..', '..'); // -> monorepo root
 
 function collectSkillFiles(): string[] {
   const files: string[] = [];
 
   // Bundled ship source: flat *.md files installSkills() copies to new users.
-  const bundled = path.join(GITNEXUS_ROOT, 'skills');
+  const bundled = path.join(YUMMYGRAPH_ROOT, 'skills');
   if (existsSync(bundled)) {
     for (const f of readdirSync(bundled)) {
       if (f.endsWith('.md')) files.push(path.join(bundled, f));
@@ -32,9 +32,9 @@ function collectSkillFiles(): string[] {
 
   // Per-skill <name>/SKILL.md copies across the other distribution locations.
   const skillRoots = [
-    path.join(REPO_ROOT, '.claude', 'skills', 'gitnexus'),
-    path.join(REPO_ROOT, 'gitnexus-claude-plugin', 'skills'),
-    path.join(REPO_ROOT, 'gitnexus-cursor-integration', 'skills'),
+    path.join(REPO_ROOT, '.claude', 'skills', 'yummygraph'),
+    path.join(REPO_ROOT, 'yummygraph-claude-plugin', 'skills'),
+    path.join(REPO_ROOT, 'yummygraph-cursor-integration', 'skills'),
   ];
   for (const root of skillRoots) {
     if (!existsSync(root)) continue;
@@ -50,7 +50,7 @@ function collectSkillFiles(): string[] {
 function cliSkillFiles(files: string[]): string[] {
   return files.filter(
     (f) =>
-      /gitnexus-cli/.test(path.basename(path.dirname(f))) || path.basename(f) === 'gitnexus-cli.md',
+      /yummygraph-cli/.test(path.basename(path.dirname(f))) || path.basename(f) === 'yummygraph-cli.md',
   );
 }
 
@@ -59,24 +59,24 @@ describe('skill-file steering (#1939, #1945)', () => {
 
   it('collects skill files from all four committed locations (guard is not vacuous)', () => {
     const rels = files.map((f) => path.relative(REPO_ROOT, f));
-    expect(rels.some((r) => r.startsWith(`gitnexus${path.sep}skills${path.sep}`))).toBe(true);
+    expect(rels.some((r) => r.startsWith(`yummygraph${path.sep}skills${path.sep}`))).toBe(true);
     expect(
-      rels.some((r) => r.startsWith(path.join('.claude', 'skills', 'gitnexus') + path.sep)),
+      rels.some((r) => r.startsWith(path.join('.claude', 'skills', 'yummygraph') + path.sep)),
     ).toBe(true);
     expect(
-      rels.some((r) => r.startsWith(path.join('gitnexus-claude-plugin', 'skills') + path.sep)),
+      rels.some((r) => r.startsWith(path.join('yummygraph-claude-plugin', 'skills') + path.sep)),
     ).toBe(true);
     expect(
-      rels.some((r) => r.startsWith(path.join('gitnexus-cursor-integration', 'skills') + path.sep)),
+      rels.some((r) => r.startsWith(path.join('yummygraph-cursor-integration', 'skills') + path.sep)),
     ).toBe(true);
   });
 
   it('routes EVERY cli skill subcommand through the project-local runner (#1945)', () => {
     // The cli skill demonstrates every subcommand. Each must invoke the
-    // CLI-neutral runner `gitnexus analyze` drops next to the index — not a
+    // CLI-neutral runner `yummygraph analyze` drops next to the index — not a
     // hardcoded package manager — so the docs make no pnpm/npx assumption.
     // Checking each subcommand (not just `analyze`) guards against a regression
-    // where status/clean/wiki/list silently revert to `npx gitnexus <sub>`.
+    // where status/clean/wiki/list silently revert to `npx yummygraph <sub>`.
     const cli = cliSkillFiles(files);
     expect(cli.length).toBeGreaterThan(0); // guard is not vacuous
     const SUBCOMMANDS = ['analyze', 'status', 'clean', 'wiki', 'list'];
@@ -84,7 +84,7 @@ describe('skill-file steering (#1939, #1945)', () => {
     for (const f of cli) {
       const text = readFileSync(f, 'utf-8');
       for (const sub of SUBCOMMANDS) {
-        if (!new RegExp(`node\\s+\\.gitnexus/run\\.cjs\\s+${sub}\\b`).test(text)) {
+        if (!new RegExp(`node\\s+\\.yummygraph/run\\.cjs\\s+${sub}\\b`).test(text)) {
           offenders.push(`${path.relative(REPO_ROOT, f)}:${sub}`);
         }
       }
@@ -101,7 +101,7 @@ describe('skill-file steering (#1939, #1945)', () => {
       const text = readFileSync(f, 'utf-8');
       const refsIssue = /1939/.test(text);
       const hasFallback =
-        /install -g gitnexus/.test(text) || /--allow-build.*dlx gitnexus/.test(text);
+        /install -g yummygraph/.test(text) || /--allow-build.*dlx yummygraph/.test(text);
       return !(refsIssue && hasFallback);
     });
     expect(offenders.map((f) => path.relative(REPO_ROOT, f))).toEqual([]);
@@ -110,7 +110,7 @@ describe('skill-file steering (#1939, #1945)', () => {
     // pre-`dlx` fallback form, so the npm-11 pnpm path can't silently vanish
     // from every skill while the OR above is satisfied by `install -g` alone.
     const withPnpmFallback = cli.filter((f) =>
-      /--allow-build.*dlx gitnexus/.test(readFileSync(f, 'utf-8')),
+      /--allow-build.*dlx yummygraph/.test(readFileSync(f, 'utf-8')),
     );
     expect(withPnpmFallback.length).toBeGreaterThan(0);
   });
@@ -121,7 +121,7 @@ describe('skill-file steering (#1939, #1945)', () => {
     const offenders = files.filter((f) => {
       const text = readFileSync(f, 'utf-8');
       if (!/[Ss]tale/.test(text)) return false; // only skills with a reanalyze hint
-      return !/node\s+\.gitnexus\/run\.cjs\s+analyze/.test(text);
+      return !/node\s+\.yummygraph\/run\.cjs\s+analyze/.test(text);
     });
     expect(offenders.map((f) => path.relative(REPO_ROOT, f))).toEqual([]);
   });

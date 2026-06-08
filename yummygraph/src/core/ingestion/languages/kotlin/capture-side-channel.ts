@@ -29,7 +29,7 @@
  * only restores kotlin state and ignores a foreign-shaped snapshot.
  */
 
-import type { ParsedFile, ScopeId } from 'gitnexus-shared';
+import type { ParsedFile, ScopeId } from 'yummygraph-shared';
 import { getCompanionScopesForFile, markCompanionScope } from './companion-scopes.js';
 
 /**

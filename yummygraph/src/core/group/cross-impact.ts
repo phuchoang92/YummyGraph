@@ -75,7 +75,7 @@ type BridgeNeighborRow = {
 
 export interface RunGroupImpactDeps {
   port: GroupToolPort;
-  gitnexusDir: string;
+  yummygraphDir: string;
 }
 
 function parseDirection(raw: unknown): 'upstream' | 'downstream' | null {
@@ -354,7 +354,7 @@ async function ensureBridgeReady(
   const meta = await readBridgeMeta(groupDir);
   if (meta.version > 0 && meta.version !== BRIDGE_SCHEMA_VERSION) {
     return {
-      error: `Bridge schema version mismatch (meta.json has ${meta.version}, expected ${BRIDGE_SCHEMA_VERSION}). Run gitnexus group sync for this group.`,
+      error: `Bridge schema version mismatch (meta.json has ${meta.version}, expected ${BRIDGE_SCHEMA_VERSION}). Run yummygraph group sync for this group.`,
     };
   }
   const dbPath = path.join(groupDir, 'bridge.lbug');
@@ -362,13 +362,13 @@ async function ensureBridgeReady(
     await fsp.access(dbPath);
   } catch {
     return {
-      error: `No bridge.lbug in this group directory. Run gitnexus group sync (schema ${BRIDGE_SCHEMA_VERSION}).`,
+      error: `No bridge.lbug in this group directory. Run yummygraph group sync (schema ${BRIDGE_SCHEMA_VERSION}).`,
     };
   }
   const handle = await openBridgeDbReadOnly(groupDir);
   if (!handle) {
     return {
-      error: `Could not open bridge.lbug read-only (schema ${BRIDGE_SCHEMA_VERSION}). Run gitnexus group sync.`,
+      error: `Could not open bridge.lbug read-only (schema ${BRIDGE_SCHEMA_VERSION}). Run yummygraph group sync.`,
     };
   }
   return { handle };
@@ -413,7 +413,7 @@ export async function runGroupImpact(
     timeoutMs,
   } = parsed;
 
-  const groupDir = getGroupDir(deps.gitnexusDir, name);
+  const groupDir = getGroupDir(deps.yummygraphDir, name);
   let config: GroupConfig;
   try {
     config = await loadGroupConfig(groupDir);

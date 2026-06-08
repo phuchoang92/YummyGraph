@@ -38,7 +38,7 @@
  * `import './polyfill'` as a module-reachability dependency only).
  */
 
-import type { Capture, CaptureMatch } from 'gitnexus-shared';
+import type { Capture, CaptureMatch } from 'yummygraph-shared';
 import {
   findChild,
   nodeToCapture,

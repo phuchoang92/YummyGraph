@@ -3,7 +3,7 @@
  * Build tree-sitter-proto native binding.
  *
  * Why this script exists:
- *   tree-sitter-proto is vendored under gitnexus/vendor/tree-sitter-proto/
+ *   tree-sitter-proto is vendored under yummygraph/vendor/tree-sitter-proto/
  *   and copied into node_modules/ by materialize-vendor-grammars.cjs. Previously, the vendored
  *   package had its own `dependencies` and `install` script, which caused
  *   npm to create `vendor/tree-sitter-proto/node_modules/` and
@@ -11,13 +11,13 @@
  *   blocked `rmdir` on global-install upgrade, producing:
  *
  *     ENOTEMPTY: directory not empty, rmdir
- *       '.../gitnexus/vendor/tree-sitter-proto/node_modules/node-addon-api'
+ *       '.../yummygraph/vendor/tree-sitter-proto/node_modules/node-addon-api'
  *
- *   (See https://github.com/abhigyanpatwari/GitNexus/issues/836.)
+ *   (See https://github.com/abhigyanpatwari/YummyGraph/issues/836.)
  *
  *   We stripped `dependencies` and the `install` script from the vendored
  *   package.json, hoisted `node-addon-api` and `node-gyp-build` into
- *   gitnexus's own optionalDependencies, and moved native compilation here.
+ *   yummygraph's own optionalDependencies, and moved native compilation here.
  *
  * What this does:
  *   Runs `npx node-gyp rebuild` inside `node_modules/tree-sitter-proto/`.
@@ -27,19 +27,19 @@
  *
  *   Mirrors the tree-sitter-dart build helper. Best-effort: if any
  *   precondition fails (optional dep absent, no toolchain, --ignore-scripts),
- *   warn and exit 0 so gitnexus install still succeeds.
+ *   warn and exit 0 so yummygraph install still succeeds.
  */
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
 // Opt-out: skip the native rebuild entirely. Proto parsing becomes
-// unavailable but `npm install gitnexus` finishes much faster on machines
+// unavailable but `npm install yummygraph` finishes much faster on machines
 // without a C++ toolchain. Strict `=== '1'` only — '=true', '=yes', '=0'
 // (read as a string), and any other value all fall through to the rebuild.
-if (process.env.GITNEXUS_SKIP_OPTIONAL_GRAMMARS === '1') {
+if (process.env.YUMMYGRAPH_SKIP_OPTIONAL_GRAMMARS === '1') {
   console.warn(
-    '[tree-sitter-proto] Skipping build (GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1). Proto parsing will be unavailable until reinstalled without the env var.',
+    '[tree-sitter-proto] Skipping build (YUMMYGRAPH_SKIP_OPTIONAL_GRAMMARS=1). Proto parsing will be unavailable until reinstalled without the env var.',
   );
   process.exit(0);
 }
@@ -85,8 +85,8 @@ try {
 } catch (err) {
   console.warn('[tree-sitter-proto] Could not build native binding:', err.message);
   console.warn(
-    '[tree-sitter-proto] Proto (.proto) parsing will be unavailable. Non-proto gitnexus functionality is unaffected.',
+    '[tree-sitter-proto] Proto (.proto) parsing will be unavailable. Non-proto yummygraph functionality is unaffected.',
   );
-  // Exit 0: optionalDependency failures must not fail the gitnexus install.
+  // Exit 0: optionalDependency failures must not fail the yummygraph install.
   process.exit(0);
 }

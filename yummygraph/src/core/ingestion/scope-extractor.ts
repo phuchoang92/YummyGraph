@@ -74,8 +74,8 @@ import type {
   ScopeKind,
   SymbolDefinition,
   TypeRef,
-} from 'gitnexus-shared';
-import { buildPositionIndex, buildScopeTree, canParentScope, makeScopeId } from 'gitnexus-shared';
+} from 'yummygraph-shared';
+import { buildPositionIndex, buildScopeTree, canParentScope, makeScopeId } from 'yummygraph-shared';
 import type { LanguageProvider } from './language-provider.js';
 import { extractTemplateArguments } from './utils/template-arguments.js';
 

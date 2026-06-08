@@ -1,4 +1,4 @@
-import type { ParsedFile, ScopeId, SymbolDefinition } from 'gitnexus-shared';
+import type { ParsedFile, ScopeId, SymbolDefinition } from 'yummygraph-shared';
 
 /**
  * Per-file set of function names declared with `static` storage class.

@@ -38,7 +38,7 @@ describe('git-clone', () => {
 
     it('rejects URLs whose last segment is "..": prevents getCloneDir traversal escape', () => {
       // Without the safe-name pattern, a URL ending in `/..` would yield
-      // `getCloneDir('..')` = `~/.gitnexus/repos/..` = `~/.gitnexus/`, breaking
+      // `getCloneDir('..')` = `~/.yummygraph/repos/..` = `~/.yummygraph/`, breaking
       // out of the intended clone root.
       expect(() => extractRepoName('https://github.com/owner/repo:..')).toThrow(
         'valid repository name',
@@ -94,9 +94,9 @@ describe('git-clone', () => {
   });
 
   describe('getCloneDir', () => {
-    it('returns path under ~/.gitnexus/repos/', () => {
+    it('returns path under ~/.yummygraph/repos/', () => {
       const dir = getCloneDir('my-repo');
-      expect(dir).toContain('.gitnexus');
+      expect(dir).toContain('.yummygraph');
       expect(dir).toMatch(/repos/);
       expect(dir).toContain('my-repo');
     });
@@ -113,7 +113,7 @@ describe('git-clone', () => {
     });
 
     it('returned path is always a direct child of the clone root', () => {
-      const cloneRoot = path.resolve(path.join(os.homedir(), '.gitnexus', 'repos'));
+      const cloneRoot = path.resolve(path.join(os.homedir(), '.yummygraph', 'repos'));
       const dir = getCloneDir('my-repo');
       const rel = path.relative(cloneRoot, path.resolve(dir));
       // path.relative from the parent to the child must be just the child name —
@@ -322,7 +322,7 @@ describe('git-clone', () => {
     //
     // These tests do NOT mock spawn — the barrier throws synchronously
     // before git is invoked, so the rejection is observable directly.
-    const cloneRoot = path.resolve(path.join(os.homedir(), '.gitnexus', 'repos'));
+    const cloneRoot = path.resolve(path.join(os.homedir(), '.yummygraph', 'repos'));
 
     it('rejects an absolute target outside CLONE_ROOT', async () => {
       await expect(cloneOrPull('https://github.com/a/b.git', '/etc/passwd')).rejects.toThrow(
@@ -442,7 +442,7 @@ describe('git-clone', () => {
     let fixtureDir: string;
 
     beforeAll(async () => {
-      fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'gitnexus-remote-match-'));
+      fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'yummygraph-remote-match-'));
       // git init + set remote.origin.url. We can't call git init via runGit
       // since it's private; spawn directly.
       await new Promise<void>((resolve, reject) => {
@@ -511,7 +511,7 @@ describe('git-clone', () => {
     });
 
     it('rejects when the directory has no remote.origin', async () => {
-      const noRemoteDir = await fs.mkdtemp(path.join(os.tmpdir(), 'gitnexus-no-remote-'));
+      const noRemoteDir = await fs.mkdtemp(path.join(os.tmpdir(), 'yummygraph-no-remote-'));
       try {
         await new Promise<void>((resolve, reject) => {
           const proc = spawn('git', ['init', '--quiet'], { cwd: noRemoteDir, stdio: 'ignore' });
@@ -531,7 +531,7 @@ describe('git-clone', () => {
 
   describe('getRemoteOriginUrl', () => {
     it('returns null for a directory that is not a git repository', async () => {
-      const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'gitnexus-not-git-'));
+      const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'yummygraph-not-git-'));
       try {
         const result = await getRemoteOriginUrl(tmp);
         expect(result).toBeNull();

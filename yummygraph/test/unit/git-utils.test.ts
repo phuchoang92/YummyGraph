@@ -26,7 +26,7 @@ describe('hasGitDir', () => {
 
   it('returns true when .git directory exists', async () => {
     const hasGitDir = await getHasGitDir();
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-test-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-test-'));
     try {
       fs.mkdirSync(path.join(tmpDir, '.git'));
       expect(hasGitDir(tmpDir)).toBe(true);
@@ -37,7 +37,7 @@ describe('hasGitDir', () => {
 
   it('returns true when .git is a file (git worktree)', async () => {
     const hasGitDir = await getHasGitDir();
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-test-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-test-'));
     try {
       fs.writeFileSync(path.join(tmpDir, '.git'), 'gitdir: /some/other/.git\n');
       expect(hasGitDir(tmpDir)).toBe(true);
@@ -48,7 +48,7 @@ describe('hasGitDir', () => {
 
   it('returns false when .git entry is absent', async () => {
     const hasGitDir = await getHasGitDir();
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-test-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-test-'));
     try {
       // No .git here — plain directory
       expect(hasGitDir(tmpDir)).toBe(false);
@@ -59,7 +59,7 @@ describe('hasGitDir', () => {
 
   it('returns false for a non-existent path', async () => {
     const hasGitDir = await getHasGitDir();
-    expect(hasGitDir('/tmp/__gitnexus_nonexistent_path__')).toBe(false);
+    expect(hasGitDir('/tmp/__yummygraph_nonexistent_path__')).toBe(false);
   });
 });
 
@@ -71,7 +71,7 @@ describe('hasGitDir', () => {
 describe('isGitRepo', () => {
   it('returns false for a plain (non-git) directory', async () => {
     const { isGitRepo } = await import('../../src/storage/git.js');
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-test-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-test-'));
     try {
       expect(isGitRepo(tmpDir)).toBe(false);
     } finally {
@@ -81,7 +81,7 @@ describe('isGitRepo', () => {
 
   it('returns false for a non-existent path', async () => {
     const { isGitRepo } = await import('../../src/storage/git.js');
-    expect(isGitRepo('/tmp/__gitnexus_nonexistent__')).toBe(false);
+    expect(isGitRepo('/tmp/__yummygraph_nonexistent__')).toBe(false);
   });
 });
 
@@ -90,7 +90,7 @@ describe('isGitRepo', () => {
 describe('getCurrentCommit', () => {
   it('returns empty string for a non-git directory', async () => {
     const { getCurrentCommit } = await import('../../src/storage/git.js');
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-test-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-test-'));
     try {
       expect(getCurrentCommit(tmpDir)).toBe('');
     } finally {
@@ -105,7 +105,7 @@ describe('getCurrentCommit', () => {
     const { getCurrentCommit } = await import('../../src/storage/git.js');
     // git-init a dir without commits so `git rev-parse HEAD` fails with a
     // "fatal:" message — the exact class of error that leaked before the fix.
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-test-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-test-'));
     execSync('git init -q', { cwd: tmpDir, stdio: 'ignore' });
     const spy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
     try {
@@ -124,7 +124,7 @@ describe('getCurrentCommit', () => {
 describe('getGitRoot', () => {
   it('returns null for a plain temp directory', async () => {
     const { getGitRoot } = await import('../../src/storage/git.js');
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-test-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-test-'));
     try {
       expect(getGitRoot(tmpDir)).toBeNull();
     } finally {
@@ -135,7 +135,7 @@ describe('getGitRoot', () => {
   // Regression: #1172 -- mirrors the getCurrentCommit stderr test above.
   it('does not leak git stderr to process.stderr (#1172)', async () => {
     const { getGitRoot } = await import('../../src/storage/git.js');
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-test-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-test-'));
     const spy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
     try {
       getGitRoot(tmpDir);
@@ -152,7 +152,7 @@ describe('getGitRoot', () => {
 
 describe('getRemoteUrl', () => {
   const setupRepoWithRemote = (remoteUrl: string): string => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-remote-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-remote-'));
     // Use real fs paths and shellouts — the helper itself shells out to
     // `git config`, so we need a real git repo for the assertion to be
     // meaningful.
@@ -163,7 +163,7 @@ describe('getRemoteUrl', () => {
 
   it('returns undefined for a non-git directory', async () => {
     const { getRemoteUrl } = await import('../../src/storage/git.js');
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-test-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-test-'));
     try {
       expect(getRemoteUrl(tmpDir)).toBeUndefined();
     } finally {
@@ -173,7 +173,7 @@ describe('getRemoteUrl', () => {
 
   it('returns undefined for a git repo with no origin remote', async () => {
     const { getRemoteUrl } = await import('../../src/storage/git.js');
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-test-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-test-'));
     try {
       execSync('git init -q', { cwd: tmpDir });
       expect(getRemoteUrl(tmpDir)).toBeUndefined();
@@ -218,7 +218,7 @@ describe('getRemoteUrl', () => {
 
 // ─── getCanonicalRepoRoot (#1259) ────────────────────────────────────────
 //
-// Critical for the worktree-naming bug: when `gitnexus analyze` runs from a
+// Critical for the worktree-naming bug: when `yummygraph analyze` runs from a
 // linked worktree, deriving `repoName` from `path.basename(getGitRoot(cwd))`
 // uses the worktree's directory slug instead of the canonical repo's
 // basename. `getCanonicalRepoRoot` exists specifically to dereference
@@ -227,7 +227,7 @@ describe('getRemoteUrl', () => {
 describe('getCanonicalRepoRoot', () => {
   it('returns null for a plain temp directory (not a git repo)', async () => {
     const { getCanonicalRepoRoot } = await import('../../src/storage/git.js');
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-canonical-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-canonical-'));
     try {
       expect(getCanonicalRepoRoot(tmpDir)).toBeNull();
     } finally {
@@ -237,12 +237,12 @@ describe('getCanonicalRepoRoot', () => {
 
   it('returns null for a non-existent path', async () => {
     const { getCanonicalRepoRoot } = await import('../../src/storage/git.js');
-    expect(getCanonicalRepoRoot('/tmp/__gitnexus_canonical_nonexistent__')).toBeNull();
+    expect(getCanonicalRepoRoot('/tmp/__yummygraph_canonical_nonexistent__')).toBeNull();
   });
 
   it('returns the repo root when called from a regular (non-worktree) checkout', async () => {
     const { getCanonicalRepoRoot } = await import('../../src/storage/git.js');
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-canonical-main-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-canonical-main-'));
     try {
       execSync('git init -q', { cwd: tmpDir });
       // Compare via `path.basename` instead of full-path string equality so
@@ -260,7 +260,7 @@ describe('getCanonicalRepoRoot', () => {
 
   it('returns the CANONICAL repo root when called from inside a linked worktree (#1259)', async () => {
     const { getCanonicalRepoRoot, getGitRoot } = await import('../../src/storage/git.js');
-    const repoDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-canonical-wt-'));
+    const repoDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-canonical-wt-'));
     try {
       execSync('git init -q', { cwd: repoDir });
       // `git worktree add` requires at least one commit on a real branch.

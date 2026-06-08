@@ -1,5 +1,5 @@
 /**
- * Unit tests for `gitnexus/src/cli/cli-message.ts`.
+ * Unit tests for `yummygraph/src/cli/cli-message.ts`.
  *
  * cli-message is the helper for user-facing CLI banners and error guidance.
  * The contract: each call writes plain text to stderr AND emits a

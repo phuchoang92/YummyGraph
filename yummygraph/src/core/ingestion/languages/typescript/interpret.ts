@@ -14,7 +14,7 @@
  * `@type-binding.type`.
  */
 
-import type { CaptureMatch, ParsedImport, ParsedTypeBinding, TypeRef } from 'gitnexus-shared';
+import type { CaptureMatch, ParsedImport, ParsedTypeBinding, TypeRef } from 'yummygraph-shared';
 
 // ─── interpretImport ──────────────────────────────────────────────────────
 

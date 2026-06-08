@@ -1,6 +1,6 @@
 /**
  * Cross-platform best-effort probe: does another process hold dbPath open
- * with a command line that looks like a GitNexus MCP/serve server?
+ * with a command line that looks like a YummyGraph MCP/serve server?
  *
  * Backends (no user-installed Sysinternals):
  * - Linux: scan procfs under /proc (per-PID fd entries) via stat(2) (dev+inode); works without lsof;
@@ -17,16 +17,16 @@ const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
 
-function isGitNexusServerCommand(command) {
+function isYummyGraphServerCommand(command) {
   const hasServerMode = /(?:^|\s)(mcp|serve)(?:\s|$)/.test(command);
-  const hasGitNexus =
-    /(?:^|[/\\\s])gitnexus(?:\.cmd)?(?:\s|$)/.test(command) ||
-    /node_modules[/\\]gitnexus[/\\]/.test(command);
-  return hasServerMode && hasGitNexus;
+  const hasYummyGraph =
+    /(?:^|[/\\\s])yummygraph(?:\.cmd)?(?:\s|$)/.test(command) ||
+    /node_modules[/\\]yummygraph[/\\]/.test(command);
+  return hasServerMode && hasYummyGraph;
 }
 
 function resolveHookBinary(tool) {
-  const envKey = tool === 'lsof' ? 'GITNEXUS_HOOK_LSOF_PATH' : 'GITNEXUS_HOOK_PS_PATH';
+  const envKey = tool === 'lsof' ? 'YUMMYGRAPH_HOOK_LSOF_PATH' : 'YUMMYGRAPH_HOOK_PS_PATH';
   const fromEnv = process.env[envKey];
   if (fromEnv && String(fromEnv).trim() && fs.existsSync(String(fromEnv))) {
     return String(fromEnv);
@@ -47,7 +47,7 @@ function resolveHookBinary(tool) {
 }
 
 function resolveWindowsPowerShellPath() {
-  const fromEnv = process.env.GITNEXUS_HOOK_POWERSHELL_PATH;
+  const fromEnv = process.env.YUMMYGRAPH_HOOK_POWERSHELL_PATH;
   if (fromEnv && String(fromEnv).trim() && fs.existsSync(String(fromEnv).trim())) {
     return String(fromEnv).trim();
   }
@@ -80,17 +80,17 @@ function getWindowsRmListEncodedCommand() {
     windowsRmListPsEncodedCommandCache = null;
     if (
       !windowsRmListPsLoadFailureWarned &&
-      (process.env.GITNEXUS_DEBUG === '1' || process.env.GITNEXUS_DEBUG === 'true')
+      (process.env.YUMMYGRAPH_DEBUG === '1' || process.env.YUMMYGRAPH_DEBUG === 'true')
     ) {
       windowsRmListPsLoadFailureWarned = true;
       const msg = err && err.message ? String(err.message).slice(0, 200) : 'unknown';
-      process.stderr.write(`[GitNexus hook] win-rm-list-json.ps1 load failed: ${msg}\n`);
+      process.stderr.write(`[YummyGraph hook] win-rm-list-json.ps1 load failed: ${msg}\n`);
     }
   }
   return windowsRmListPsEncodedCommandCache;
 }
 
-function hasGitNexusServerOwnerWindows(dbPathAbs, myPid) {
+function hasYummyGraphServerOwnerWindows(dbPathAbs, myPid) {
   const encoded = getWindowsRmListEncodedCommand();
   if (!encoded) return false;
   const psExe = resolveWindowsPowerShellPath();
@@ -110,7 +110,7 @@ function hasGitNexusServerOwnerWindows(dbPathAbs, myPid) {
       timeout: 6000,
       stdio: ['ignore', 'pipe', 'ignore'],
       windowsHide: true,
-      env: { ...process.env, GITNEXUS_HOOK_RM_TARGET: dbPathAbs },
+      env: { ...process.env, YUMMYGRAPH_HOOK_RM_TARGET: dbPathAbs },
     },
   );
   // ETIMEDOUT means the PowerShell probe didn't return in time; treat as 'unresponsive process holds DB' → fail-closed (skip augment).
@@ -127,7 +127,7 @@ function hasGitNexusServerOwnerWindows(dbPathAbs, myPid) {
     const procId = Number(row.pid);
     const cmd = String(row.cmd || '');
     if (!Number.isFinite(procId) || procId === myPid) continue;
-    if (isGitNexusServerCommand(cmd)) return true;
+    if (isYummyGraphServerCommand(cmd)) return true;
   }
   return false;
 }
@@ -140,8 +140,8 @@ function readLinuxCmdline(pidStr) {
   }
 }
 
-function linuxProcScanFindGitNexusServer(dbPathAbs, myPid) {
-  const raw = process.env.GITNEXUS_HOOK_LINUX_PROC_BUDGET_MS;
+function linuxProcScanFindYummyGraphServer(dbPathAbs, myPid) {
+  const raw = process.env.YUMMYGRAPH_HOOK_LINUX_PROC_BUDGET_MS;
   const budget = Number(raw && String(raw).trim()) ? Number.parseInt(String(raw), 10) : 1200;
   const start = Date.now();
   let targetStat;
@@ -182,12 +182,12 @@ function linuxProcScanFindGitNexusServer(dbPathAbs, myPid) {
       }
     }
     if (!holds) continue;
-    if (isGitNexusServerCommand(readLinuxCmdline(ent.name))) return true;
+    if (isYummyGraphServerCommand(readLinuxCmdline(ent.name))) return true;
   }
   return false;
 }
 
-function unixLsofPsFindGitNexusServer(dbPathAbs, myPid) {
+function unixLsofPsFindYummyGraphServer(dbPathAbs, myPid) {
   const lsofPath = resolveHookBinary('lsof');
   const lsof = spawnSync(lsofPath, ['-nP', '-t', '--', dbPathAbs], {
     encoding: 'utf-8',
@@ -211,7 +211,7 @@ function unixLsofPsFindGitNexusServer(dbPathAbs, myPid) {
       if (ps.error.code === 'ETIMEDOUT') return true;
       continue;
     }
-    if (isGitNexusServerCommand(ps.stdout || '')) return true;
+    if (isYummyGraphServerCommand(ps.stdout || '')) return true;
   }
   return false;
 }
@@ -220,22 +220,22 @@ function unixLsofPsFindGitNexusServer(dbPathAbs, myPid) {
  * @param {string} dbPath Absolute or relative path to the DB file (e.g. .../lbug).
  * @param {number} myPid Current process PID (hook runner), excluded from matches.
  */
-function hasGitNexusDbLockedByGitNexusServer(dbPath, myPid) {
+function hasYummyGraphDbLockedByYummyGraphServer(dbPath, myPid) {
   if (!fs.existsSync(dbPath)) return false;
   const dbPathAbs = path.resolve(dbPath);
 
   if (process.platform === 'win32') {
-    return hasGitNexusServerOwnerWindows(dbPathAbs, myPid);
+    return hasYummyGraphServerOwnerWindows(dbPathAbs, myPid);
   }
 
   if (process.platform === 'linux') {
-    if (linuxProcScanFindGitNexusServer(dbPathAbs, myPid)) return true;
-    return unixLsofPsFindGitNexusServer(dbPathAbs, myPid);
+    if (linuxProcScanFindYummyGraphServer(dbPathAbs, myPid)) return true;
+    return unixLsofPsFindYummyGraphServer(dbPathAbs, myPid);
   }
 
-  return unixLsofPsFindGitNexusServer(dbPathAbs, myPid);
+  return unixLsofPsFindYummyGraphServer(dbPathAbs, myPid);
 }
 
 module.exports = {
-  hasGitNexusDbLockedByGitNexusServer,
+  hasYummyGraphDbLockedByYummyGraphServer,
 };

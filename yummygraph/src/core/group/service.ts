@@ -12,7 +12,7 @@ import {
   normalizeServicePrefix,
   repoInSubgroup,
 } from './group-path-utils.js';
-import { getDefaultGitnexusDir, getGroupDir, listGroups, readContractRegistry } from './storage.js';
+import { getDefaultYummygraphDir, getGroupDir, listGroups, readContractRegistry } from './storage.js';
 import { syncGroup } from './sync.js';
 import { logger } from '../logger.js';
 import type {
@@ -231,7 +231,7 @@ export class GroupService {
       const groups = await listGroups();
       return { groups };
     }
-    const groupDir = getGroupDir(getDefaultGitnexusDir(), name);
+    const groupDir = getGroupDir(getDefaultYummygraphDir(), name);
     let config: GroupConfig;
     try {
       config = await loadGroupConfig(groupDir);
@@ -251,7 +251,7 @@ export class GroupService {
   async groupSync(params: Record<string, unknown>): Promise<unknown> {
     const name = String(params.name ?? '').trim();
     if (!name) return { error: 'name is required' };
-    const groupDir = getGroupDir(getDefaultGitnexusDir(), name);
+    const groupDir = getGroupDir(getDefaultYummygraphDir(), name);
     let config: GroupConfig;
     try {
       config = await loadGroupConfig(groupDir);
@@ -278,7 +278,7 @@ export class GroupService {
   async groupContracts(params: Record<string, unknown>): Promise<unknown> {
     const name = String(params.name ?? '').trim();
     if (!name) return { error: 'name is required' };
-    const groupDir = getGroupDir(getDefaultGitnexusDir(), name);
+    const groupDir = getGroupDir(getDefaultYummygraphDir(), name);
     const loaded = await loadContractRegistryResilient(groupDir);
     if (loaded.ok === false) {
       if (loaded.error.includes('No contracts.json')) {
@@ -306,7 +306,7 @@ export class GroupService {
 
   async groupImpact(params: Record<string, unknown>): Promise<unknown> {
     const { runGroupImpact } = await import('./cross-impact.js');
-    return runGroupImpact({ port: this.port, gitnexusDir: getDefaultGitnexusDir() }, params);
+    return runGroupImpact({ port: this.port, yummygraphDir: getDefaultYummygraphDir() }, params);
   }
 
   async groupContext(params: Record<string, unknown>): Promise<GroupContextResult> {
@@ -333,7 +333,7 @@ export class GroupService {
       return { group: name, error: 'target or uid is required', results: [] };
     }
 
-    const groupDir = getGroupDir(getDefaultGitnexusDir(), name);
+    const groupDir = getGroupDir(getDefaultYummygraphDir(), name);
     let config: GroupConfig;
     try {
       config = await loadGroupConfig(groupDir);
@@ -413,7 +413,7 @@ export class GroupService {
     const limit = typeof params.limit === 'number' && params.limit > 0 ? params.limit : 5;
     const subgroup = typeof params.subgroup === 'string' ? params.subgroup : undefined;
     const subgroupExact = params.subgroupExact === true;
-    const groupDir = getGroupDir(getDefaultGitnexusDir(), name);
+    const groupDir = getGroupDir(getDefaultYummygraphDir(), name);
     let config: GroupConfig;
     try {
       config = await loadGroupConfig(groupDir);
@@ -470,7 +470,7 @@ export class GroupService {
   async groupStatus(params: Record<string, unknown>): Promise<unknown> {
     const name = String(params.name ?? '').trim();
     if (!name) return { error: 'name is required' };
-    const groupDir = getGroupDir(getDefaultGitnexusDir(), name);
+    const groupDir = getGroupDir(getDefaultYummygraphDir(), name);
     let config: GroupConfig;
     try {
       config = await loadGroupConfig(groupDir);

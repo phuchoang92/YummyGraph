@@ -1,4 +1,4 @@
-import type { NodeLabel } from 'gitnexus-shared';
+import type { NodeLabel } from 'yummygraph-shared';
 
 /**
  * Callables whose same-name overloads occupy distinct graph nodes keyed by

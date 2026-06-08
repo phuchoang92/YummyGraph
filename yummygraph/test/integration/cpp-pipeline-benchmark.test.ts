@@ -7,7 +7,7 @@
  * missing slot in the per-language benchmark suite (cobol/csharp/go/php/ruby/
  * rust already have one); modeled on cobol-pipeline-benchmark.test.ts.
  *
- * Run: GITNEXUS_BENCH=1 npx vitest run test/integration/cpp-pipeline-benchmark.test.ts
+ * Run: YUMMYGRAPH_BENCH=1 npx vitest run test/integration/cpp-pipeline-benchmark.test.ts
  *
  * Parses with a single-worker pool (`workerPoolSize: 1`) — the sequential
  * parser was removed, so the worker pool is the only parse path. NOTE: this
@@ -31,7 +31,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { runPipelineFromRepo } from '../../src/core/ingestion/pipeline.js';
 
-const BENCH_ENABLED = process.env.GITNEXUS_BENCH === '1';
+const BENCH_ENABLED = process.env.YUMMYGRAPH_BENCH === '1';
 
 interface BenchResult {
   fileCount: number;

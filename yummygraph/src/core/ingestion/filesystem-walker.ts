@@ -19,7 +19,7 @@ export interface FilePath {
 }
 
 const READ_CONCURRENCY = 32;
-const ANALYZE_PROGRESS_ACTIVE_ENV = 'GITNEXUS_ANALYZE_PROGRESS_ACTIVE';
+const ANALYZE_PROGRESS_ACTIVE_ENV = 'YUMMYGRAPH_ANALYZE_PROGRESS_ACTIVE';
 
 const warnLargeFileSkip = (message: string): void => {
   if (process.env[ANALYZE_PROGRESS_ACTIVE_ENV] === '1') {
@@ -85,7 +85,7 @@ export const walkRepositoryPaths = async (
 
   if (skippedLarge > 0) {
     const isDefault = maxFileSizeBytes === DEFAULT_MAX_FILE_SIZE_BYTES;
-    const isOverrideUnset = !process.env.GITNEXUS_MAX_FILE_SIZE;
+    const isOverrideUnset = !process.env.YUMMYGRAPH_MAX_FILE_SIZE;
     const suffix = isDefault ? ', likely generated/vendored' : '';
     warnLargeFileSkip(
       `  Skipped ${skippedLarge} large files (>${maxFileSizeBytes / 1024}KB${suffix})`,
@@ -93,7 +93,7 @@ export const walkRepositoryPaths = async (
 
     // Always show at least the first few paths so users can diagnose why
     // edges are missing from a specific file (issue #1659). The full list is
-    // gated behind GITNEXUS_VERBOSE=1 to avoid flooding output on repos with
+    // gated behind YUMMYGRAPH_VERBOSE=1 to avoid flooding output on repos with
     // many generated/vendored blobs. Sort before slicing so the preview is
     // stable across runs (fs.stat callbacks race within each batch).
     skippedLargePaths.sort();
@@ -105,14 +105,14 @@ export const walkRepositoryPaths = async (
     }
     if (!showAll) {
       const remaining = skippedLargePaths.length - SKIPPED_PREVIEW_CAP;
-      warnLargeFileSkip(`  ...and ${remaining} more (set GITNEXUS_VERBOSE=1 to list them all)`);
+      warnLargeFileSkip(`  ...and ${remaining} more (set YUMMYGRAPH_VERBOSE=1 to list them all)`);
     }
     // Only hint about the env var when the user has not set it at all. An
-    // explicit GITNEXUS_MAX_FILE_SIZE=512 happens to resolve to the same
+    // explicit YUMMYGRAPH_MAX_FILE_SIZE=512 happens to resolve to the same
     // bytes as the default but the operator clearly already knows the knob.
     if (isDefault && isOverrideUnset) {
       warnLargeFileSkip(
-        `  Set GITNEXUS_MAX_FILE_SIZE=<KB> to include files above the default cap.`,
+        `  Set YUMMYGRAPH_MAX_FILE_SIZE=<KB> to include files above the default cap.`,
       );
     }
   }

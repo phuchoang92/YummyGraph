@@ -59,7 +59,7 @@
  *     (which also doesn't track type-only separately) is preserved.
  */
 
-import type { BindingRef, NodeLabel } from 'gitnexus-shared';
+import type { BindingRef, NodeLabel } from 'yummygraph-shared';
 
 /** Declaration spaces a TypeScript binding can occupy. */
 type Space = 'value' | 'type' | 'namespace';

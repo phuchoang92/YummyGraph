@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { knowledgeGraphToTreeGraphology, knowledgeGraphToCirclesGraphology } from './graph-adapter';
 import type { KnowledgeGraph } from '../core/graph/types';
-import type { GraphNode } from 'gitnexus-shared';
+import type { GraphNode } from 'yummygraph-shared';
 import { EDGE_INFO } from './constants';
 
 function makeNode(id: string, label: string, name: string): GraphNode {

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import type { ParameterTypeClass, SymbolDefinition } from 'gitnexus-shared';
+import type { ParameterTypeClass, SymbolDefinition } from 'yummygraph-shared';
 import { cppConversionRank } from '../../../../src/core/ingestion/languages/cpp/conversion-rank.js';
 import {
   clearCppUserDefinedConversions,

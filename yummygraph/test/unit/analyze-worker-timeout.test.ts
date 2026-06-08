@@ -11,7 +11,7 @@ vi.mock('../../src/core/lbug/lbug-adapter.js', () => ({
 }));
 
 vi.mock('../../src/storage/repo-manager.js', () => ({
-  getStoragePaths: vi.fn(() => ({ storagePath: '.gitnexus', lbugPath: '.gitnexus/lbug' })),
+  getStoragePaths: vi.fn(() => ({ storagePath: '.yummygraph', lbugPath: '.yummygraph/lbug' })),
   getGlobalRegistryPath: vi.fn(() => 'registry.json'),
   RegistryNameCollisionError: class RegistryNameCollisionError extends Error {},
   AnalysisNotFinalizedError: class AnalysisNotFinalizedError extends Error {},
@@ -28,11 +28,11 @@ vi.mock('../../src/core/ingestion/utils/max-file-size.js', () => ({
 }));
 
 describe('analyzeCommand worker timeout validation', () => {
-  // analyzeCommand now snapshot/restores GITNEXUS_* env vars, so the value
+  // analyzeCommand now snapshot/restores YUMMYGRAPH_* env vars, so the value
   // observed *after* the call is the pre-call baseline — not what the CLI
   // wrote. Tests that need to verify "the env was set for the downstream
   // call" must capture it inside the runFullAnalysisMock implementation.
-  const ORIGINAL_TIMEOUT = process.env.GITNEXUS_WORKER_SUB_BATCH_TIMEOUT_MS;
+  const ORIGINAL_TIMEOUT = process.env.YUMMYGRAPH_WORKER_SUB_BATCH_TIMEOUT_MS;
   const ORIGINAL_NODE_OPTIONS = process.env.NODE_OPTIONS;
 
   beforeEach(() => {
@@ -74,7 +74,7 @@ describe('analyzeCommand worker timeout validation', () => {
     const { analyzeCommand } = await import('../../src/cli/analyze.js');
     let envAtCallTime: string | undefined;
     runFullAnalysisMock.mockImplementation(async () => {
-      envAtCallTime = process.env.GITNEXUS_WORKER_SUB_BATCH_TIMEOUT_MS;
+      envAtCallTime = process.env.YUMMYGRAPH_WORKER_SUB_BATCH_TIMEOUT_MS;
       return {
         repoName: 'repo',
         repoPath: '/repo',
@@ -92,6 +92,6 @@ describe('analyzeCommand worker timeout validation', () => {
     // subsequent analyzeCommand invocation in the same host (or test
     // process) doesn't inherit the previous call's worker timeout. This
     // is the env-leak fix from PR #1693 review (B2).
-    expect(process.env.GITNEXUS_WORKER_SUB_BATCH_TIMEOUT_MS).toBe(ORIGINAL_TIMEOUT);
+    expect(process.env.YUMMYGRAPH_WORKER_SUB_BATCH_TIMEOUT_MS).toBe(ORIGINAL_TIMEOUT);
   });
 });

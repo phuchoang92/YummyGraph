@@ -21,9 +21,9 @@ import {
   ProviderConfig,
 } from './types';
 import { DEFAULT_OPENROUTER_BASE_URL, DEFAULT_OLLAMA_BASE_URL } from '../../config/ui-constants';
-import { resilientFetch } from 'gitnexus-shared';
+import { resilientFetch } from 'yummygraph-shared';
 
-const STORAGE_KEY = 'gitnexus-llm-settings';
+const STORAGE_KEY = 'yummygraph-llm-settings';
 
 const mergeWithDefaults = (parsed?: Partial<LLMSettings> | null): LLMSettings => ({
   ...DEFAULT_LLM_SETTINGS,

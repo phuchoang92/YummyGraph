@@ -20,7 +20,7 @@ const itLbugReopen = process.platform === 'win32' ? it.skip : it;
 
 describe('safeClose — close + reopen does not surface lock errors', () => {
   it('survives 10 sequential open/close/reopen cycles on the same path', async () => {
-    const tmp = await createTempDir('gitnexus-lbug-close-cycle-');
+    const tmp = await createTempDir('yummygraph-lbug-close-cycle-');
     const dbPath = path.join(tmp.dbPath, 'lbug');
     try {
       const adapter = await import('../../src/core/lbug/lbug-adapter.js');
@@ -34,7 +34,7 @@ describe('safeClose — close + reopen does not surface lock errors', () => {
   });
 
   it('safeClose is idempotent — calling twice in a row does not throw', async () => {
-    const tmp = await createTempDir('gitnexus-lbug-idempotent-');
+    const tmp = await createTempDir('yummygraph-lbug-idempotent-');
     const dbPath = path.join(tmp.dbPath, 'lbug');
     try {
       const adapter = await import('../../src/core/lbug/lbug-adapter.js');
@@ -47,8 +47,8 @@ describe('safeClose — close + reopen does not surface lock errors', () => {
   });
 
   itLbugReopen('flushes WAL when switching between two database paths in one process', async () => {
-    const repoA = await createTempDir('gitnexus-lbug-switch-a-');
-    const repoB = await createTempDir('gitnexus-lbug-switch-b-');
+    const repoA = await createTempDir('yummygraph-lbug-switch-a-');
+    const repoB = await createTempDir('yummygraph-lbug-switch-b-');
     const dbPathA = path.join(repoA.dbPath, 'lbug');
     const dbPathB = path.join(repoB.dbPath, 'lbug');
 

@@ -126,7 +126,7 @@ export const getGitRoot = (fromPath: string): string | null => {
  * directory, identical for the main checkout and every linked
  * worktree — and returns its parent.
  *
- * Why it matters (#1259): when `gitnexus analyze` runs inside a
+ * Why it matters (#1259): when `yummygraph analyze` runs inside a
  * worktree (e.g. `/repo/wt-feature/`), deriving `repoName` from
  * `path.basename(getGitRoot(cwd))` registers the project under the
  * worktree's directory slug (`wt-feature`) instead of the canonical

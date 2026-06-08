@@ -7,7 +7,7 @@
 #
 # We pin the image by digest, not by tag. That way a silent upstream retag can't
 # change the build under us. This matches the Dockerfile.cli /
-# gitnexus/Dockerfile.test convention and issue #1451.
+# yummygraph/Dockerfile.test convention and issue #1451.
 #
 # We pin it as a bare `name@digest` with NO `:tag` prefix on purpose. The
 # production Dockerfiles use plain `docker build`, but this one is built by
@@ -60,11 +60,11 @@ ENV CLAUDE_CODE_VERSION=${CLAUDE_CODE_VERSION} \
     NODE_OPTIONS=--max-old-space-size=4096 \
     POWERLEVEL9K_DISABLE_GITSTATUS=true
 
-# Native build toolchain that gitnexus/postinstall needs. It compiles
+# Native build toolchain that yummygraph/postinstall needs. It compiles
 # tree-sitter native bindings, the vendored Dart/Proto/Swift grammars, and the
 # @ladybugdb/core N-API addon (a native Node add-on). python3, make, and g++ are
 # required. This mirrors the apt block in the existing Dockerfile.cli /
-# gitnexus/Dockerfile.test images.
+# yummygraph/Dockerfile.test images.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         python3 make g++ git curl ca-certificates bash unzip \

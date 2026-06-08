@@ -1,5 +1,5 @@
 import type { MethodInfo } from '../method-types.js';
-import { SupportedLanguages, type ParameterTypeClass } from 'gitnexus-shared';
+import { SupportedLanguages, type ParameterTypeClass } from 'yummygraph-shared';
 
 /** Languages where class overload signatures are declaration-only contracts
  *  that should collapse to the implementation body's node ID. */

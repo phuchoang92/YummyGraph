@@ -114,7 +114,7 @@ describe('doInitLbug WAL corruption guard — behavioural', () => {
   it('throws with WAL recovery message when a schema query raises a WAL corruption error', async () => {
     vi.resetModules();
 
-    const dbPath = '/tmp/gitnexus-lbug-wal-schema-throw/lbug';
+    const dbPath = '/tmp/yummygraph-lbug-wal-schema-throw/lbug';
     const walError = new Error(
       'Runtime exception: Corrupted wal file. Read out invalid WAL record type.',
     );
@@ -137,7 +137,7 @@ describe('doInitLbug WAL corruption guard — behavioural', () => {
         return /corrupt.*wal|invalid.*wal.*record/i.test(msg);
       }),
       WAL_RECOVERY_SUGGESTION:
-        'WAL corruption detected. Run `gitnexus analyze --force` to rebuild the index.',
+        'WAL corruption detected. Run `yummygraph analyze --force` to rebuild the index.',
       waitForWindowsHandleRelease: vi.fn(async () => true),
     }));
     vi.doMock('../../src/core/lbug/extension-loader.js', () => ({
@@ -159,13 +159,13 @@ describe('doInitLbug WAL corruption guard — behavioural', () => {
     const err = await adapter.initLbug(dbPath).catch((e: unknown) => e);
     expect(err).toBeInstanceOf(Error);
     expect((err as Error).message).toMatch(/LadybugDB WAL corruption detected/);
-    expect((err as Error).message).toMatch(/gitnexus analyze/);
+    expect((err as Error).message).toMatch(/yummygraph analyze/);
   });
 
   it('does NOT throw for unrecognised schema errors — logs warn and continues', async () => {
     vi.resetModules();
 
-    const dbPath = '/tmp/gitnexus-lbug-wal-schema-nonwal/lbug';
+    const dbPath = '/tmp/yummygraph-lbug-wal-schema-nonwal/lbug';
     const genericError = new Error('some unrelated schema warning');
     const queryResult = { getAll: vi.fn(async () => []), close: vi.fn() };
     let callCount = 0;
@@ -189,7 +189,7 @@ describe('doInitLbug WAL corruption guard — behavioural', () => {
       isOpenRetryExhausted: vi.fn(() => false),
       isWalCorruptionError: vi.fn(() => false), // always false → generic warn path
       WAL_RECOVERY_SUGGESTION:
-        'WAL corruption detected. Run `gitnexus analyze --force` to rebuild the index.',
+        'WAL corruption detected. Run `yummygraph analyze --force` to rebuild the index.',
       waitForWindowsHandleRelease: vi.fn(async () => true),
     }));
     vi.doMock('../../src/core/lbug/extension-loader.js', () => ({
@@ -215,7 +215,7 @@ describe('doInitLbug WAL corruption guard — behavioural', () => {
   it('quarantines the WAL and retries writable schema creation when shadow sidecar is missing', async () => {
     vi.resetModules();
 
-    const dbPath = '/tmp/gitnexus-lbug-writable-shadow-missing/lbug';
+    const dbPath = '/tmp/yummygraph-lbug-writable-shadow-missing/lbug';
     const missingShadowError = new Error(
       `IO exception: Cannot open file ${dbPath}.shadow: No such file or directory`,
     );
@@ -250,7 +250,7 @@ describe('doInitLbug WAL corruption guard — behavioural', () => {
       isOpenRetryExhausted: vi.fn(() => false),
       isWalCorruptionError: vi.fn(() => false),
       WAL_RECOVERY_SUGGESTION:
-        'WAL corruption detected. Run `gitnexus analyze --force` to rebuild the index.',
+        'WAL corruption detected. Run `yummygraph analyze --force` to rebuild the index.',
       waitForWindowsHandleRelease: vi.fn(async () => true),
     }));
     vi.doMock('../../src/core/lbug/extension-loader.js', () => ({
@@ -282,7 +282,7 @@ describe('doInitLbug WAL corruption guard — behavioural', () => {
   it('skips schema DDL and uses load-only FTS policy for read-only opens', async () => {
     vi.resetModules();
 
-    const dbPath = '/tmp/gitnexus-lbug-readonly-schema-skip/lbug';
+    const dbPath = '/tmp/yummygraph-lbug-readonly-schema-skip/lbug';
     const queryResult = { getAll: vi.fn(async () => []), close: vi.fn() };
     const conn = {
       query: vi.fn(async () => queryResult),
@@ -302,7 +302,7 @@ describe('doInitLbug WAL corruption guard — behavioural', () => {
       isOpenRetryExhausted: vi.fn(() => false),
       isWalCorruptionError: vi.fn(() => false),
       WAL_RECOVERY_SUGGESTION:
-        'WAL corruption detected. Run `gitnexus analyze --force` to rebuild the index.',
+        'WAL corruption detected. Run `yummygraph analyze --force` to rebuild the index.',
       waitForWindowsHandleRelease: vi.fn(async () => true),
     }));
     vi.doMock('../../src/core/lbug/extension-loader.js', () => ({
@@ -337,7 +337,7 @@ describe('doInitLbug WAL corruption guard — behavioural', () => {
   it('replays dirty shadow pages with a temporary writable open before read-only serving', async () => {
     vi.resetModules();
 
-    const dbPath = '/tmp/gitnexus-lbug-readonly-shadow-replay/lbug';
+    const dbPath = '/tmp/yummygraph-lbug-readonly-shadow-replay/lbug';
     const shadowReplayError = new Error(
       "Runtime exception: Couldn't replay shadow pages under read-only mode. Please re-open the database with read-write mode to replay shadow pages.",
     );
@@ -379,7 +379,7 @@ describe('doInitLbug WAL corruption guard — behavioural', () => {
       isOpenRetryExhausted: vi.fn(() => false),
       isWalCorruptionError: vi.fn(() => false),
       WAL_RECOVERY_SUGGESTION:
-        'WAL corruption detected. Run `gitnexus analyze --force` to rebuild the index.',
+        'WAL corruption detected. Run `yummygraph analyze --force` to rebuild the index.',
       waitForWindowsHandleRelease: vi.fn(async () => true),
     }));
     vi.doMock('../../src/core/lbug/extension-loader.js', () => ({
@@ -422,7 +422,7 @@ describe('doInitLbug WAL corruption guard — behavioural', () => {
   it('quarantines the WAL and reopens read-only when the shadow sidecar is missing', async () => {
     vi.resetModules();
 
-    const dbPath = '/tmp/gitnexus-lbug-readonly-shadow-missing/lbug';
+    const dbPath = '/tmp/yummygraph-lbug-readonly-shadow-missing/lbug';
     const missingShadowError = new Error(
       `IO exception: Cannot open file ${dbPath}.shadow: No such file or directory`,
     );
@@ -460,7 +460,7 @@ describe('doInitLbug WAL corruption guard — behavioural', () => {
       isOpenRetryExhausted: vi.fn(() => false),
       isWalCorruptionError: vi.fn(() => false),
       WAL_RECOVERY_SUGGESTION:
-        'WAL corruption detected. Run `gitnexus analyze --force` to rebuild the index.',
+        'WAL corruption detected. Run `yummygraph analyze --force` to rebuild the index.',
       waitForWindowsHandleRelease: vi.fn(async () => true),
     }));
     vi.doMock('../../src/core/lbug/extension-loader.js', () => ({
@@ -493,7 +493,7 @@ describe('doInitLbug WAL corruption guard — behavioural', () => {
   it('calls safeClose() (db.close) when WAL corruption is detected mid-schema', async () => {
     vi.resetModules();
 
-    const dbPath = '/tmp/gitnexus-lbug-wal-schema-state/lbug';
+    const dbPath = '/tmp/yummygraph-lbug-wal-schema-state/lbug';
     const walError = new Error('Corrupted wal file. Read out invalid WAL record type.');
     const queryResult = { getAll: vi.fn(async () => []), close: vi.fn() };
     const conn = {
@@ -514,7 +514,7 @@ describe('doInitLbug WAL corruption guard — behavioural', () => {
         return /corrupt.*wal|invalid.*wal.*record/i.test(msg);
       }),
       WAL_RECOVERY_SUGGESTION:
-        'WAL corruption detected. Run `gitnexus analyze --force` to rebuild the index.',
+        'WAL corruption detected. Run `yummygraph analyze --force` to rebuild the index.',
       waitForWindowsHandleRelease: vi.fn(async () => true),
     }));
     vi.doMock('../../src/core/lbug/extension-loader.js', () => ({
@@ -622,7 +622,7 @@ describe('Symmetric WAL-size gate during missing-shadow recovery (PR #1747 D2)',
       isOpenRetryExhausted: vi.fn(() => false),
       isWalCorruptionError: vi.fn(() => false),
       WAL_RECOVERY_SUGGESTION:
-        'WAL corruption detected. Run `gitnexus analyze --force` to rebuild the index.',
+        'WAL corruption detected. Run `yummygraph analyze --force` to rebuild the index.',
       waitForWindowsHandleRelease: vi.fn(async () => true),
     }));
     vi.doMock('../../src/core/lbug/extension-loader.js', () => ({
@@ -641,7 +641,7 @@ describe('Symmetric WAL-size gate during missing-shadow recovery (PR #1747 D2)',
 
   it('writable recovery: refuses to quarantine a large WAL (4097 bytes) and throws shadow-recovery message', async () => {
     vi.resetModules();
-    const dbPath = '/tmp/gitnexus-lbug-large-wal-writable/lbug';
+    const dbPath = '/tmp/yummygraph-lbug-large-wal-writable/lbug';
     const { fsMock, warnMock } = setupShadowMissingRecovery(dbPath, TINY_ORPHAN_WAL_BYTES_TEST + 1);
 
     const adapter = await import('../../src/core/lbug/lbug-adapter.js');
@@ -658,7 +658,7 @@ describe('Symmetric WAL-size gate during missing-shadow recovery (PR #1747 D2)',
 
   it('read-only recovery: refuses to quarantine a large WAL (4097 bytes) and throws shadow-recovery message', async () => {
     vi.resetModules();
-    const dbPath = '/tmp/gitnexus-lbug-large-wal-readonly/lbug';
+    const dbPath = '/tmp/yummygraph-lbug-large-wal-readonly/lbug';
     const { fsMock, warnMock } = setupShadowMissingRecovery(dbPath, TINY_ORPHAN_WAL_BYTES_TEST + 1);
 
     const adapter = await import('../../src/core/lbug/lbug-adapter.js');
@@ -675,7 +675,7 @@ describe('Symmetric WAL-size gate during missing-shadow recovery (PR #1747 D2)',
 
   it('writable recovery: WAL at exactly TINY_ORPHAN_WAL_BYTES (4096 bytes) is treated as tiny and quarantined', async () => {
     vi.resetModules();
-    const dbPath = '/tmp/gitnexus-lbug-boundary-tiny/lbug';
+    const dbPath = '/tmp/yummygraph-lbug-boundary-tiny/lbug';
     const { fsMock } = setupShadowMissingRecovery(dbPath, TINY_ORPHAN_WAL_BYTES_TEST);
 
     const adapter = await import('../../src/core/lbug/lbug-adapter.js');
@@ -690,7 +690,7 @@ describe('Symmetric WAL-size gate during missing-shadow recovery (PR #1747 D2)',
 
   it('writable recovery: WAL at TINY_ORPHAN_WAL_BYTES + 1 (4097 bytes) is treated as orphan-wal and refused', async () => {
     vi.resetModules();
-    const dbPath = '/tmp/gitnexus-lbug-boundary-large/lbug';
+    const dbPath = '/tmp/yummygraph-lbug-boundary-large/lbug';
     const { fsMock } = setupShadowMissingRecovery(dbPath, TINY_ORPHAN_WAL_BYTES_TEST + 1);
 
     const adapter = await import('../../src/core/lbug/lbug-adapter.js');
@@ -701,7 +701,7 @@ describe('Symmetric WAL-size gate during missing-shadow recovery (PR #1747 D2)',
 
   it('tiny-WAL recovery path: writable recovery still quarantines and proceeds for a 1024-byte WAL', async () => {
     vi.resetModules();
-    const dbPath = '/tmp/gitnexus-lbug-tiny-wal/lbug';
+    const dbPath = '/tmp/yummygraph-lbug-tiny-wal/lbug';
     const { fsMock } = setupShadowMissingRecovery(dbPath, 1024);
 
     const adapter = await import('../../src/core/lbug/lbug-adapter.js');

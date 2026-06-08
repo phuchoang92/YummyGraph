@@ -13,7 +13,7 @@ import {
 import { dedupeContracts, dedupeCrossLinks } from './normalization.js';
 import { createLogger } from '../logger.js';
 
-const bridgeLogger = createLogger('bridge-db', { debugEnvVar: 'GITNEXUS_DEBUG_BRIDGE' });
+const bridgeLogger = createLogger('bridge-db', { debugEnvVar: 'YUMMYGRAPH_DEBUG_BRIDGE' });
 
 /**
  * Sidecar files that LadybugDB creates next to a `bridge.lbug` file.

@@ -19,7 +19,7 @@ describe('IncludeExtractor', () => {
   let extractor: IncludeExtractor;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-include-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-include-'));
     extractor = new IncludeExtractor();
   });
 
@@ -37,7 +37,7 @@ describe('IncludeExtractor', () => {
     id: 'test-repo',
     path: 'test/app',
     repoPath,
-    storagePath: path.join(repoPath, '.gitnexus'),
+    storagePath: path.join(repoPath, '.yummygraph'),
   });
 
   // ---- Provider detection ----
@@ -171,13 +171,13 @@ int main() { return 0; }`,
   describe('cross-repo matching', () => {
     it('provider and consumer produce matching contractIds', async () => {
       // Simulate provider repo (header-only)
-      const providerDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-include-provider-'));
+      const providerDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-include-provider-'));
       const providerFile = path.join(providerDir, 'map/base/dice_map_view.h');
       fs.mkdirSync(path.dirname(providerFile), { recursive: true });
       fs.writeFileSync(providerFile, '#pragma once\nclass DiceMapView {};');
 
       // Simulate consumer repo
-      const consumerDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-include-consumer-'));
+      const consumerDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-include-consumer-'));
       const consumerFile = path.join(consumerDir, 'src/controller.cpp');
       fs.mkdirSync(path.dirname(consumerFile), { recursive: true });
       fs.writeFileSync(consumerFile, '#include "map/base/dice_map_view.h"\nvoid init() {}');
@@ -452,7 +452,7 @@ int main(){return 0;}`,
       writeFile('utils/types.hpp', '#pragma once');
 
       // Stub the Cypher executor to return absolute paths the way
-      // gitnexus analyze actually persists them.
+      // yummygraph analyze actually persists them.
       const absolute1 = path.join(tmpDir, 'map/base/view.h');
       const absolute2 = path.join(tmpDir, 'utils/types.hpp');
       const stubDb = async () => [
@@ -499,8 +499,8 @@ int main(){return 0;}`,
       expect(providerIds).not.toContain('include::vendor-headers/blocked.h');
     });
 
-    it('does not emit a provider contract for a header excluded by .gitnexusignore', async () => {
-      writeFile('.gitnexusignore', 'legacy/\n');
+    it('does not emit a provider contract for a header excluded by .yummygraphignore', async () => {
+      writeFile('.yummygraphignore', 'legacy/\n');
       writeFile('legacy/old.h', '#pragma once');
       writeFile('src/current.h', '#pragma once');
 
@@ -528,9 +528,9 @@ int auto_main() { return 0; }`,
       expect(consumerIds).not.toContain('include::remote/should_not_appear.h');
     });
 
-    it('skips a provider header whose size exceeds GITNEXUS_MAX_FILE_SIZE', async () => {
-      const previous = process.env.GITNEXUS_MAX_FILE_SIZE;
-      process.env.GITNEXUS_MAX_FILE_SIZE = '1'; // 1 KB cap
+    it('skips a provider header whose size exceeds YUMMYGRAPH_MAX_FILE_SIZE', async () => {
+      const previous = process.env.YUMMYGRAPH_MAX_FILE_SIZE;
+      process.env.YUMMYGRAPH_MAX_FILE_SIZE = '1'; // 1 KB cap
       try {
         // 4 KB header — comfortably exceeds the cap.
         const oversized = '#pragma once\n' + 'x'.repeat(4 * 1024);
@@ -543,14 +543,14 @@ int auto_main() { return 0; }`,
         expect(providerIds).toContain('include::small/tiny.h');
         expect(providerIds).not.toContain('include::huge/big.h');
       } finally {
-        if (previous === undefined) delete process.env.GITNEXUS_MAX_FILE_SIZE;
-        else process.env.GITNEXUS_MAX_FILE_SIZE = previous;
+        if (previous === undefined) delete process.env.YUMMYGRAPH_MAX_FILE_SIZE;
+        else process.env.YUMMYGRAPH_MAX_FILE_SIZE = previous;
       }
     });
 
-    it('skips parsing #include directives in source files exceeding GITNEXUS_MAX_FILE_SIZE', async () => {
-      const previous = process.env.GITNEXUS_MAX_FILE_SIZE;
-      process.env.GITNEXUS_MAX_FILE_SIZE = '1';
+    it('skips parsing #include directives in source files exceeding YUMMYGRAPH_MAX_FILE_SIZE', async () => {
+      const previous = process.env.YUMMYGRAPH_MAX_FILE_SIZE;
+      process.env.YUMMYGRAPH_MAX_FILE_SIZE = '1';
       try {
         const oversized =
           '#include "remote/should_not_appear.h"\n' +
@@ -563,8 +563,8 @@ int auto_main() { return 0; }`,
 
         expect(consumerIds).not.toContain('include::remote/should_not_appear.h');
       } finally {
-        if (previous === undefined) delete process.env.GITNEXUS_MAX_FILE_SIZE;
-        else process.env.GITNEXUS_MAX_FILE_SIZE = previous;
+        if (previous === undefined) delete process.env.YUMMYGRAPH_MAX_FILE_SIZE;
+        else process.env.YUMMYGRAPH_MAX_FILE_SIZE = previous;
       }
     });
   });
@@ -578,8 +578,8 @@ int auto_main() { return 0; }`,
       // this size SIGSEGVs the process on Windows. The spy assertion catches
       // the regression — a "no throw" assertion alone is satisfied by the
       // bypass on Linux/macOS where parser.parse(40 000 chars) succeeds.
-      const previousLimit = process.env.GITNEXUS_MAX_FILE_SIZE;
-      process.env.GITNEXUS_MAX_FILE_SIZE = '512';
+      const previousLimit = process.env.YUMMYGRAPH_MAX_FILE_SIZE;
+      process.env.YUMMYGRAPH_MAX_FILE_SIZE = '512';
       try {
         const includes = Array.from(
           { length: 1500 },
@@ -594,8 +594,8 @@ int auto_main() { return 0; }`,
 
         expect(parseSourceSafeSpy).toHaveBeenCalled();
       } finally {
-        if (previousLimit === undefined) delete process.env.GITNEXUS_MAX_FILE_SIZE;
-        else process.env.GITNEXUS_MAX_FILE_SIZE = previousLimit;
+        if (previousLimit === undefined) delete process.env.YUMMYGRAPH_MAX_FILE_SIZE;
+        else process.env.YUMMYGRAPH_MAX_FILE_SIZE = previousLimit;
       }
     });
   });

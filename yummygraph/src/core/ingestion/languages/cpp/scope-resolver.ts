@@ -1,9 +1,9 @@
-import type { ParsedFile, SymbolDefinition } from 'gitnexus-shared';
+import type { ParsedFile, SymbolDefinition } from 'yummygraph-shared';
 import {
   findClassBindingInScope,
   findEnclosingClassDef,
 } from '../../scope-resolution/scope/walkers.js';
-import { SupportedLanguages } from 'gitnexus-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 import { buildMro, defaultLinearize } from '../../scope-resolution/passes/mro.js';
 import {
   populateClassOwnedMembers,

@@ -5,13 +5,13 @@
  * Imported by both the core embedder (batch) and MCP embedder (query).
  *
  * Network resilience is delegated to `resilientFetch` from
- * `gitnexus-shared` — bounded retries with exponential-backoff jitter,
+ * `yummygraph-shared` — bounded retries with exponential-backoff jitter,
  * `Retry-After` honored on 429, and an in-process circuit breaker that
  * fails fast on a flapping endpoint. Per-attempt timeout is enforced
  * via `AbortSignal.timeout` on the underlying fetch.
  */
 
-import { CircuitOpenError, ResilientFetchExhaustedError, resilientFetch } from 'gitnexus-shared';
+import { CircuitOpenError, ResilientFetchExhaustedError, resilientFetch } from 'yummygraph-shared';
 
 const HTTP_TIMEOUT_MS = 30_000;
 const HTTP_MAX_RETRIES = 2;
@@ -29,23 +29,23 @@ interface HttpConfig {
 
 /**
  * Build config from the current process.env snapshot.
- * Returns null when GITNEXUS_EMBEDDING_URL + GITNEXUS_EMBEDDING_MODEL are unset.
+ * Returns null when YUMMYGRAPH_EMBEDDING_URL + YUMMYGRAPH_EMBEDDING_MODEL are unset.
  * Not cached — env vars are read fresh so late configuration takes effect.
  */
 const readConfig = (): HttpConfig | null => {
-  const baseUrl = process.env.GITNEXUS_EMBEDDING_URL;
-  const model = process.env.GITNEXUS_EMBEDDING_MODEL;
+  const baseUrl = process.env.YUMMYGRAPH_EMBEDDING_URL;
+  const model = process.env.YUMMYGRAPH_EMBEDDING_MODEL;
   if (!baseUrl || !model) return null;
 
-  const rawDims = process.env.GITNEXUS_EMBEDDING_DIMS;
+  const rawDims = process.env.YUMMYGRAPH_EMBEDDING_DIMS;
   let dimensions: number | undefined;
   if (rawDims !== undefined) {
     if (!/^\d+$/.test(rawDims)) {
-      throw new Error(`GITNEXUS_EMBEDDING_DIMS must be a positive integer, got "${rawDims}"`);
+      throw new Error(`YUMMYGRAPH_EMBEDDING_DIMS must be a positive integer, got "${rawDims}"`);
     }
     const parsed = parseInt(rawDims, 10);
     if (parsed <= 0) {
-      throw new Error(`GITNEXUS_EMBEDDING_DIMS must be a positive integer, got "${rawDims}"`);
+      throw new Error(`YUMMYGRAPH_EMBEDDING_DIMS must be a positive integer, got "${rawDims}"`);
     }
     dimensions = parsed;
   }
@@ -53,7 +53,7 @@ const readConfig = (): HttpConfig | null => {
   return {
     baseUrl: baseUrl.replace(/\/+$/, ''),
     model,
-    apiKey: process.env.GITNEXUS_EMBEDDING_API_KEY ?? 'unused',
+    apiKey: process.env.YUMMYGRAPH_EMBEDDING_API_KEY ?? 'unused',
     dimensions,
   };
 };
@@ -99,7 +99,7 @@ interface EmbeddingItem {
  *   Matryoshka truncation (OpenAI text-embedding-3-*, Cohere embed-v3,
  *   Voyage) return a truncated vector at that size; endpoints that do not
  *   recognise the field may ignore it or return 400. Leave
- *   `GITNEXUS_EMBEDDING_DIMS` unset for strict backends that reject
+ *   `YUMMYGRAPH_EMBEDDING_DIMS` unset for strict backends that reject
  *   unknown fields.
  */
 const httpEmbedBatch = async (
@@ -210,8 +210,8 @@ export const httpEmbed = async (texts: string[]): Promise<Float32Array[]> => {
       const expected = config.dimensions ?? DEFAULT_DIMS;
       if (vec.length !== expected) {
         const hint = config.dimensions
-          ? 'Update GITNEXUS_EMBEDDING_DIMS to match your model output.'
-          : `Set GITNEXUS_EMBEDDING_DIMS=${vec.length} to match your model output.`;
+          ? 'Update YUMMYGRAPH_EMBEDDING_DIMS to match your model output.'
+          : `Set YUMMYGRAPH_EMBEDDING_DIMS=${vec.length} to match your model output.`;
         throw new Error(
           `Embedding dimension mismatch: endpoint returned ${vec.length}d vector, ` +
             `but expected ${expected}d. ${hint}`,
@@ -255,8 +255,8 @@ export const httpEmbedQuery = async (text: string): Promise<number[]> => {
   const expected = config.dimensions ?? DEFAULT_DIMS;
   if (embedding.length !== expected) {
     const hint = config.dimensions
-      ? 'Update GITNEXUS_EMBEDDING_DIMS to match your model output.'
-      : `Set GITNEXUS_EMBEDDING_DIMS=${embedding.length} to match your model output.`;
+      ? 'Update YUMMYGRAPH_EMBEDDING_DIMS to match your model output.'
+      : `Set YUMMYGRAPH_EMBEDDING_DIMS=${embedding.length} to match your model output.`;
     throw new Error(
       `Embedding dimension mismatch: endpoint returned ${embedding.length}d vector, ` +
         `but expected ${expected}d. ${hint}`,

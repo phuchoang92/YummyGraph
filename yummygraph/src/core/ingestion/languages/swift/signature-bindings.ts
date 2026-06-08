@@ -21,7 +21,7 @@
  *     files and callers see `let u = getUser(); u.save()`.
  */
 
-import type { Capture, CaptureMatch } from 'gitnexus-shared';
+import type { Capture, CaptureMatch } from 'yummygraph-shared';
 import { nodeToCapture, syntheticCapture, type SyntaxNode } from '../../utils/ast-helpers.js';
 import { swiftMethodConfig } from '../../method-extractors/configs/swift.js';
 

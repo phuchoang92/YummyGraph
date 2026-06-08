@@ -14,7 +14,7 @@ const _require = createRequire(import.meta.url);
 const pkg = _require('../../package.json');
 const program = new Command();
 
-program.name('gitnexus').description('GitNexus local CLI and MCP server').version(pkg.version);
+program.name('yummygraph').description('YummyGraph local CLI and MCP server').version(pkg.version);
 
 program
   .command('setup')
@@ -43,16 +43,16 @@ program
     'Generate repo-specific skill files from detected communities ' +
       '(no-op when --index-only is also set).',
   )
-  .option('--skip-agents-md', 'Skip updating the gitnexus section in AGENTS.md and CLAUDE.md')
+  .option('--skip-agents-md', 'Skip updating the yummygraph section in AGENTS.md and CLAUDE.md')
   .option(
     '--default-branch <branch>',
     'Default branch used in the generated regression-compare example (base_ref). ' +
-      'Falls back to .gitnexusrc, then auto-detected origin/HEAD, then "main".',
+      'Falls back to .yummygraphrc, then auto-detected origin/HEAD, then "main".',
   )
   .option('--no-stats', 'Omit volatile file/symbol counts from AGENTS.md and CLAUDE.md')
   .option(
     '--skip-skills',
-    'Skip installing standard GitNexus skill files under .claude/skills/gitnexus/. ' +
+    'Skip installing standard YummyGraph skill files under .claude/skills/yummygraph/. ' +
       'Does not suppress community skills from --skills (those use .claude/skills/generated/). ' +
       'Use --index-only to skip all AI-context file injection.',
   )
@@ -63,7 +63,7 @@ program
   )
   .option(
     '--name <alias>',
-    'Register this repo under a custom name in ~/.gitnexus/registry.json ' +
+    'Register this repo under a custom name in ~/.yummygraph/registry.json ' +
       '(disambiguates repos whose paths share a basename, e.g. two different .../app folders)',
   )
   .option(
@@ -99,7 +99,7 @@ program
 program
   .command('index [path...]')
   .description(
-    'Register an existing .gitnexus/ folder into the global registry (no re-analysis needed)',
+    'Register an existing .yummygraph/ folder into the global registry (no re-analysis needed)',
   )
   .option('-f, --force', 'Register even if meta.json is missing (stats will be empty)')
   .option('--allow-non-git', 'Allow registering folders that are not Git repositories')
@@ -134,7 +134,7 @@ program
 
 program
   .command('clean')
-  .description('Delete GitNexus index for current repo')
+  .description('Delete YummyGraph index for current repo')
   .option('-f, --force', 'Skip confirmation prompt')
   .option('--all', 'Clean all indexed repos')
   .option('--lbug-sidecars', 'Clean quarantined LadybugDB missing-shadow WAL sidecars')
@@ -143,7 +143,7 @@ program
 program
   .command('remove <target>')
   .description(
-    'Delete the GitNexus index for a registered repo (by alias, name, or absolute path). ' +
+    'Delete the YummyGraph index for a registered repo (by alias, name, or absolute path). ' +
       'Unlike `clean`, does not require being inside the repo. Idempotent on unknown targets.',
   )
   .option('-f, --force', 'Skip confirmation prompt')
@@ -162,7 +162,7 @@ program
     '--base-url <url>',
     'LLM API base URL. Azure v1: https://{resource}.openai.azure.com/openai/v1',
   )
-  .option('--api-key <key>', 'LLM API key or Azure api-key (saved to ~/.gitnexus/config.json)')
+  .option('--api-key <key>', 'LLM API key or Azure api-key (saved to ~/.yummygraph/config.json)')
   .option(
     '--api-version <version>',
     'Azure api-version query param, e.g. 2024-10-21 (legacy Azure API only)',
@@ -192,7 +192,7 @@ program
 program
   .command('publish [path]')
   .description(
-    'Notify the understand-quickly registry that this repo has a fresh GitNexus index. ' +
+    'Notify the understand-quickly registry that this repo has a fresh YummyGraph index. ' +
       'Opt-in: requires UNDERSTAND_QUICKLY_TOKEN (fine-grained PAT with ' +
       '`Repository dispatches: write` on looptech-ai/understand-quickly). ' +
       'No-op without the token. See https://github.com/looptech-ai/understand-quickly.',

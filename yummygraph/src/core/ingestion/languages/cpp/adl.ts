@@ -69,7 +69,7 @@
  * declared in either file.
  */
 
-import type { ParsedFile, ScopeId, SymbolDefinition } from 'gitnexus-shared';
+import type { ParsedFile, ScopeId, SymbolDefinition } from 'yummygraph-shared';
 import type { ScopeResolutionIndexes } from '../../model/scope-resolution-indexes.js';
 import { normalizeCppParamType } from './arity-metadata.js';
 import { isCppInlineNamespaceScope } from './inline-namespaces.js';

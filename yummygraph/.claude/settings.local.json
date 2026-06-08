@@ -2,8 +2,8 @@
   "permissions": {
     "allow": [
       "mcp__plugin_claude-mem_mcp-search__get_observations",
-      "Skill(gitnexus-exploring)",
-      "Bash(npx gitnexus *)",
+      "Skill(yummygraph-exploring)",
+      "Bash(npx yummygraph *)",
       "mcp__obsidian-memory__search_nodes",
       "mcp__obsidian-memory__add_observations",
       "WebSearch",
@@ -14,5 +14,5 @@
     ]
   },
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": ["gitnexus"]
+  "enabledMcpjsonServers": ["yummygraph"]
 }

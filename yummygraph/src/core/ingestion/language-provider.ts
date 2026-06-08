@@ -24,7 +24,7 @@ import type {
   SymbolDefinition,
   Callsite,
   WorkspaceIndex,
-} from 'gitnexus-shared';
+} from 'yummygraph-shared';
 import type { LanguageTypeConfig } from './type-extractors/types.js';
 import type { CallRouter } from './call-routing.js';
 import type { CallExtractor } from './call-types.js';
@@ -35,14 +35,14 @@ import type { MethodExtractor } from './method-types.js';
 import type { VariableExtractor } from './variable-types.js';
 import type { ImportResolverFn } from './import-resolvers/types.js';
 import type { SyntaxNode } from './utils/ast-helpers.js';
-import type { NodeLabel } from 'gitnexus-shared';
+import type { NodeLabel } from 'yummygraph-shared';
 
 // ── Shared type aliases ────────────────────────────────────────────────────
 /** Tree-sitter query captures: capture name → AST node (or undefined if not captured). */
 export type CaptureMap = Record<string, SyntaxNode | undefined>;
 
 // ── Strategy tag types ─────────────────────────────────────────────────────
-// NOTE: `MroStrategy` is defined in `gitnexus-shared` and re-exported above
+// NOTE: `MroStrategy` is defined in `yummygraph-shared` and re-exported above
 // so `core/ingestion/model/resolve.ts` can consume it without importing from
 // this file (which would pull in the full language-registry dependency graph).
 

@@ -1,8 +1,8 @@
 /**
  * Remove Command (#664)
  *
- * Delete the `.gitnexus/` index for a registered repo and unregister it
- * from the global registry (~/.gitnexus/registry.json). The target is
+ * Delete the `.yummygraph/` index for a registered repo and unregister it
+ * from the global registry (~/.yummygraph/registry.json). The target is
  * identified by alias / basename-derived name / remote-inferred name /
  * absolute path — no `--repo` flag, just a positional argument so the
  * destructive-command ergonomics match `clean` (which is also
@@ -20,7 +20,7 @@
  *     partial failure leaves the registry pointing at a missing dir
  *     (recoverable by `listRegisteredRepos({ validate: true })` on
  *     next read) rather than the opposite, which would orphan
- *     .gitnexus/ directories on disk.
+ *     .yummygraph/ directories on disk.
  *   - `-f` / `--force` matches the confirmation-skip semantics of
  *     `clean -f`. (Distinct from `analyze --force`, which re-indexes;
  *     here there is no pipeline, so no conflation.)
@@ -79,7 +79,7 @@ export const removeCommand = async (target: string, options?: { force?: boolean 
 
   // Safety guard (#1003 review — @magyargergo): refuse to proceed if
   // the registry entry's `storagePath` isn't the canonical
-  // `<entry.path>/.gitnexus` subfolder. `~/.gitnexus/registry.json` is
+  // `<entry.path>/.yummygraph` subfolder. `~/.yummygraph/registry.json` is
   // user-writable, so a corrupted or hand-edited entry could point
   // storagePath at the repo root, an empty string (→ cwd), a parent
   // dir, or anywhere else; `fs.rm(recursive: true, force: true)` on

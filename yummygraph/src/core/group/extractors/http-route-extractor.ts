@@ -300,7 +300,7 @@ export class HttpRouteExtractor implements ContractExtractor {
   }
 
   private async scanFiles(repoPath: string): Promise<string[]> {
-    // Honour `.gitnexusignore` and `.gitignore` via the shared IgnoreService
+    // Honour `.yummygraphignore` and `.gitignore` via the shared IgnoreService
     // so contract extraction respects the same exclusion rules as the rest of
     // the ingestion pipeline. Mirrors `filesystem-walker.ts` which uses the
     // same shape. Replaces a hardcoded `[node_modules, .git, dist, build,

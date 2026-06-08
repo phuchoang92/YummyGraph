@@ -51,7 +51,7 @@ function killChildTree(child: import('child_process').ChildProcess): void {
 }
 
 function isVerbose(): boolean {
-  return process.env.GITNEXUS_VERBOSE === '1';
+  return process.env.YUMMYGRAPH_VERBOSE === '1';
 }
 
 function verboseLog(provider: LocalAgentProvider, ...args: unknown[]): void {
@@ -127,7 +127,7 @@ export async function callCodexLLM(
     throw new Error('Codex CLI not found. Install Codex CLI and ensure `codex` is on PATH.');
   }
 
-  const outputDir = await fs.mkdtemp(path.join(os.tmpdir(), 'gitnexus-wiki-codex-'));
+  const outputDir = await fs.mkdtemp(path.join(os.tmpdir(), 'yummygraph-wiki-codex-'));
   const outputPath = path.join(outputDir, 'last-message.txt');
   const workingDirectory = config.workingDirectory || process.cwd();
   const fullPrompt = systemPrompt ? `${systemPrompt}\n\n---\n\n${prompt}` : prompt;

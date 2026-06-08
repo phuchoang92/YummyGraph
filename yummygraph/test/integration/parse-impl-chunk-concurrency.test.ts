@@ -2,7 +2,7 @@
  * U1 — Bounded chunk concurrency (B1 from PR #1693 review).
  *
  * Verifies that the new `parseChunkConcurrency` PipelineOption (and the
- * paired `GITNEXUS_PARSE_CHUNK_CONCURRENCY` env-var fallback) flow through
+ * paired `YUMMYGRAPH_PARSE_CHUNK_CONCURRENCY` env-var fallback) flow through
  * `runChunkedParseAndResolve` without changing graph output. Pre-fetching
  * chunk file contents up to N chunks ahead of the worker-dispatch cursor
  * is a wall-clock optimization (file I/O overlaps with worker compute),
@@ -93,9 +93,9 @@ describe('parse-impl chunk concurrency (U1)', () => {
     expect(symbolNames.includes('Baz')).toBe(true);
   });
 
-  it('falls back to GITNEXUS_PARSE_CHUNK_CONCURRENCY env when option is undefined', async () => {
-    const original = process.env.GITNEXUS_PARSE_CHUNK_CONCURRENCY;
-    process.env.GITNEXUS_PARSE_CHUNK_CONCURRENCY = '3';
+  it('falls back to YUMMYGRAPH_PARSE_CHUNK_CONCURRENCY env when option is undefined', async () => {
+    const original = process.env.YUMMYGRAPH_PARSE_CHUNK_CONCURRENCY;
+    process.env.YUMMYGRAPH_PARSE_CHUNK_CONCURRENCY = '3';
     try {
       const files = ['a.ts', 'b.ts', 'c.ts'];
       const graph = createKnowledgeGraph();
@@ -120,9 +120,9 @@ describe('parse-impl chunk concurrency (U1)', () => {
       expect(symbolNames.includes('Baz')).toBe(true);
     } finally {
       if (original === undefined) {
-        delete process.env.GITNEXUS_PARSE_CHUNK_CONCURRENCY;
+        delete process.env.YUMMYGRAPH_PARSE_CHUNK_CONCURRENCY;
       } else {
-        process.env.GITNEXUS_PARSE_CHUNK_CONCURRENCY = original;
+        process.env.YUMMYGRAPH_PARSE_CHUNK_CONCURRENCY = original;
       }
     }
   });

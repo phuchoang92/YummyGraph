@@ -22,7 +22,7 @@ import {
   startMCPServer,
   SHUTDOWN_EXIT_CODES,
 } from '../../src/mcp/server.js';
-import { GITNEXUS_TOOLS } from '../../src/mcp/tools.js';
+import { YUMMYGRAPH_TOOLS } from '../../src/mcp/tools.js';
 
 // ─── Mock backend ──────────────────────────────────────────────────
 
@@ -72,10 +72,10 @@ describe('createMCPServer', () => {
       await Promise.all([server.connect(serverTransport), client.connect(clientTransport)]);
 
       const response = await client.listTools();
-      expect(response.tools).toHaveLength(GITNEXUS_TOOLS.length);
+      expect(response.tools).toHaveLength(YUMMYGRAPH_TOOLS.length);
 
       for (const tool of response.tools) {
-        const definition = GITNEXUS_TOOLS.find((t) => t.name === tool.name)!;
+        const definition = YUMMYGRAPH_TOOLS.find((t) => t.name === tool.name)!;
         expect(tool.annotations).toEqual(definition.annotations);
       }
     } finally {

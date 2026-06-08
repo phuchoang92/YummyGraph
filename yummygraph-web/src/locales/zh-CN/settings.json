@@ -5,7 +5,7 @@
   "backendUrl": "后端 URL",
   "connected": "已连接",
   "notConnected": "未连接",
-  "runServeHint": "运行 `gitnexus serve` 将 Web UI 连接到本地后端。",
+  "runServeHint": "运行 `yummygraph serve` 将 Web UI 连接到本地后端。",
   "provider": "提供商",
   "apiKey": "API Key",
   "learnMore": "了解更多",

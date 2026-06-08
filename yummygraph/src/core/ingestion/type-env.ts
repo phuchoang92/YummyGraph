@@ -5,7 +5,7 @@ import {
   genericFuncName,
 } from './utils/ast-helpers.js';
 import { CALL_EXPRESSION_TYPES } from './utils/call-analysis.js';
-import { SupportedLanguages } from 'gitnexus-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 import { TYPED_PARAMETER_TYPES } from './type-extractors/shared.js';
 import { getProvider } from './languages/index.js';
 import type { BindingAccumulator, BindingEntry } from './binding-accumulator.js';
@@ -22,7 +22,7 @@ import {
   extractReturnTypeName,
 } from './type-extractors/shared.js';
 import type { SemanticModel } from './model/index.js';
-import type { NodeLabel } from 'gitnexus-shared';
+import type { NodeLabel } from 'yummygraph-shared';
 
 import { logger } from '../logger.js';
 /**
@@ -776,7 +776,7 @@ const resolveFixpointBindings = (
       }
     }
     if (!changed) break;
-    if (iter === MAX_FIXPOINT_ITERATIONS - 1 && process.env.GITNEXUS_DEBUG) {
+    if (iter === MAX_FIXPOINT_ITERATIONS - 1 && process.env.YUMMYGRAPH_DEBUG) {
       const unresolved = pendingItems.length - resolved.size;
       if (unresolved > 0) {
         logger.warn(

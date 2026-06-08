@@ -49,7 +49,7 @@ import type {
   ConstraintContext,
   ParameterTypeClass,
   SymbolDefinition,
-} from 'gitnexus-shared';
+} from 'yummygraph-shared';
 
 /**
  * Per-slot conversion-rank function. Returns a numeric cost for
@@ -347,7 +347,7 @@ function pairwiseCompare(a: readonly number[], b: readonly number[]): -1 | 0 | 1
 /**
  * Closed-table approximation of C++ function-template partial ordering.
  *
- * Full `[temp.func.order]` requires template argument deduction. GitNexus
+ * Full `[temp.func.order]` requires template argument deduction. YummyGraph
  * keeps this graph-safe by recognizing only syntactic placeholder shapes
  * that the C++ parameter sidecar already preserves:
  *   - `T*` is more specialized than `T` for pointer arguments.

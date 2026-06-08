@@ -26,7 +26,7 @@
  * capture-time maps need to cross the boundary.
  */
 
-import type { ParsedFile } from 'gitnexus-shared';
+import type { ParsedFile } from 'yummygraph-shared';
 import { collectCppAdlSideChannel, applyCppAdlSideChannel, type CppAdlSideChannel } from './adl.js';
 import {
   collectCppInlineNamespaceSideChannel,

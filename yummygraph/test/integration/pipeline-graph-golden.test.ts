@@ -198,7 +198,7 @@ describe('pipeline graph golden', () => {
         ...diffs,
         '',
         'If this drift is intentional, regenerate the golden file with:',
-        '  UPDATE_GOLDEN=1 npm --prefix gitnexus test -- pipeline-graph-golden',
+        '  UPDATE_GOLDEN=1 npm --prefix yummygraph test -- pipeline-graph-golden',
       ].join('\n');
       throw new Error(msg);
     }

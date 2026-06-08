@@ -8,7 +8,7 @@
  *   - Every byte the server writes to stdout reassembles into a valid
  *     Content-Length-framed JSON-RPC message — any stray byte fails the
  *     test and is surfaced in the assertion message.
- *   - tools/list reports the GitNexus tool set we expect.
+ *   - tools/list reports the YummyGraph tool set we expect.
  *
  * This locks in U1 (no stray console.log/warn in MCP-reachable code) and
  * U3 (AsyncLocalStorage stdout sentinel). A regression in either would
@@ -55,7 +55,7 @@ function spawnMcpServer(): SpawnedServer {
   const env: NodeJS.ProcessEnv = {
     ...process.env,
     // Avoid adding indexed repos noise to the test.
-    GITNEXUS_HOME: path.join(REPO_ROOT, 'test', 'integration', 'mcp', '.tmp-home'),
+    YUMMYGRAPH_HOME: path.join(REPO_ROOT, 'test', 'integration', 'mcp', '.tmp-home'),
     // Be deterministic across machines.
     NODE_OPTIONS: '',
   };
@@ -207,7 +207,7 @@ describe('MCP server end-to-end startup', () => {
         params: {
           protocolVersion: '2025-06-18',
           capabilities: {},
-          clientInfo: { name: 'gitnexus-startup-test', version: '0.0.0' },
+          clientInfo: { name: 'yummygraph-startup-test', version: '0.0.0' },
         },
       });
 
@@ -223,7 +223,7 @@ describe('MCP server end-to-end startup', () => {
       expect(initResponse.id).toBe(1);
       expect(initResponse.error).toBeUndefined();
       expect(initResponse.result).toBeDefined();
-      expect(initResponse.result!.serverInfo.name).toMatch(/gitnexus/i);
+      expect(initResponse.result!.serverInfo.name).toMatch(/yummygraph/i);
       expect(firstFrameAt - startedAt).toBeLessThan(FIRST_FRAME_BUDGET_MS);
 
       // initialized notification (no response expected)
@@ -240,7 +240,7 @@ describe('MCP server end-to-end startup', () => {
       expect(toolsResponse.id).toBe(2);
       expect(toolsResponse.result).toBeDefined();
       const toolNames = (toolsResponse.result!.tools ?? []).map((t) => t.name);
-      // The published GitNexus tool set. Adjust if the surface changes.
+      // The published YummyGraph tool set. Adjust if the surface changes.
       const expectedTools = [
         'list_repos',
         'query',

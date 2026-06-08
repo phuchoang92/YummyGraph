@@ -3,7 +3,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { emitRustScopeCaptures } from '../../../src/core/ingestion/languages/rust/index.js';
-import type { CaptureMatch } from 'gitnexus-shared';
+import type { CaptureMatch } from 'yummygraph-shared';
 
 describe('F70 — struct literal constructor calls', () => {
   it('bare struct Foo {} captures Foo as @reference.name', () => {

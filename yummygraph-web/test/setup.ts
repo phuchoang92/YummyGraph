@@ -1,7 +1,7 @@
 import { beforeEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 
-const I18N_LANGUAGE_STORAGE_KEY = 'gitnexus.lng';
+const I18N_LANGUAGE_STORAGE_KEY = 'yummygraph.lng';
 
 function ensureStorage(name: 'localStorage' | 'sessionStorage') {
   const current = globalThis[name];
@@ -35,7 +35,7 @@ localStorage.removeItem(I18N_LANGUAGE_STORAGE_KEY);
 
 // Reset storage between tests
 beforeEach(() => {
-  sessionStorage.removeItem('gitnexus-llm-settings');
-  localStorage.removeItem('gitnexus-llm-settings'); // legacy key (migration)
+  sessionStorage.removeItem('yummygraph-llm-settings');
+  localStorage.removeItem('yummygraph-llm-settings'); // legacy key (migration)
   localStorage.removeItem(I18N_LANGUAGE_STORAGE_KEY);
 });

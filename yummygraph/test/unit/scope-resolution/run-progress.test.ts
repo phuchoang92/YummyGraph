@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { ParsedFile, ScopeId, Scope } from 'gitnexus-shared';
+import type { ParsedFile, ScopeId, Scope } from 'yummygraph-shared';
 import {
   runScopeResolution,
   type ScopeResolutionSubPhase,

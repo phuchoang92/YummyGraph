@@ -1,9 +1,9 @@
 ---
-name: gitnexus-exploring
-description: Navigate unfamiliar code using GitNexus knowledge graph
+name: yummygraph-exploring
+description: Navigate unfamiliar code using YummyGraph knowledge graph
 ---
 
-# Exploring Codebases with GitNexus
+# Exploring Codebases with YummyGraph
 
 ## When to Use
 - "How does authentication work?"
@@ -15,19 +15,19 @@ description: Navigate unfamiliar code using GitNexus knowledge graph
 ## Workflow
 
 ```
-1. READ gitnexus://repos                          → Discover indexed repos
-2. READ gitnexus://repo/{name}/context             → Codebase overview, check staleness
+1. READ yummygraph://repos                          → Discover indexed repos
+2. READ yummygraph://repo/{name}/context             → Codebase overview, check staleness
 3. query({query: "<what you want to understand>"})  → Find related execution flows
 4. context({name: "<symbol>"})            → Deep dive on specific symbol
-5. READ gitnexus://repo/{name}/process/{name}      → Trace full execution flow
+5. READ yummygraph://repo/{name}/process/{name}      → Trace full execution flow
 ```
 
-> If step 2 says "Index is stale" → run `node .gitnexus/run.cjs analyze` in terminal.
+> If step 2 says "Index is stale" → run `node .yummygraph/run.cjs analyze` in terminal.
 
 ## Checklist
 
 ```
-- [ ] READ gitnexus://repo/{name}/context
+- [ ] READ yummygraph://repo/{name}/context
 - [ ] query for the concept you want to understand
 - [ ] Review returned processes (execution flows)
 - [ ] context on key symbols for callers/callees
@@ -39,10 +39,10 @@ description: Navigate unfamiliar code using GitNexus knowledge graph
 
 | Resource | What you get |
 |----------|-------------|
-| `gitnexus://repo/{name}/context` | Stats, staleness warning (~150 tokens) |
-| `gitnexus://repo/{name}/clusters` | All functional areas with cohesion scores (~300 tokens) |
-| `gitnexus://repo/{name}/cluster/{name}` | Area members with file paths (~500 tokens) |
-| `gitnexus://repo/{name}/process/{name}` | Step-by-step execution trace (~200 tokens) |
+| `yummygraph://repo/{name}/context` | Stats, staleness warning (~150 tokens) |
+| `yummygraph://repo/{name}/clusters` | All functional areas with cohesion scores (~300 tokens) |
+| `yummygraph://repo/{name}/cluster/{name}` | Area members with file paths (~500 tokens) |
+| `yummygraph://repo/{name}/process/{name}` | Step-by-step execution trace (~200 tokens) |
 
 ## Tools
 
@@ -64,7 +64,7 @@ context({name: "validateUser"})
 ## Example: "How does payment processing work?"
 
 ```
-1. READ gitnexus://repo/my-app/context       → 918 symbols, 45 processes
+1. READ yummygraph://repo/my-app/context       → 918 symbols, 45 processes
 2. query({query: "payment processing"})
    → CheckoutFlow: processPayment → validateCard → chargeStripe
    → RefundFlow: initiateRefund → calculateRefund → processRefund

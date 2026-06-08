@@ -37,7 +37,7 @@ import {
   getStoragePaths,
   saveMeta,
   loadMeta,
-  ensureGitNexusIgnored,
+  ensureYummyGraphIgnored,
   registerRepo,
   cleanupOldKuzuFiles,
   INCREMENTAL_SCHEMA_VERSION,
@@ -109,11 +109,11 @@ export interface AnalyzeOptions {
    */
   dropEmbeddings?: boolean;
   skipGit?: boolean;
-  /** Skip AGENTS.md and CLAUDE.md gitnexus block updates. */
+  /** Skip AGENTS.md and CLAUDE.md yummygraph block updates. */
   skipAgentsMd?: boolean;
   /** Omit volatile symbol/relationship counts from AGENTS.md and CLAUDE.md. */
   noStats?: boolean;
-  /** Skip installing standard GitNexus skill files to .claude/skills/gitnexus/. */
+  /** Skip installing standard YummyGraph skill files to .claude/skills/yummygraph/. */
   skipSkills?: boolean;
   /**
    * Default branch threaded into generated AGENTS.md / CLAUDE.md so the
@@ -180,8 +180,8 @@ export interface AnalyzeResult {
 const FTS_UNAVAILABLE_MESSAGE =
   'FTS extension unavailable; skipping search-index creation. ' +
   'Full-text/BM25 search will be disabled until the LadybugDB FTS extension is ' +
-  'installed once with network access (GITNEXUS_LBUG_EXTENSION_INSTALL=auto) or ' +
-  'pre-installed for offline use. Run `gitnexus doctor` for details.';
+  'installed once with network access (YUMMYGRAPH_LBUG_EXTENSION_INSTALL=auto) or ' +
+  'pre-installed for offline use. Run `yummygraph doctor` for details.';
 
 // Re-export the pure flag-derivation helper so external callers (and tests)
 // keep importing from this module's stable surface.
@@ -215,7 +215,7 @@ export const PHASE_LABELS: Record<string, string> = {
 // ---------------------------------------------------------------------------
 
 /**
- * Run the full GitNexus analysis pipeline.
+ * Run the full YummyGraph analysis pipeline.
  *
  * This is the shared core extracted from the CLI `analyze` command. It
  * handles: pipeline execution, LadybugDB loading, FTS indexing, embedding
@@ -259,7 +259,7 @@ export async function runFullAnalysis(
     if (!existingMeta) {
       throw new Error(
         'Cannot repair FTS indexes because this repository has not been analyzed yet. ' +
-          'Run `gitnexus analyze` first to create the initial index, then retry `--repair-fts`.',
+          'Run `yummygraph analyze` first to create the initial index, then retry `--repair-fts`.',
       );
     }
     let lbugStat;
@@ -268,7 +268,7 @@ export async function runFullAnalysis(
     } catch {
       throw new Error(
         `Cannot repair FTS indexes: graph store at ${lbugPath} is missing. ` +
-          'Run `gitnexus analyze` (full) to rebuild from scratch.',
+          'Run `yummygraph analyze` (full) to rebuild from scratch.',
       );
     }
     if (!lbugStat.isFile()) {
@@ -287,7 +287,7 @@ export async function runFullAnalysis(
                   : 'not a regular file';
       throw new Error(
         `Cannot repair FTS indexes: graph store at ${lbugPath} is ${foundType} (expected a file). ` +
-          'Run `gitnexus analyze` (full) to rebuild from scratch.',
+          'Run `yummygraph analyze` (full) to rebuild from scratch.',
       );
     }
     try {
@@ -305,11 +305,11 @@ export async function runFullAnalysis(
       if (missing.length > 0) {
         throw new Error(
           `FTS repair failed - missing indexes after rebuild: ${missing.join(', ')}. ` +
-            'Run `gitnexus analyze --force` to perform a full graph+FTS rebuild; ' +
-            'if that also fails, verify FTS extension availability via `gitnexus doctor`.',
+            'Run `yummygraph analyze --force` to perform a full graph+FTS rebuild; ' +
+            'if that also fails, verify FTS extension availability via `yummygraph doctor`.',
         );
       }
-      await ensureGitNexusIgnored(repoPath);
+      await ensureYummyGraphIgnored(repoPath);
       progress('fts', 90, 'Search indexes ready');
       progress('done', 100, 'Done');
       return {
@@ -350,8 +350,8 @@ export async function runFullAnalysis(
       // tree is also clean — otherwise fall through to the incremental
       // path which will hash-diff and update only changed files.
       //
-      // We exclude paths that GitNexus itself writes during analyze:
-      //   .gitnexus/                  — db / parse cache / meta.json
+      // We exclude paths that YummyGraph itself writes during analyze:
+      //   .yummygraph/                  — db / parse cache / meta.json
       //   .claude/, .cursor/          — auto-generated agent skill files
       //   AGENTS.md, CLAUDE.md        — auto-updated stats blocks
       // Counting them as dirty would perpetually defeat the up-to-date
@@ -366,8 +366,8 @@ export async function runFullAnalysis(
               '--porcelain',
               '--',
               '.',
-              ':(exclude).gitnexus',
-              ':(exclude).gitnexus/**',
+              ':(exclude).yummygraph',
+              ':(exclude).yummygraph/**',
               ':(exclude).claude',
               ':(exclude).claude/**',
               ':(exclude).cursor',
@@ -388,7 +388,7 @@ export async function runFullAnalysis(
         }
       })();
       if (!dirty) {
-        await ensureGitNexusIgnored(repoPath);
+        await ensureYummyGraphIgnored(repoPath);
         return {
           // `resolveRepoIdentityRoot` collapses worktree roots to the
           // canonical repo basename (#1259) but leaves arbitrary subdirs
@@ -581,7 +581,7 @@ export async function runFullAnalysis(
   // has work left to do. Failures of the manual CHECKPOINT are absorbed
   // by the driver's bounded retry; the final un-recoverable error still
   // surfaces via the surrounding write that follows the failed flush.
-  // Opt-out via `GITNEXUS_WAL_MANUAL_CHECKPOINT=0` (the driver itself
+  // Opt-out via `YUMMYGRAPH_WAL_MANUAL_CHECKPOINT=0` (the driver itself
   // returns a no-op handle when disabled). Analyze-only: MCP and serve
   // paths continue to rely on the close-time CHECKPOINT in `safeClose`.
   const walCheckpointDriver: WalCheckpointDriver = startWalCheckpointDriver();
@@ -759,7 +759,7 @@ export async function runFullAnalysis(
       if (missingIndexNames.length > 0) {
         throw new Error(
           `FTS verification failed - missing indexes after analyze: ${missingIndexNames.join(', ')}. ` +
-            'Check FTS extension availability, then retry `gitnexus analyze --force` for a full rebuild.',
+            'Check FTS extension availability, then retry `yummygraph analyze --force` for a full rebuild.',
         );
       }
       progress('fts', 90, 'Search indexes ready');
@@ -958,7 +958,7 @@ export async function runFullAnalysis(
         // Reflect what this analyze run actually produced: when the FTS
         // extension was unavailable the indexes were skipped, so record
         // 'unavailable' rather than the static runtime default. Keeps
-        // meta.json / `gitnexus doctor` honest about degraded search.
+        // meta.json / `yummygraph doctor` honest about degraded search.
         fts: {
           provider: 'ladybugdb-fts',
           status: ftsAvailable ? runtimeCapabilities.fts : 'unavailable',
@@ -1023,8 +1023,8 @@ export async function runFullAnalysis(
       allowDuplicateName: options.allowDuplicateName,
     });
 
-    // Keep generated .gitnexus contents ignored without editing the user's root .gitignore.
-    await ensureGitNexusIgnored(repoPath);
+    // Keep generated .yummygraph contents ignored without editing the user's root .gitignore.
+    await ensureYummyGraphIgnored(repoPath);
 
     // ── Generate AI context files (best-effort) ───────────────────────
     let aggregatedClusterCount = 0;

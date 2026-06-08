@@ -25,7 +25,7 @@ describe('runFullAnalysis FTS repair and verification failure paths', () => {
   });
 
   it('fails repair mode when no base meta exists', async () => {
-    const tmpRepo = await createTempDir('gitnexus-run-analyze-repair-no-meta-');
+    const tmpRepo = await createTempDir('yummygraph-run-analyze-repair-no-meta-');
     try {
       const { runFullAnalysis } = await import('../../src/core/run-analyze.js');
 
@@ -44,7 +44,7 @@ describe('runFullAnalysis FTS repair and verification failure paths', () => {
   });
 
   it('fails repair mode when graph store is missing', async () => {
-    const tmpRepo = await createTempDir('gitnexus-run-analyze-repair-missing-store-');
+    const tmpRepo = await createTempDir('yummygraph-run-analyze-repair-missing-store-');
     try {
       const { storagePath, lbugPath } = getStoragePaths(tmpRepo.dbPath);
       await fs.mkdir(storagePath, { recursive: true });
@@ -72,7 +72,7 @@ describe('runFullAnalysis FTS repair and verification failure paths', () => {
   });
 
   it('fails repair mode when graph store path is not a file', async () => {
-    const tmpRepo = await createTempDir('gitnexus-run-analyze-repair-store-not-file-');
+    const tmpRepo = await createTempDir('yummygraph-run-analyze-repair-store-not-file-');
     try {
       const { storagePath, lbugPath } = getStoragePaths(tmpRepo.dbPath);
       await fs.mkdir(storagePath, { recursive: true });
@@ -123,7 +123,7 @@ describe('runFullAnalysis FTS repair and verification failure paths', () => {
       verifySearchFTSIndexes: vi.fn(async () => [SIMULATED_MISSING_FTS_INDEX_NAME]),
     }));
 
-    const tmpRepo = await createTempDir('gitnexus-run-analyze-repair-verify-fail-');
+    const tmpRepo = await createTempDir('yummygraph-run-analyze-repair-verify-fail-');
     try {
       const { storagePath, lbugPath } = getStoragePaths(tmpRepo.dbPath);
       await fs.mkdir(storagePath, { recursive: true });
@@ -172,7 +172,7 @@ describe('runFullAnalysis FTS repair and verification failure paths', () => {
       verifySearchFTSIndexes: vi.fn(async () => []),
     }));
 
-    const tmpRepo = await createTempDir('gitnexus-run-analyze-repair-extension-fail-');
+    const tmpRepo = await createTempDir('yummygraph-run-analyze-repair-extension-fail-');
     try {
       const { storagePath, lbugPath } = getStoragePaths(tmpRepo.dbPath);
       await fs.mkdir(storagePath, { recursive: true });
@@ -227,7 +227,7 @@ describe('runFullAnalysis FTS repair and verification failure paths', () => {
       })),
     }));
 
-    const tmpRepo = await createTempDir('gitnexus-run-analyze-full-verify-fail-');
+    const tmpRepo = await createTempDir('yummygraph-run-analyze-full-verify-fail-');
     try {
       const { runFullAnalysis } = await import('../../src/core/run-analyze.js');
       await expect(
@@ -275,14 +275,14 @@ describe('runFullAnalysis FTS repair and verification failure paths', () => {
         graph: { forEachNode: () => undefined },
       })),
     }));
-    // Avoid touching the global registry / repo .gitnexusignore from a unit test.
+    // Avoid touching the global registry / repo .yummygraphignore from a unit test.
     vi.doMock('../../src/storage/repo-manager.js', async (importActual) => ({
       ...(await importActual<typeof import('../../src/storage/repo-manager.js')>()),
       registerRepo: vi.fn(async () => 'degraded-repo'),
-      ensureGitNexusIgnored: vi.fn(async () => undefined),
+      ensureYummyGraphIgnored: vi.fn(async () => undefined),
     }));
 
-    const tmpRepo = await createTempDir('gitnexus-run-analyze-fts-degrade-');
+    const tmpRepo = await createTempDir('yummygraph-run-analyze-fts-degrade-');
     try {
       const logs: string[] = [];
       const { runFullAnalysis } = await import('../../src/core/run-analyze.js');

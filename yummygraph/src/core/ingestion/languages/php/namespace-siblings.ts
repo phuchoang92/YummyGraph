@@ -25,7 +25,7 @@
  * already parsed, reused via `treeCache` to avoid double-parsing.
  */
 
-import type { BindingRef, ParsedFile, Scope, ScopeId, SymbolDefinition } from 'gitnexus-shared';
+import type { BindingRef, ParsedFile, Scope, ScopeId, SymbolDefinition } from 'yummygraph-shared';
 import type { ScopeResolutionIndexes } from '../../model/scope-resolution-indexes.js';
 import { getPhpParser } from './query.js';
 
@@ -115,7 +115,7 @@ export function extractNamespaceViaScanner(content: string): string {
  * native Tree objects across MessageChannels), uses a line scanner
  * instead of re-parsing every file with tree-sitter. For 16K+ PHP files
  * this eliminates ~16K tree-sitter re-parses during the namespace-siblings
- * pass. See: https://github.com/abhigyanpatwari/GitNexus/issues/1741
+ * pass. See: https://github.com/abhigyanpatwari/YummyGraph/issues/1741
  */
 export function extractPhpFileStructure(content: string, cachedTree: unknown): PhpFileStructure {
   if (!cachedTree) {
@@ -353,7 +353,7 @@ export function populatePhpNamespaceSiblings(
     if (moduleScope === undefined) continue;
     const moduleTypeBindings = moduleScope.typeBindings as Map<
       string,
-      import('gitnexus-shared').TypeRef
+      import('yummygraph-shared').TypeRef
     >;
 
     const struct = structureByFile.get(parsed.filePath);

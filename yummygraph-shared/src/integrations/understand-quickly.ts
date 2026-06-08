@@ -1,14 +1,14 @@
 /**
  * Understand-Quickly registry integration helpers.
  *
- * Pure, runtime-agnostic logic for opting in to publishing a GitNexus
+ * Pure, runtime-agnostic logic for opting in to publishing a YummyGraph
  * index to the [`looptech-ai/understand-quickly`](https://github.com/looptech-ai/understand-quickly)
- * registry. Lives in `gitnexus-shared` so both the Node CLI and any
+ * registry. Lives in `yummygraph-shared` so both the Node CLI and any
  * future browser-side surface can construct identical dispatch payloads.
  *
- * Network I/O lives in the CLI command (`gitnexus/src/cli/publish.ts`)
+ * Network I/O lives in the CLI command (`yummygraph/src/cli/publish.ts`)
  * to keep this module free of Node-only imports — see the comment at
- * the top of `gitnexus-shared/src/graph/types.ts`.
+ * the top of `yummygraph-shared/src/graph/types.ts`.
  *
  * The protocol contract (single dispatch event, no graph upload) is
  * documented at:
@@ -101,7 +101,7 @@ export function stripGitSuffix(input: string): string {
 
 /**
  * Parse `owner/repo` out of a git remote URL. Mirrors the heuristic in
- * `gitnexus/src/storage/git.ts:parseRepoNameFromUrl` but keeps both
+ * `yummygraph/src/storage/git.ts:parseRepoNameFromUrl` but keeps both
  * halves so we can build a registry id. Returns `null` on shapes we
  * don't recognise.
  *

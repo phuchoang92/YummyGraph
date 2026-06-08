@@ -11,7 +11,7 @@
  */
 
 import { detectFrameworkFromPath } from './framework-detection.js';
-import { SupportedLanguages } from 'gitnexus-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 import { providers } from './languages/index.js';
 
 // ============================================================================

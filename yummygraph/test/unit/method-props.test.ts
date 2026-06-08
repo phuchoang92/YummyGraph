@@ -5,7 +5,7 @@ import {
   constTagForId,
 } from '../../src/core/ingestion/utils/method-props.js';
 import type { MethodInfo } from '../../src/core/ingestion/method-types.js';
-import { SupportedLanguages } from 'gitnexus-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 
 function makeMethodInfo(
   name: string,

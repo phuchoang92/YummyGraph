@@ -20,7 +20,7 @@ import {
 
 beforeEach(() => {
   vi.unstubAllEnvs();
-  vi.stubEnv('GITNEXUS_LANG', 'en');
+  vi.stubEnv('YUMMYGRAPH_LANG', 'en');
 });
 
 afterEach(() => {
@@ -216,10 +216,10 @@ describe('formatImpactResult', () => {
   it('returns error with suggestion when provided', () => {
     const result = formatImpactResult({
       error: 'Impact analysis failed',
-      suggestion: 'Try gitnexus context <symbol> as a fallback',
+      suggestion: 'Try yummygraph context <symbol> as a fallback',
     });
     expect(result).toContain('Error: Impact analysis failed');
-    expect(result).toContain('Suggestion: Try gitnexus context');
+    expect(result).toContain('Suggestion: Try yummygraph context');
   });
 
   it('shows partial warning when traversal was interrupted', () => {
@@ -392,7 +392,7 @@ describe('formatDetectChangesResult', () => {
   });
 
   it('localizes detect_changes labels for Simplified Chinese', () => {
-    vi.stubEnv('GITNEXUS_LANG', 'zh-CN');
+    vi.stubEnv('YUMMYGRAPH_LANG', 'zh-CN');
 
     const result = formatDetectChangesResult({
       summary: { changed_files: 2, changed_count: 3, affected_count: 1, risk_level: 'MEDIUM' },

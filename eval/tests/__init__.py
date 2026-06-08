@@ -1,1 +1,1 @@
-"""Tests for the GitNexus eval harness."""
+"""Tests for the YummyGraph eval harness."""

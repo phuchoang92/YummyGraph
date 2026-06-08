@@ -1,5 +1,5 @@
 /**
- * Centralized structured logger for GitNexus.
+ * Centralized structured logger for YummyGraph.
  *
  * Wraps `pino` so the rest of the codebase imports from one place. Pino's
  * NDJSON output is structurally log-injection-resistant (CWE-117 / CodeQL
@@ -11,7 +11,7 @@
  * Usage:
  *   import { logger, createLogger } from '../core/logger.js';
  *   logger.warn({ groupDir }, 'msg');
- *   const childLogger = createLogger('bridge-db', { debugEnvVar: 'GITNEXUS_DEBUG_BRIDGE' });
+ *   const childLogger = createLogger('bridge-db', { debugEnvVar: 'YUMMYGRAPH_DEBUG_BRIDGE' });
  *
  * Operator semantics:
  *   - Default level: 'info' (matches pino default; preserves visibility of
@@ -26,7 +26,7 @@
  *   The exported `logger` singleton is a Proxy that forwards every call to a
  *   lazily-built pino instance. Tests use `_captureLogger()` to redirect that
  *   inner instance to a memory stream so they can assert on records the
- *   production code logged. See `gitnexus/test/unit/logger.test.ts` for the
+ *   production code logged. See `yummygraph/test/unit/logger.test.ts` for the
  *   pattern.
  */
 import pino, { type Logger, type LoggerOptions, type DestinationStream } from 'pino';
@@ -72,7 +72,7 @@ function shouldUsePretty(): boolean {
  *     handlers (SIGINT/SIGTERM) MUST call before `process.exit(N)` so
  *     in-flight buffered records still reach stderr.
  *   - `pino.final(...)` integration in `uncaughtException` / `unhandledRejection`
- *     handlers (see `gitnexus/src/cli/serve.ts` and `gitnexus/src/server/api.ts`).
+ *     handlers (see `yummygraph/src/cli/serve.ts` and `yummygraph/src/server/api.ts`).
  *
  * Skipped under `VITEST` so vitest's between-test cleanup doesn't fight
  * `_captureLogger()`'s lifecycle. Tests use an in-memory destination via
@@ -126,7 +126,7 @@ function installFlushHook(): void {
  * the one-time stderr warning on miss only fires once.
  *
  * Production installs ship pino-pretty as a runtime dependency (see
- * gitnexus/package.json). The probe is the safety net for `--omit=optional`,
+ * yummygraph/package.json). The probe is the safety net for `--omit=optional`,
  * `--no-package-lock` style installs and for any environment where the
  * module turns out to be missing for reasons we can't predict — pino's
  * own transport-resolution path resolves the target lazily at FIRST log
@@ -147,7 +147,7 @@ function isPrettyAvailable(): boolean {
     // NDJSON instead of pretty-printed. Use realStderrWrite-style direct
     // write — going through `logger` here would recurse.
     process.stderr.write(
-      '[gitnexus:logger] pino-pretty unavailable; falling back to NDJSON on stderr\n',
+      '[yummygraph:logger] pino-pretty unavailable; falling back to NDJSON on stderr\n',
     );
   }
   return _prettyAvailable;
@@ -173,7 +173,7 @@ export function _tryBuildPrettyTransport(): LoggerOptions['transport'] | undefin
     options: {
       // Route to stderr (fd 2) so pretty output doesn't contaminate
       // CLI tool data on stdout (fd 1). pino-pretty's default is fd 1,
-      // which would interleave with `gitnexus query | jq` output.
+      // which would interleave with `yummygraph query | jq` output.
       destination: 2,
       colorize: true,
       translateTime: 'SYS:HH:MM:ss.l',
@@ -190,7 +190,7 @@ export function _tryBuildPrettyTransport(): LoggerOptions['transport'] | undefin
 const PINO_LEVELS = new Set(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']);
 
 function resolveBaseLevel(): string {
-  const fromEnv = process.env.GITNEXUS_LOG_LEVEL;
+  const fromEnv = process.env.YUMMYGRAPH_LOG_LEVEL;
   if (fromEnv && PINO_LEVELS.has(fromEnv.toLowerCase())) {
     return fromEnv.toLowerCase();
   }
@@ -255,14 +255,14 @@ function _getInner(): Logger {
   // formatters) apply uniformly. The destination override is honored when set
   // by `_captureLogger()` below.
   _cached = createLogger(
-    'gitnexus',
+    'yummygraph',
     _activeDestination ? { destination: _activeDestination } : undefined,
   );
   return _cached;
 }
 
 /**
- * Default singleton logger (`name: 'gitnexus'`). Backed by a Proxy so test
+ * Default singleton logger (`name: 'yummygraph'`). Backed by a Proxy so test
  * capture (`_captureLogger()`) can redirect output without breaking modules
  * that already imported the singleton at module-load time.
  */

@@ -13,7 +13,7 @@ import Rust from 'tree-sitter-rust';
 import PHP from 'tree-sitter-php';
 import Ruby from 'tree-sitter-ruby';
 import { createRequire } from 'node:module';
-import { SupportedLanguages } from 'gitnexus-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 import { getProvider } from '../languages/index.js';
 import {
   getTreeSitterBufferSize,
@@ -54,7 +54,7 @@ let Kotlin: TreeSitterLanguage | null = null;
 try {
   Kotlin = _require('tree-sitter-kotlin');
 } catch {}
-import { getLanguageFromFilename } from 'gitnexus-shared';
+import { getLanguageFromFilename } from 'yummygraph-shared';
 import {
   buildConcreteTypedefDefinitionRanges,
   FUNCTION_NODE_TYPES,
@@ -84,7 +84,7 @@ import {
   extractTemplateComponents,
   isVueSetupTopLevel,
 } from '../vue-sfc-extractor.js';
-import type { NodeLabel, ParameterTypeClass } from 'gitnexus-shared';
+import type { NodeLabel, ParameterTypeClass } from 'yummygraph-shared';
 import type { FieldInfo, FieldExtractorContext } from '../field-types.js';
 import type { MethodInfo, MethodExtractorContext } from '../method-types.js';
 import type { VariableExtractorContext, VariableInfo } from '../variable-types.js';
@@ -102,7 +102,7 @@ import {
   templateConstraintsIdTag,
 } from '../utils/template-arguments.js';
 import type { LanguageProvider } from '../language-provider.js';
-import type { ParsedFile } from 'gitnexus-shared';
+import type { ParsedFile } from 'yummygraph-shared';
 import { extractParsedFile, type ScopeCaptureSourceKind } from '../scope-extractor-bridge.js';
 import {
   persistParsedFileShardSync,
@@ -135,7 +135,7 @@ const DURABLE_PARSED_FILE_STORAGE_PATH: string | undefined = (
 let shardSeq = 0;
 
 // ── Bootstrap-stage diagnostics (#1741) ────────────────────────────────────
-// When GITNEXUS_WORKER_BOOTSTRAP=1 (or --verbose sets GITNEXUS_VERBOSE), each
+// When YUMMYGRAPH_WORKER_BOOTSTRAP=1 (or --verbose sets YUMMYGRAPH_VERBOSE), each
 // worker reports its startup stage timings to stderr — which the pool tees
 // and captures (worker-pool.ts captureWorkerStderr). This makes a slow or
 // crashing startup diagnosable: you can see whether a worker reached
@@ -144,7 +144,7 @@ let shardSeq = 0;
 // attaches whatever stderr it captured to its readiness-failure message,
 // so the operator sees the real cause instead of "did not report ready".
 const BOOTSTRAP_LOG =
-  process.env.GITNEXUS_WORKER_BOOTSTRAP === '1' || process.env.GITNEXUS_VERBOSE === '1';
+  process.env.YUMMYGRAPH_WORKER_BOOTSTRAP === '1' || process.env.YUMMYGRAPH_VERBOSE === '1';
 const bootstrapStart = performance.now();
 const bootstrapLog = (stage: string): void => {
   if (!BOOTSTRAP_LOG) return;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { ParsedFile, SymbolDefinition } from 'gitnexus-shared';
+import type { ParsedFile, SymbolDefinition } from 'yummygraph-shared';
 import type { ScopeResolutionIndexes } from '../../../../src/core/ingestion/model/scope-resolution-indexes.js';
 import { populateGoPackageSiblings } from '../../../../src/core/ingestion/languages/go/index.js';
 

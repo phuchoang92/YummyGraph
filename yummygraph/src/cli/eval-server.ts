@@ -14,14 +14,14 @@
  *   Agent bash cmd → curl localhost:PORT/tool/query → eval-server → LocalBackend → format → text
  *
  * Usage:
- *   gitnexus eval-server                        # default port 4848, binds 127.0.0.1
- *   gitnexus eval-server --port 4848            # explicit port
- *   gitnexus eval-server --host 0.0.0.0         # reachable from other VMs / containers
- *   gitnexus eval-server --idle-timeout 300     # auto-shutdown after 300s idle
+ *   yummygraph eval-server                        # default port 4848, binds 127.0.0.1
+ *   yummygraph eval-server --port 4848            # explicit port
+ *   yummygraph eval-server --host 0.0.0.0         # reachable from other VMs / containers
+ *   yummygraph eval-server --idle-timeout 300     # auto-shutdown after 300s idle
  *
- * READY signal format: GITNEXUS_EVAL_SERVER_READY:<host>:<port>
- *   IPv4: GITNEXUS_EVAL_SERVER_READY:127.0.0.1:4848
- *   IPv6: GITNEXUS_EVAL_SERVER_READY:[::1]:4848
+ * READY signal format: YUMMYGRAPH_EVAL_SERVER_READY:<host>:<port>
+ *   IPv4: YUMMYGRAPH_EVAL_SERVER_READY:127.0.0.1:4848
+ *   IPv6: YUMMYGRAPH_EVAL_SERVER_READY:[::1]:4848
  *
  * API:
  *   POST /tool/:name   — Call a tool. Body is JSON arguments. Returns formatted text.
@@ -112,7 +112,7 @@ export function formatContextResult(result: any): string {
     for (const c of result.candidates || []) {
       lines.push(`  ${c.kind} ${c.name} → ${c.filePath}:${c.line || '?'}  (uid: ${c.uid})`);
     }
-    lines.push(`\nRe-run: gitnexus-context "${result.candidates?.[0]?.name}" "<file_path>"`);
+    lines.push(`\nRe-run: yummygraph-context "${result.candidates?.[0]?.name}" "<file_path>"`);
     return lines.join('\n');
   }
 
@@ -311,19 +311,19 @@ function formatToolResult(toolName: string, result: any): string {
 function getNextStepHint(toolName: string): string {
   switch (toolName) {
     case 'query':
-      return '\n---\nNext: Pick a symbol above and run gitnexus-context "<name>" to see all its callers, callees, and execution flows.';
+      return '\n---\nNext: Pick a symbol above and run yummygraph-context "<name>" to see all its callers, callees, and execution flows.';
 
     case 'context':
-      return '\n---\nNext: To check what breaks if you change this, run gitnexus-impact "<name>" upstream';
+      return '\n---\nNext: To check what breaks if you change this, run yummygraph-impact "<name>" upstream';
 
     case 'impact':
       return '\n---\nNext: Review d=1 items first (WILL BREAK). Read the source with cat to understand the code, then make your fix.';
 
     case 'cypher':
-      return '\n---\nNext: To explore a result symbol in depth, run gitnexus-context "<name>"';
+      return '\n---\nNext: To explore a result symbol in depth, run yummygraph-context "<name>"';
 
     case 'detect_changes':
-      return '\n---\nNext: Run gitnexus-context "<symbol>" on high-risk changed symbols to check their callers.';
+      return '\n---\nNext: Run yummygraph-context "<symbol>" on high-risk changed symbols to check their callers.';
 
     default:
       return '';
@@ -343,10 +343,10 @@ export async function evalServerCommand(options?: EvalServerOptions): Promise<vo
       `Invalid --host value "${rawHost}":\n` +
         `  Must be an IP address or "localhost".\n\n` +
         `  Examples:\n` +
-        `    gitnexus eval-server --host 127.0.0.1    (loopback only, default)\n` +
-        `    gitnexus eval-server --host 0.0.0.0      (all network interfaces)\n` +
-        `    gitnexus eval-server --host 192.168.1.5  (specific interface)\n` +
-        `    gitnexus eval-server --host localhost     (OS-resolved loopback)\n`,
+        `    yummygraph eval-server --host 127.0.0.1    (loopback only, default)\n` +
+        `    yummygraph eval-server --host 0.0.0.0      (all network interfaces)\n` +
+        `    yummygraph eval-server --host 192.168.1.5  (specific interface)\n` +
+        `    yummygraph eval-server --host localhost     (OS-resolved loopback)\n`,
       { flag: '--host', value: rawHost },
     );
     process.exit(1);
@@ -361,14 +361,14 @@ export async function evalServerCommand(options?: EvalServerOptions): Promise<vo
     // cliWarn so the diagnostic reaches stderr synchronously before
     // process.exit() — direct logger.warn would be lost to the buffered
     // pino destination on hard exit (skips beforeExit flush).
-    cliWarn('GitNexus eval-server: No indexed repositories found. Run: gitnexus analyze');
+    cliWarn('YummyGraph eval-server: No indexed repositories found. Run: yummygraph analyze');
     process.exit(1);
   }
 
   const repos = await backend.listRepos();
   logger.info(
     { repoCount: repos.length, repos: repos.map((r) => r.name) },
-    'GitNexus eval-server: repos loaded',
+    'YummyGraph eval-server: repos loaded',
   );
 
   let idleTimer: ReturnType<typeof setTimeout> | null = null;
@@ -377,7 +377,7 @@ export async function evalServerCommand(options?: EvalServerOptions): Promise<vo
     if (idleTimeoutSec <= 0) return;
     if (idleTimer) clearTimeout(idleTimer);
     idleTimer = setTimeout(async () => {
-      logger.info({ idleTimeoutSec }, 'GitNexus eval-server: idle timeout reached, shutting down');
+      logger.info({ idleTimeoutSec }, 'YummyGraph eval-server: idle timeout reached, shutting down');
       await backend.disconnect();
       process.exit(0);
     }, idleTimeoutSec * 1000);
@@ -451,11 +451,11 @@ export async function evalServerCommand(options?: EvalServerOptions): Promise<vo
   server.on('error', (err: NodeJS.ErrnoException) => {
     if (err.code === 'EADDRINUSE') {
       cliError(
-        `\nGitNexus eval-server failed to start:\n` +
+        `\nYummyGraph eval-server failed to start:\n` +
           `  Port ${port} is already in use.\n\n` +
           `  Either:\n` +
           `    1. Stop the process already using port ${port}\n` +
-          `    2. Use a different port: gitnexus eval-server --port 4849\n`,
+          `    2. Use a different port: yummygraph eval-server --port 4849\n`,
         { code: err.code, port, host },
       );
     } else if (err.code === 'EADDRNOTAVAIL') {
@@ -463,7 +463,7 @@ export async function evalServerCommand(options?: EvalServerOptions): Promise<vo
       // potentially IPv6 so the user gets the right diagnostic hint.
       const isIPv6Host = isIPv6(host) || host === 'localhost';
       cliError(
-        `\nGitNexus eval-server failed to start:\n` +
+        `\nYummyGraph eval-server failed to start:\n` +
           `  Address ${host} is not available on this machine.\n\n` +
           (isIPv6Host
             ? `  Address ${host} resolved but is not reachable — IPv6 may be disabled, or the loopback interface may be unavailable.\n` +
@@ -471,20 +471,20 @@ export async function evalServerCommand(options?: EvalServerOptions): Promise<vo
             : `  The --host value must be an IP assigned to a local network interface.\n` +
               `  Run \`ip addr\` (Linux) or \`ipconfig\` (Windows) to list available addresses.\n\n`) +
           `  Common fixes:\n` +
-          `    gitnexus eval-server --host 127.0.0.1  (loopback, this machine only)\n` +
-          `    gitnexus eval-server --host 0.0.0.0    (all interfaces, reachable from other VMs)\n`,
+          `    yummygraph eval-server --host 127.0.0.1  (loopback, this machine only)\n` +
+          `    yummygraph eval-server --host 0.0.0.0    (all interfaces, reachable from other VMs)\n`,
         { code: err.code, port, host },
       );
     } else if (err.code === 'EACCES') {
       cliError(
-        `\nGitNexus eval-server failed to start:\n` +
+        `\nYummyGraph eval-server failed to start:\n` +
           `  Permission denied binding to port ${port}.\n\n` +
           `  Ports below 1024 require elevated privileges.\n` +
-          `  Use a port above 1024: gitnexus eval-server --port 4848\n`,
+          `  Use a port above 1024: yummygraph eval-server --port 4848\n`,
         { code: err.code, port, host },
       );
     } else {
-      cliError(`\nGitNexus eval-server failed to start:\n  ${err.message}\n`, {
+      cliError(`\nYummyGraph eval-server failed to start:\n  ${err.message}\n`, {
         code: err.code,
         port,
         host,
@@ -505,7 +505,7 @@ export async function evalServerCommand(options?: EvalServerOptions): Promise<vo
     // server.address() is guaranteed to return an AddressInfo object here.
     if (typeof addr !== 'object' || addr === null) {
       cliError(
-        `\nGitNexus eval-server: unexpected server.address() value after bind: ${JSON.stringify(addr)}\n`,
+        `\nYummyGraph eval-server: unexpected server.address() value after bind: ${JSON.stringify(addr)}\n`,
       );
       process.exit(1);
     }
@@ -513,7 +513,7 @@ export async function evalServerCommand(options?: EvalServerOptions): Promise<vo
     const boundAddress = addr.address;
     const displayHost = boundAddress.includes(':') ? `[${boundAddress}]` : boundAddress;
     const bannerLines = [
-      `GitNexus eval-server: listening on http://${displayHost}:${boundPort}`,
+      `YummyGraph eval-server: listening on http://${displayHost}:${boundPort}`,
       `  POST /tool/query    — search execution flows`,
       `  POST /tool/context  — 360-degree symbol view`,
       `  POST /tool/impact   — blast radius analysis`,
@@ -539,7 +539,7 @@ export async function evalServerCommand(options?: EvalServerOptions): Promise<vo
     });
     try {
       // Use fd 1 directly — LadybugDB captures process.stdout (#324)
-      writeSync(1, `GITNEXUS_EVAL_SERVER_READY:${displayHost}:${boundPort}\n`);
+      writeSync(1, `YUMMYGRAPH_EVAL_SERVER_READY:${displayHost}:${boundPort}\n`);
     } catch {
       // stdout may not be available (e.g., broken pipe)
     }
@@ -548,7 +548,7 @@ export async function evalServerCommand(options?: EvalServerOptions): Promise<vo
   resetIdleTimer();
 
   const shutdown = async () => {
-    logger.info('GitNexus eval-server: shutting down...');
+    logger.info('YummyGraph eval-server: shutting down...');
     await backend.disconnect();
     server.close();
     process.exit(0);

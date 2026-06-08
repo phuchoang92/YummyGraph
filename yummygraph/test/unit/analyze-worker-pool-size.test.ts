@@ -11,7 +11,7 @@ vi.mock('../../src/core/lbug/lbug-adapter.js', () => ({
 }));
 
 vi.mock('../../src/storage/repo-manager.js', () => ({
-  getStoragePaths: vi.fn(() => ({ storagePath: '.gitnexus', lbugPath: '.gitnexus/lbug' })),
+  getStoragePaths: vi.fn(() => ({ storagePath: '.yummygraph', lbugPath: '.yummygraph/lbug' })),
   getGlobalRegistryPath: vi.fn(() => 'registry.json'),
   RegistryNameCollisionError: class RegistryNameCollisionError extends Error {},
   AnalysisNotFinalizedError: class AnalysisNotFinalizedError extends Error {},
@@ -105,7 +105,7 @@ describe('analyzeCommand --workers validation', () => {
     process.exitCode = undefined; // reset the global so sibling tests aren't affected
   });
 
-  it('does not mutate GITNEXUS_WORKER_POOL_SIZE in process.env', async () => {
+  it('does not mutate YUMMYGRAPH_WORKER_POOL_SIZE in process.env', async () => {
     const { analyzeCommand } = await import('../../src/cli/analyze.js');
     runFullAnalysisMock.mockResolvedValue({
       repoName: 'repo',
@@ -114,9 +114,9 @@ describe('analyzeCommand --workers validation', () => {
       alreadyUpToDate: true,
     });
 
-    const before = process.env.GITNEXUS_WORKER_POOL_SIZE;
+    const before = process.env.YUMMYGRAPH_WORKER_POOL_SIZE;
     await analyzeCommand(undefined, { workers: '7' });
-    expect(process.env.GITNEXUS_WORKER_POOL_SIZE).toBe(before);
+    expect(process.env.YUMMYGRAPH_WORKER_POOL_SIZE).toBe(before);
   });
 
   it('restores snapshotted env vars after returning (no cross-invocation leak)', async () => {
@@ -128,10 +128,10 @@ describe('analyzeCommand --workers validation', () => {
       alreadyUpToDate: true,
     });
 
-    const originalVerbose = process.env.GITNEXUS_VERBOSE;
-    const originalMaxFileSize = process.env.GITNEXUS_MAX_FILE_SIZE;
+    const originalVerbose = process.env.YUMMYGRAPH_VERBOSE;
+    const originalMaxFileSize = process.env.YUMMYGRAPH_MAX_FILE_SIZE;
     await analyzeCommand(undefined, { verbose: true, maxFileSize: '1024' });
-    expect(process.env.GITNEXUS_VERBOSE).toBe(originalVerbose);
-    expect(process.env.GITNEXUS_MAX_FILE_SIZE).toBe(originalMaxFileSize);
+    expect(process.env.YUMMYGRAPH_VERBOSE).toBe(originalVerbose);
+    expect(process.env.YUMMYGRAPH_MAX_FILE_SIZE).toBe(originalMaxFileSize);
   });
 });

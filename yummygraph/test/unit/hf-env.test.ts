@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import os from 'node:os';
 import { join } from 'node:path';
-import { CircuitBreaker } from 'gitnexus-shared';
+import { CircuitBreaker } from 'yummygraph-shared';
 import {
   applyHfEnvOverrides,
   isNetworkFetchError,
@@ -155,7 +155,7 @@ describe('isHfDownloadFailure', () => {
 });
 
 // CircuitBreaker state-machine tests live in
-// `gitnexus/test/unit/integrations/circuit-breaker.test.ts` — that suite
+// `yummygraph/test/unit/integrations/circuit-breaker.test.ts` — that suite
 // already covers the closed/open/half-open transitions, recordSuccess/
 // recordFailure semantics, half-open probe gating, and configurable
 // thresholds. No need to duplicate here; this file's remaining tests

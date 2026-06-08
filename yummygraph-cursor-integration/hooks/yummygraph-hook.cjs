@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
- * GitNexus Cursor postToolUse Hook
+ * YummyGraph Cursor postToolUse Hook
  *
  * Receives a JSON event on stdin describing a finished tool call, derives a
  * search pattern (Grep query, Read file basename, or rg/grep arg from a Shell
- * command), runs `gitnexus augment <pattern>`, and emits the enriched context
+ * command), runs `yummygraph augment <pattern>`, and emits the enriched context
  * back as `{ additional_context: "..." }` so the agent sees it alongside the
  * tool result.
  *
@@ -37,10 +37,10 @@ function isGlobalRegistryDir(candidate) {
   );
 }
 
-function walkForGitNexusDir(startDir) {
+function walkForYummyGraphDir(startDir) {
   let dir = startDir;
   for (let i = 0; i < 5; i++) {
-    const candidate = path.join(dir, '.gitnexus');
+    const candidate = path.join(dir, '.yummygraph');
     if (fs.existsSync(candidate)) {
       if (!isGlobalRegistryDir(candidate)) return candidate;
     }
@@ -69,13 +69,13 @@ function findCanonicalRepoRoot(cwd) {
   }
 }
 
-function findGitNexusDir(startDir) {
+function findYummyGraphDir(startDir) {
   const cwd = startDir || process.cwd();
-  const fromCwd = walkForGitNexusDir(cwd);
+  const fromCwd = walkForYummyGraphDir(cwd);
   if (fromCwd) return fromCwd;
   const canonicalRoot = findCanonicalRepoRoot(cwd);
   if (canonicalRoot && canonicalRoot !== cwd) {
-    return walkForGitNexusDir(canonicalRoot);
+    return walkForYummyGraphDir(canonicalRoot);
   }
   return null;
 }
@@ -124,7 +124,7 @@ function parseRgGrepPattern(cmd) {
  * formally specify the per-tool tool_input field names, so we probe a
  * generous set of MCP-style aliases. As a last-resort fallback for Grep
  * (the highest-frequency search path) we also accept the longest plausible
- * string value in tool_input. Set GITNEXUS_DEBUG=1 to log the raw payload
+ * string value in tool_input. Set YUMMYGRAPH_DEBUG=1 to log the raw payload
  * to stderr if Cursor changes the contract and aliases stop matching.
  */
 function pickLongestStringValue(obj) {
@@ -188,13 +188,13 @@ function extractPattern(toolName, toolInput) {
 
 function resolveCliPath() {
   try {
-    return require.resolve('gitnexus/dist/cli/index.js');
+    return require.resolve('yummygraph/dist/cli/index.js');
   } catch {
     return '';
   }
 }
 
-function runGitNexusCli(cliPath, args, cwd, timeout) {
+function runYummyGraphCli(cliPath, args, cwd, timeout) {
   const isWin = process.platform === 'win32';
   if (cliPath) {
     return spawnSync(process.execPath, [cliPath, ...args], {
@@ -205,7 +205,7 @@ function runGitNexusCli(cliPath, args, cwd, timeout) {
       windowsHide: true,
     });
   }
-  return spawnSync(isWin ? 'npx.cmd' : 'npx', ['-y', 'gitnexus', ...args], {
+  return spawnSync(isWin ? 'npx.cmd' : 'npx', ['-y', 'yummygraph', ...args], {
     encoding: 'utf-8',
     timeout: timeout + 5000,
     cwd,
@@ -217,13 +217,13 @@ function runGitNexusCli(cliPath, args, cwd, timeout) {
 function main() {
   try {
     const input = readInput();
-    if (process.env.GITNEXUS_DEBUG) {
+    if (process.env.YUMMYGRAPH_DEBUG) {
       // Echo the payload so users can capture Cursor's actual contract when
       // diagnosing why augmentation isn't firing. Stderr only — stdout is
       // reserved for the JSON response Cursor consumes.
       try {
         process.stderr.write(
-          `GitNexus Cursor hook stdin: ${JSON.stringify(input).slice(0, 500)}\n`,
+          `YummyGraph Cursor hook stdin: ${JSON.stringify(input).slice(0, 500)}\n`,
         );
       } catch {
         /* never let debug logging break the hook */
@@ -231,8 +231,8 @@ function main() {
     }
     const cwd = input.cwd || process.cwd();
     if (!path.isAbsolute(cwd)) return;
-    const gitNexusDir = findGitNexusDir(cwd);
-    if (!gitNexusDir) return;
+    const yummyGraphDir = findYummyGraphDir(cwd);
+    if (!yummyGraphDir) return;
 
     const toolName = input.tool_name || '';
     const toolInput = input.tool_input || {};
@@ -240,13 +240,13 @@ function main() {
     const pattern = extractPattern(toolName, toolInput);
     if (!pattern || pattern.length < 3) return;
 
-    const release = acquireHookSlot(gitNexusDir);
+    const release = acquireHookSlot(yummyGraphDir);
     if (!release) return;
 
     const cliPath = resolveCliPath();
     let result = '';
     try {
-      const child = runGitNexusCli(cliPath, ['augment', '--', pattern], cwd, 7000);
+      const child = runYummyGraphCli(cliPath, ['augment', '--', pattern], cwd, 7000);
       if (!child.error && child.status === 0) {
         result = child.stderr || '';
       }
@@ -260,8 +260,8 @@ function main() {
       console.log(JSON.stringify({ additional_context: result.trim() }));
     }
   } catch (err) {
-    if (process.env.GITNEXUS_DEBUG) {
-      console.error('GitNexus Cursor hook error:', (err.message || '').slice(0, 200));
+    if (process.env.YUMMYGRAPH_DEBUG) {
+      console.error('YummyGraph Cursor hook error:', (err.message || '').slice(0, 200));
     }
   }
 }

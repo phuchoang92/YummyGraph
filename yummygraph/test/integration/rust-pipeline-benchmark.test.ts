@@ -6,7 +6,7 @@
  * scope extraction, impl/trait resolution, use decomposition, and
  * call resolution.
  *
- * Run: GITNEXUS_BENCH=1 npx vitest run test/integration/rust-pipeline-benchmark.test.ts
+ * Run: YUMMYGRAPH_BENCH=1 npx vitest run test/integration/rust-pipeline-benchmark.test.ts
  */
 import { describe, it, expect } from 'vitest';
 import fs from 'node:fs';
@@ -14,7 +14,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { runPipelineFromRepo } from '../../src/core/ingestion/pipeline.js';
 
-const BENCH_ENABLED = process.env.GITNEXUS_BENCH === '1';
+const BENCH_ENABLED = process.env.YUMMYGRAPH_BENCH === '1';
 
 interface BenchResult {
   fileCount: number;

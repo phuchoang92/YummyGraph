@@ -46,8 +46,8 @@
  *   4. **`@_exported import` re-exports** are treated as plain imports.
  */
 
-import type { ParsedFile } from 'gitnexus-shared';
-import { SupportedLanguages } from 'gitnexus-shared';
+import type { ParsedFile } from 'yummygraph-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 import { loadSwiftPackageConfig } from '../../language-config.js';
 import { buildMro, defaultLinearize } from '../../scope-resolution/passes/mro.js';
 import { populateClassOwnedMembers, isClassLike } from '../../scope-resolution/scope/walkers.js';

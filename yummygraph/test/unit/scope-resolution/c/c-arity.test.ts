@@ -10,7 +10,7 @@ import {
 } from '../../../../src/core/ingestion/languages/c/arity-metadata.js';
 import { cArityCompatibility } from '../../../../src/core/ingestion/languages/c/arity.js';
 import type { SyntaxNode } from '../../../../src/core/ingestion/utils/ast-helpers.js';
-import type { Callsite, SymbolDefinition } from 'gitnexus-shared';
+import type { Callsite, SymbolDefinition } from 'yummygraph-shared';
 
 function parseFunctionNode(src: string): SyntaxNode | null {
   const tree = getCParser().parse(src);

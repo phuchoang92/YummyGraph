@@ -27,7 +27,7 @@ import path from 'path';
 import fs from 'fs';
 import crypto from 'crypto';
 import { emitPhpScopeCaptures } from '../../../../src/core/ingestion/languages/php/index.js';
-import type { CaptureMatch } from 'gitnexus-shared';
+import type { CaptureMatch } from 'yummygraph-shared';
 
 // This test lives at test/unit/scope-resolution/php/, so fixtures are THREE
 // levels up (unlike pipeline-graph-golden.test.ts at test/integration/).

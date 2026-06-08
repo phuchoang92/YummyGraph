@@ -14,8 +14,8 @@
  * `linkStatus: 'unresolved'`.
  */
 
-import type { ParsedImport, WorkspaceIndex } from 'gitnexus-shared';
-import { SupportedLanguages } from 'gitnexus-shared';
+import type { ParsedImport, WorkspaceIndex } from 'yummygraph-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 import { resolveImportPath } from '../../import-resolvers/standard.js';
 import type { SuffixIndex } from '../../import-resolvers/utils.js';
 import type { TsconfigPaths } from '../../language-config.js';

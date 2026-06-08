@@ -1,4 +1,4 @@
-import type { Capture, CaptureMatch, ParameterTypeClass } from 'gitnexus-shared';
+import type { Capture, CaptureMatch, ParameterTypeClass } from 'yummygraph-shared';
 import {
   nodeIfType,
   nodeToCapture,

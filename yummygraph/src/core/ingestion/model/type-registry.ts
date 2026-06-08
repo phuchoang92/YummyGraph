@@ -6,7 +6,7 @@
  * Also includes a separate index for Rust Impl blocks.
  */
 
-import type { SymbolDefinition } from 'gitnexus-shared';
+import type { SymbolDefinition } from 'yummygraph-shared';
 
 const EMPTY: readonly SymbolDefinition[] = Object.freeze([]);
 

@@ -1,6 +1,6 @@
-// gitnexus/src/core/ingestion/call-extractors/configs/c-cpp.ts
+// yummygraph/src/core/ingestion/call-extractors/configs/c-cpp.ts
 
-import { SupportedLanguages } from 'gitnexus-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 import type { CallExtractionConfig } from '../../call-types.js';
 import type { SyntaxNode } from '../../utils/ast-helpers.js';
 

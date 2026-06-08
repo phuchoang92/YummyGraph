@@ -22,7 +22,7 @@ import {
 } from '../services/backend-client';
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { GraphNode } from 'gitnexus-shared';
+import { GraphNode } from 'yummygraph-shared';
 import { EmbeddingStatus } from './EmbeddingStatus';
 import { RepoAnalyzer } from './RepoAnalyzer';
 import { LanguageSwitcher } from './LanguageSwitcher';
@@ -168,7 +168,7 @@ export const Header = ({
           <div className="flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-accent to-node-interface text-sm font-bold text-white shadow-glow">
             ◇
           </div>
-          <span className="text-[15px] font-semibold tracking-tight">GitNexus</span>
+          <span className="text-[15px] font-semibold tracking-tight">YummyGraph</span>
         </div>
 
         {/* Project badge + repo dropdown */}
@@ -442,7 +442,7 @@ export const Header = ({
       <div className="flex items-center gap-2">
         {/* GitHub Star Button */}
         <a
-          href="https://github.com/abhigyanpatwari/GitNexus"
+          href="https://github.com/abhigyanpatwari/YummyGraph"
           target="_blank"
           rel="noopener noreferrer"
           className="group flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 px-3.5 py-2 text-sm font-medium text-white shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:from-purple-500 hover:to-pink-500 hover:shadow-xl"

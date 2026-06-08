@@ -39,7 +39,7 @@
  * Build cost is O(totalScopes). Read-only after construction.
  */
 
-import type { ParsedFile, Scope, ScopeId, ScopeTree, SymbolDefinition } from 'gitnexus-shared';
+import type { ParsedFile, Scope, ScopeId, ScopeTree, SymbolDefinition } from 'yummygraph-shared';
 import { isClassLike } from './scope/walkers.js';
 
 export interface WorkspaceResolutionIndex {

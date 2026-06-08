@@ -105,9 +105,9 @@ const MAX_CONNS_PER_REPO = 8;
 
 let idleTimer: ReturnType<typeof setInterval> | null = null;
 
-// Stdout-capture state lives in `gitnexus/src/mcp/stdio-capture.ts` — a leaf
+// Stdout-capture state lives in `yummygraph/src/mcp/stdio-capture.ts` — a leaf
 // module with zero non-`node:` imports. We re-export the same symbols here
-// so the existing test mock seam (`gitnexus/src/mcp/core/lbug-adapter.ts`
+// so the existing test mock seam (`yummygraph/src/mcp/core/lbug-adapter.ts`
 // re-exports * from this file, and 8+ test files use that path with
 // `vi.mock(...)`) continues to work without churn. The source of truth is
 // the leaf module; this re-export is a compatibility shim.
@@ -460,12 +460,12 @@ async function tryQuarantineAndReopen(dbPath: string, repoId: string): Promise<l
   } catch {
     throw new Error(
       `LadybugDB WAL corruption detected for ${repoId}. ` +
-        `Run \`gitnexus analyze\` to rebuild the index. (quarantine failed)`,
+        `Run \`yummygraph analyze\` to rebuild the index. (quarantine failed)`,
     );
   }
   realStderrWrite(
-    `GitNexus: LadybugDB WAL quarantined for ${repoId}; graph may be stale. ` +
-      `Run \`gitnexus analyze\` to rebuild the index.\n`,
+    `YummyGraph: LadybugDB WAL quarantined for ${repoId}; graph may be stale. ` +
+      `Run \`yummygraph analyze\` to rebuild the index.\n`,
   );
   return await openReadOnlyDatabase(dbPath);
 }
@@ -475,7 +475,7 @@ const initPromises = new Map<string, Promise<void>>();
 
 /**
  * Initialize (or reuse) a Database + connection pool for a specific repo.
- * Retries on lock errors (e.g., when `gitnexus analyze` is running).
+ * Retries on lock errors (e.g., when `yummygraph analyze` is running).
  *
  * Concurrent calls for the same repoId are deduplicated — the second caller
  * awaits the first's in-progress init rather than starting a redundant one.
@@ -512,7 +512,7 @@ async function doInitLbug(repoId: string, dbPath: string): Promise<void> {
   try {
     await fs.stat(dbPath);
   } catch {
-    throw new Error(`LadybugDB not found at ${dbPath}. Run: gitnexus analyze`);
+    throw new Error(`LadybugDB not found at ${dbPath}. Run: yummygraph analyze`);
   }
 
   evictLRU();
@@ -523,7 +523,7 @@ async function doInitLbug(repoId: string, dbPath: string): Promise<void> {
   if (!shared) {
     // Open in read-only mode — MCP server never writes to the database.
     // This allows multiple MCP server instances to read concurrently, and
-    // avoids lock conflicts when `gitnexus analyze` is writing.
+    // avoids lock conflicts when `yummygraph analyze` is writing.
     let lastError: Error | null = null;
     for (let attempt = 1; attempt <= LOCK_RETRY_ATTEMPTS; attempt++) {
       try {
@@ -550,7 +550,7 @@ async function doInitLbug(repoId: string, dbPath: string): Promise<void> {
 
         if (
           lastError.message.startsWith('LadybugDB checkpoint sidecar is missing') ||
-          lastError.message.startsWith('GitNexus could not move the LadybugDB WAL sidecar') ||
+          lastError.message.startsWith('YummyGraph could not move the LadybugDB WAL sidecar') ||
           isMissingShadowSidecarError(lastError)
         ) {
           throw lastError;

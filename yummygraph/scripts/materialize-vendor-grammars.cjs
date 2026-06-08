@@ -2,11 +2,11 @@
 /**
  * Copy vendored tree-sitter grammars into node_modules/ using real files (fs.cpSync).
  *
- * Published gitnexus used to declare these as optionalDependencies with
+ * Published yummygraph used to declare these as optionalDependencies with
  * `file:./vendor/...`, which makes npm symlink/junction vendor → node_modules on
  * install. Windows without Developer Mode often fails with EPERM (#1728).
  *
- * Vendor trees stay read-only in gitnexus/vendor/; build artifacts must only
+ * Vendor trees stay read-only in yummygraph/vendor/; build artifacts must only
  * land under node_modules/ (see #836).
  */
 const fs = require('fs');
@@ -15,9 +15,9 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const VENDORED_GRAMMARS = ['tree-sitter-dart', 'tree-sitter-proto', 'tree-sitter-swift'];
 
-if (process.env.GITNEXUS_SKIP_OPTIONAL_GRAMMARS === '1') {
+if (process.env.YUMMYGRAPH_SKIP_OPTIONAL_GRAMMARS === '1') {
   console.warn(
-    '[gitnexus] Skipping vendored grammar materialize (GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1). Dart/Proto/Swift parsing will be unavailable.',
+    '[yummygraph] Skipping vendored grammar materialize (YUMMYGRAPH_SKIP_OPTIONAL_GRAMMARS=1). Dart/Proto/Swift parsing will be unavailable.',
   );
   process.exit(0);
 }
@@ -27,7 +27,7 @@ for (const name of VENDORED_GRAMMARS) {
   const dest = path.join(ROOT, 'node_modules', name);
 
   if (!fs.existsSync(src)) {
-    console.warn(`[gitnexus] vendor/${name} missing; skipping materialize.`);
+    console.warn(`[yummygraph] vendor/${name} missing; skipping materialize.`);
     continue;
   }
 
@@ -62,11 +62,11 @@ for (const name of VENDORED_GRAMMARS) {
     fs.rmSync(backup, { recursive: true, force: true });
   } catch (err) {
     // Fail-soft: a single locked/inaccessible file (common on Windows) must not
-    // abort the whole gitnexus install. Matches build-tree-sitter-*.cjs pattern.
+    // abort the whole yummygraph install. Matches build-tree-sitter-*.cjs pattern.
     fs.rmSync(partial, { recursive: true, force: true });
-    console.warn(`[gitnexus] Could not materialize vendor/${name}: ${err.message}`);
+    console.warn(`[yummygraph] Could not materialize vendor/${name}: ${err.message}`);
     console.warn(
-      `[gitnexus] ${name} parsing will be unavailable. Other functionality is unaffected.`,
+      `[yummygraph] ${name} parsing will be unavailable. Other functionality is unaffected.`,
     );
   }
 }

@@ -17,7 +17,7 @@ import type {
   SymbolDefinition,
   TypeRef,
   WorkspaceIndex,
-} from 'gitnexus-shared';
+} from 'yummygraph-shared';
 import {
   pythonArityCompatibility,
   pythonImportOwningScope,

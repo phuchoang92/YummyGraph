@@ -1,23 +1,23 @@
 ---
-name: gitnexus-cli
-description: "Use when the user needs to run GitNexus CLI commands like analyze/index a repo, check status, clean the index, generate a wiki, or list indexed repos. Examples: \"Index this repo\", \"Reanalyze the codebase\", \"Generate a wiki\""
+name: yummygraph-cli
+description: "Use when the user needs to run YummyGraph CLI commands like analyze/index a repo, check status, clean the index, generate a wiki, or list indexed repos. Examples: \"Index this repo\", \"Reanalyze the codebase\", \"Generate a wiki\""
 ---
 
-# GitNexus CLI Commands
+# YummyGraph CLI Commands
 
-Commands below use `node .gitnexus/run.cjs <command>` — the project-local runner `gitnexus analyze` drops next to the index. It auto-selects an available runner at call time (global `gitnexus`, else `pnpm dlx`, else `npx`), so no package-manager assumption and no global install is required.
+Commands below use `node .yummygraph/run.cjs <command>` — the project-local runner `yummygraph analyze` drops next to the index. It auto-selects an available runner at call time (global `yummygraph`, else `pnpm dlx`, else `npx`), so no package-manager assumption and no global install is required.
 
-> **Not analyzed yet, or `node .gitnexus/run.cjs` reports `Cannot find module`** (the gitignored runner is absent — e.g. a fresh clone or `git clean`)? (Re)generate it with `npx gitnexus analyze` from the project root. On **npm 11.x**, if `npx` crashes during install (`node.target is null`), install once with `npm i -g gitnexus` (then `gitnexus analyze`) or use `pnpm --allow-build=@ladybugdb/core --allow-build=gitnexus --allow-build=tree-sitter dlx gitnexus@latest analyze`. See [#1939](https://github.com/abhigyanpatwari/GitNexus/issues/1939).
+> **Not analyzed yet, or `node .yummygraph/run.cjs` reports `Cannot find module`** (the gitignored runner is absent — e.g. a fresh clone or `git clean`)? (Re)generate it with `npx yummygraph analyze` from the project root. On **npm 11.x**, if `npx` crashes during install (`node.target is null`), install once with `npm i -g yummygraph` (then `yummygraph analyze`) or use `pnpm --allow-build=@ladybugdb/core --allow-build=yummygraph --allow-build=tree-sitter dlx yummygraph@latest analyze`. See [#1939](https://github.com/abhigyanpatwari/YummyGraph/issues/1939).
 
 ## Commands
 
 ### analyze — Build or refresh the index
 
 ```bash
-node .gitnexus/run.cjs analyze
+node .yummygraph/run.cjs analyze
 ```
 
-Run from the project root. This parses all source files, builds the knowledge graph, writes it to `.gitnexus/`, and generates CLAUDE.md / AGENTS.md context files.
+Run from the project root. This parses all source files, builds the knowledge graph, writes it to `.yummygraph/`, and generates CLAUDE.md / AGENTS.md context files.
 
 | Flag           | Effect                                                           |
 | -------------- | ---------------------------------------------------------------- |
@@ -25,23 +25,23 @@ Run from the project root. This parses all source files, builds the knowledge gr
 | `--embeddings` | Enable embedding generation for semantic search (off by default) |
 | `--drop-embeddings` | Drop existing embeddings on rebuild. By default, an `analyze` without `--embeddings` preserves them. |
 
-**When to run:** First time in a project, after major code changes, or when `gitnexus://repo/{name}/context` reports the index is stale. In Claude Code, a PostToolUse hook detects staleness after `git commit` and `git merge` and notifies the agent to run `analyze` — the hook does not run analyze itself, to avoid blocking the agent for up to 120s and risking KuzuDB corruption on timeout.
+**When to run:** First time in a project, after major code changes, or when `yummygraph://repo/{name}/context` reports the index is stale. In Claude Code, a PostToolUse hook detects staleness after `git commit` and `git merge` and notifies the agent to run `analyze` — the hook does not run analyze itself, to avoid blocking the agent for up to 120s and risking KuzuDB corruption on timeout.
 
 ### status — Check index freshness
 
 ```bash
-node .gitnexus/run.cjs status
+node .yummygraph/run.cjs status
 ```
 
-Shows whether the current repo has a GitNexus index, when it was last updated, and symbol/relationship counts. Use this to check if re-indexing is needed.
+Shows whether the current repo has a YummyGraph index, when it was last updated, and symbol/relationship counts. Use this to check if re-indexing is needed.
 
 ### clean — Delete the index
 
 ```bash
-node .gitnexus/run.cjs clean
+node .yummygraph/run.cjs clean
 ```
 
-Deletes the `.gitnexus/` directory and unregisters the repo from the global registry. Use before re-indexing if the index is corrupt or after removing GitNexus from a project.
+Deletes the `.yummygraph/` directory and unregisters the repo from the global registry. Use before re-indexing if the index is corrupt or after removing YummyGraph from a project.
 
 | Flag      | Effect                                            |
 | --------- | ------------------------------------------------- |
@@ -51,10 +51,10 @@ Deletes the `.gitnexus/` directory and unregisters the repo from the global regi
 ### wiki — Generate documentation from the graph
 
 ```bash
-node .gitnexus/run.cjs wiki
+node .yummygraph/run.cjs wiki
 ```
 
-Generates repository documentation from the knowledge graph using an LLM. Requires an API key (saved to `~/.gitnexus/config.json` on first use).
+Generates repository documentation from the knowledge graph using an LLM. Requires an API key (saved to `~/.yummygraph/config.json` on first use).
 
 | Flag                | Effect                                    |
 | ------------------- | ----------------------------------------- |
@@ -68,15 +68,15 @@ Generates repository documentation from the knowledge graph using an LLM. Requir
 ### list — Show all indexed repos
 
 ```bash
-node .gitnexus/run.cjs list
+node .yummygraph/run.cjs list
 ```
 
-Lists all repositories registered in `~/.gitnexus/registry.json`. The MCP `list_repos` tool provides the same information.
+Lists all repositories registered in `~/.yummygraph/registry.json`. The MCP `list_repos` tool provides the same information.
 
 ## After Indexing
 
-1. **Read `gitnexus://repo/{name}/context`** to verify the index loaded
-2. Use the other GitNexus skills (`exploring`, `debugging`, `impact-analysis`, `refactoring`) for your task
+1. **Read `yummygraph://repo/{name}/context`** to verify the index loaded
+2. Use the other YummyGraph skills (`exploring`, `debugging`, `impact-analysis`, `refactoring`) for your task
 
 ## Troubleshooting
 

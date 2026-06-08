@@ -6,7 +6,7 @@
  * Go scope capture (emitGoScopeCaptures), package/import resolution, and
  * call resolution.
  *
- * Run: GITNEXUS_BENCH=1 npx vitest run test/integration/go-pipeline-benchmark.test.ts
+ * Run: YUMMYGRAPH_BENCH=1 npx vitest run test/integration/go-pipeline-benchmark.test.ts
  *
  * The first suite ("scales with file count") generates many small files —
  * each a struct plus getter/setter/compute methods, the DAO-style shape that
@@ -22,8 +22,8 @@
  * emitGoScopeCaptures and the file is quarantined; the fix emits progress so
  * the file survives. Requires a build first:
  *
- *   (cd gitnexus && npm run build)
- *   GITNEXUS_BENCH=1 npx vitest run test/integration/go-pipeline-benchmark.test.ts
+ *   (cd yummygraph && npm run build)
+ *   YUMMYGRAPH_BENCH=1 npx vitest run test/integration/go-pipeline-benchmark.test.ts
  *
  * The worker suite auto-skips if the compiled worker is absent.
  */
@@ -32,14 +32,14 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { ParsedFile, SymbolDefinition } from 'gitnexus-shared';
+import type { ParsedFile, SymbolDefinition } from 'yummygraph-shared';
 import { runPipelineFromRepo } from '../../src/core/ingestion/pipeline.js';
 import {
   emitGoScopeCaptures,
   detectGoInterfaceImplementations,
 } from '../../src/core/ingestion/languages/go/index.js';
 
-const BENCH_ENABLED = process.env.GITNEXUS_BENCH === '1';
+const BENCH_ENABLED = process.env.YUMMYGRAPH_BENCH === '1';
 
 const MODULE_PATH = 'example.com/go-bench';
 
@@ -260,7 +260,7 @@ function generateGoQuarantineFixture(
   const lines = [
     'package generated',
     '',
-    '// Code generated for GitNexus issue #1848 repro. DO NOT EDIT.',
+    '// Code generated for YummyGraph issue #1848 repro. DO NOT EDIT.',
     '',
   ];
   for (let i = 0; i < entityCount; i++) {
@@ -334,17 +334,17 @@ describe.skipIf(!BENCH_ENABLED || !DIST_WORKER_AVAILABLE)(
     if (BENCH_ENABLED && !DIST_WORKER_AVAILABLE) {
       // Surfaced once when the bench is requested but the worker is unbuilt.
       console.warn(
-        `\n[go-bench] Skipping worker-pool suite: compiled worker not found at\n  ${fileURLToPath(DIST_WORKER_URL)}\n  Build first: (cd gitnexus && npm run build)\n`,
+        `\n[go-bench] Skipping worker-pool suite: compiled worker not found at\n  ${fileURLToPath(DIST_WORKER_URL)}\n  Build first: (cd yummygraph && npm run build)\n`,
       );
     }
 
     // Tunables mirror run-analyze-repro.sh. 800 entities ≈ 406 KiB — under the
-    // 512 KiB GITNEXUS_MAX_FILE_SIZE ceiling so the file is parsed, not skipped.
+    // 512 KiB YUMMYGRAPH_MAX_FILE_SIZE ceiling so the file is parsed, not skipped.
     const entityCount = Number(process.env.REPRO_GO_ENTITIES ?? 800);
     // 30 s reproduces on the report author's machine; raising it (e.g. 120000)
     // is the documented workaround. Kept overridable so the same test can both
     // reproduce the bug and confirm the fix.
-    const subBatchTimeoutMs = Number(process.env.GITNEXUS_WORKER_SUB_BATCH_TIMEOUT_MS ?? 30_000);
+    const subBatchTimeoutMs = Number(process.env.YUMMYGRAPH_WORKER_SUB_BATCH_TIMEOUT_MS ?? 30_000);
 
     it('does not quarantine the large generated Go file on sub-batch idle timeout', async () => {
       const { dir, bigFileBytes, fileCount } = generateGoQuarantineFixture(entityCount, 14);
@@ -353,8 +353,8 @@ describe.skipIf(!BENCH_ENABLED || !DIST_WORKER_AVAILABLE)(
       // there is no PipelineOptions field for these two). Capture the prior
       // values before the try; set them as the first statements INSIDE it so
       // the finally's restore covers every path that mutated the process env.
-      const prevMaxBytes = process.env.GITNEXUS_WORKER_SUB_BATCH_MAX_BYTES;
-      const prevTimeout = process.env.GITNEXUS_WORKER_SUB_BATCH_TIMEOUT_MS;
+      const prevMaxBytes = process.env.YUMMYGRAPH_WORKER_SUB_BATCH_MAX_BYTES;
+      const prevTimeout = process.env.YUMMYGRAPH_WORKER_SUB_BATCH_TIMEOUT_MS;
 
       let peakHeapMB = 0;
       const heapSampler = setInterval(() => {
@@ -363,8 +363,8 @@ describe.skipIf(!BENCH_ENABLED || !DIST_WORKER_AVAILABLE)(
       }, 50);
 
       try {
-        process.env.GITNEXUS_WORKER_SUB_BATCH_MAX_BYTES = '262144';
-        process.env.GITNEXUS_WORKER_SUB_BATCH_TIMEOUT_MS = String(subBatchTimeoutMs);
+        process.env.YUMMYGRAPH_WORKER_SUB_BATCH_MAX_BYTES = '262144';
+        process.env.YUMMYGRAPH_WORKER_SUB_BATCH_TIMEOUT_MS = String(subBatchTimeoutMs);
         const start = Date.now();
         const result = await runPipelineFromRepo(dir, () => {}, {
           skipGraphPhases: true,
@@ -399,10 +399,10 @@ describe.skipIf(!BENCH_ENABLED || !DIST_WORKER_AVAILABLE)(
         expect(result.graph.nodeCount).toBeGreaterThanOrEqual(survivalFloor);
       } finally {
         clearInterval(heapSampler);
-        if (prevMaxBytes === undefined) delete process.env.GITNEXUS_WORKER_SUB_BATCH_MAX_BYTES;
-        else process.env.GITNEXUS_WORKER_SUB_BATCH_MAX_BYTES = prevMaxBytes;
-        if (prevTimeout === undefined) delete process.env.GITNEXUS_WORKER_SUB_BATCH_TIMEOUT_MS;
-        else process.env.GITNEXUS_WORKER_SUB_BATCH_TIMEOUT_MS = prevTimeout;
+        if (prevMaxBytes === undefined) delete process.env.YUMMYGRAPH_WORKER_SUB_BATCH_MAX_BYTES;
+        else process.env.YUMMYGRAPH_WORKER_SUB_BATCH_MAX_BYTES = prevMaxBytes;
+        if (prevTimeout === undefined) delete process.env.YUMMYGRAPH_WORKER_SUB_BATCH_TIMEOUT_MS;
+        else process.env.YUMMYGRAPH_WORKER_SUB_BATCH_TIMEOUT_MS = prevTimeout;
         fs.rmSync(dir, { recursive: true, force: true });
       }
     }, 360_000);
@@ -410,7 +410,7 @@ describe.skipIf(!BENCH_ENABLED || !DIST_WORKER_AVAILABLE)(
 );
 
 /**
- * Unlike the two suites above, this one is NOT gated behind GITNEXUS_BENCH and
+ * Unlike the two suites above, this one is NOT gated behind YUMMYGRAPH_BENCH and
  * needs no compiled worker — so it runs in normal CI and is the actual guard
  * against an O(n^2) re-regression of emitGoScopeCaptures (issue #1848). It calls
  * the hotpath directly on a ~400-struct generated source. The O(n) path does
@@ -640,7 +640,7 @@ describe('Go structural interface detection O(n²) regression tripwire', () => {
  * Gated scaling benchmark: measures how detectGoInterfaceImplementations
  * scales as interface and struct counts grow proportionally.
  *
- * Run: GITNEXUS_BENCH=1 npx vitest run test/integration/go-pipeline-benchmark.test.ts
+ * Run: YUMMYGRAPH_BENCH=1 npx vitest run test/integration/go-pipeline-benchmark.test.ts
  */
 describe.skipIf(!BENCH_ENABLED)('Go structural interface detection benchmark', () => {
   const scales = [50, 200, 800];
@@ -724,7 +724,7 @@ describe.skipIf(!BENCH_ENABLED)('Go structural interface detection benchmark', (
  * Gated split-phase benchmark: measures index-building and detection-loop
  * time separately to identify which phase is the bottleneck.
  *
- * Run: GITNEXUS_BENCH=1 npx vitest run test/integration/go-pipeline-benchmark.test.ts -t "split-phase"
+ * Run: YUMMYGRAPH_BENCH=1 npx vitest run test/integration/go-pipeline-benchmark.test.ts -t "split-phase"
  */
 describe.skipIf(!BENCH_ENABLED)('Go structural interface detection split-phase benchmark', () => {
   const scales = [50, 100, 200, 400];

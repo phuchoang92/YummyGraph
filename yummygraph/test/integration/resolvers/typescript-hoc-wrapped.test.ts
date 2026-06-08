@@ -135,8 +135,8 @@ describe('TypeScript HOC-wrapped variable declarations', () => {
 
   // ─────────────────────────────────────────────────────────────────
   // Function-node assertions: each HOC-wrapped const must register as
-  // a Function (not just a Variable). Without this, gitnexus_context /
-  // gitnexus_impact see no symbol to walk from.
+  // a Function (not just a Variable). Without this, yummygraph_context /
+  // yummygraph_impact see no symbol to walk from.
   // ─────────────────────────────────────────────────────────────────
 
   it('each HOC-wrapped const registers as a Function node', () => {

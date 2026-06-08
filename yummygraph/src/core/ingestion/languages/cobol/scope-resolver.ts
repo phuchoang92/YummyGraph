@@ -10,8 +10,8 @@
  */
 
 import path from 'node:path';
-import type { ParsedFile } from 'gitnexus-shared';
-import { SupportedLanguages } from 'gitnexus-shared';
+import type { ParsedFile } from 'yummygraph-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 import { populateClassOwnedMembers } from '../../scope-resolution/scope/walkers.js';
 import type { ScopeResolver } from '../../scope-resolution/contract/scope-resolver.js';
 import { cobolProvider } from '../cobol.js';

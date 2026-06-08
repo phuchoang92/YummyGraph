@@ -13,8 +13,8 @@
 // pair-function defs landed in the same `(set) => ({...})` callback's
 // `ownedDefs`. `resolveCallerGraphId.ownedDefs.find(d => d.type === 'Function')`
 // then returned `addItem` for every walk-up — every call inside
-// `removeItem` and `fetchData` mis-attributed to `addItem`. `gitnexus_context("removeItem")`
-// returned zero outgoing edges; `gitnexus_impact("doB", direction:"upstream")`
+// `removeItem` and `fetchData` mis-attributed to `addItem`. `yummygraph_context("removeItem")`
+// returned zero outgoing edges; `yummygraph_impact("doB", direction:"upstream")`
 // missed `removeItem` entirely.
 //
 // After moving `@declaration.function` to the inner `arrow_function`,

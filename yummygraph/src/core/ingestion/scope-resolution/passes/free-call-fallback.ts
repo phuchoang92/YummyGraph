@@ -23,7 +23,7 @@ import type {
   Reference,
   ScopeId,
   SymbolDefinition,
-} from 'gitnexus-shared';
+} from 'yummygraph-shared';
 import type { KnowledgeGraph } from '../../../graph/types.js';
 import type { ScopeResolutionIndexes } from '../../model/scope-resolution-indexes.js';
 import type { SemanticModel } from '../../model/semantic-model.js';
@@ -789,7 +789,7 @@ export function pickImplicitThisOverload(
     readonly name: string;
     readonly arity?: number;
     readonly argumentTypes?: readonly string[];
-    readonly argumentTypeClasses?: readonly import('gitnexus-shared').ParameterTypeClass[];
+    readonly argumentTypeClasses?: readonly import('yummygraph-shared').ParameterTypeClass[];
   },
   scopes: ScopeResolutionIndexes,
   workspaceIndex: WorkspaceResolutionIndex,

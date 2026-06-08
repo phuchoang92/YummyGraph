@@ -52,7 +52,7 @@ import { promises as fs, mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import v8 from 'node:v8';
 import vm from 'node:vm';
-import type { ParsedFile, SymbolDefinition } from 'gitnexus-shared';
+import type { ParsedFile, SymbolDefinition } from 'yummygraph-shared';
 import { mapReplacer, mapReviver } from './parse-cache.js';
 
 const STORE_DIRNAME = 'parsedfile-store';

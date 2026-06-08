@@ -35,8 +35,8 @@ export {
   type FreeCallableLabel,
   CALL_TARGET_TYPES,
 } from './symbol-table.js';
-// `SymbolDefinition` moved to `gitnexus-shared` (RFC #909 Ring 1 #910).
-// Consumers should import it directly from `gitnexus-shared`, not via this barrel.
+// `SymbolDefinition` moved to `yummygraph-shared` (RFC #909 Ring 1 #910).
+// Consumers should import it directly from `yummygraph-shared`, not via this barrel.
 
 // Type registry (classes, structs, interfaces, enums, records, impls)
 export {

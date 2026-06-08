@@ -1,6 +1,6 @@
-// gitnexus/src/core/ingestion/field-extractors/configs/dart.ts
+// yummygraph/src/core/ingestion/field-extractors/configs/dart.ts
 
-import { SupportedLanguages } from 'gitnexus-shared';
+import { SupportedLanguages } from 'yummygraph-shared';
 import type { FieldExtractionConfig } from '../generic.js';
 import type { FieldVisibility } from '../../field-types.js';
 import type { SyntaxNode } from '../../utils/ast-helpers.js';

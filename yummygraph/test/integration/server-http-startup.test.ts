@@ -1,7 +1,7 @@
 /**
  * HTTP serve startup — proves createServer() boots under Express 5.
  *
- * Spawns the built CLI (`gitnexus serve`) and probes GET /api/health.
+ * Spawns the built CLI (`yummygraph serve`) and probes GET /api/health.
  * Catches regressions like invalid route patterns that throw at registration
  * time before LadybugDB or MCP initialize.
  */
@@ -60,7 +60,7 @@ const probeHealth = (port: number): Promise<{ status: number; body: string }> =>
 // Express 5 registration path on all platforms.
 const describeServeStartup = process.platform === 'win32' ? describe.skip : describe;
 
-describeServeStartup('gitnexus serve HTTP startup (Express 5)', () => {
+describeServeStartup('yummygraph serve HTTP startup (Express 5)', () => {
   let proc: ChildProcessWithoutNullStreams | undefined;
   let homeDir: string | undefined;
 
@@ -92,14 +92,14 @@ describeServeStartup('gitnexus serve HTTP startup (Express 5)', () => {
     }
 
     const port = await allocateFreePort();
-    homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-serve-home-'));
+    homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-serve-home-'));
 
     proc = spawn(
       process.execPath,
       [DIST_CLI, 'serve', '--port', String(port), '--host', '127.0.0.1'],
       {
         cwd: REPO_ROOT,
-        env: { ...process.env, GITNEXUS_HOME: homeDir, NODE_OPTIONS: '' },
+        env: { ...process.env, YUMMYGRAPH_HOME: homeDir, NODE_OPTIONS: '' },
         stdio: ['ignore', 'pipe', 'pipe'],
       },
     );

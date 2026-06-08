@@ -1,4 +1,4 @@
-import type { ParsedFile, Scope, TypeRef } from 'gitnexus-shared';
+import type { ParsedFile, Scope, TypeRef } from 'yummygraph-shared';
 import type { ScopeResolutionIndexes } from '../../model/scope-resolution-indexes.js';
 import { getGoParser } from './query.js';
 import { getTreeSitterBufferSize } from '../../constants.js';

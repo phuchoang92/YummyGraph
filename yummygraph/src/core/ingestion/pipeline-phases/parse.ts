@@ -20,7 +20,7 @@ import type { PipelinePhase, PipelineContext, PhaseResult } from './types.js';
 import { getPhaseOutput } from './types.js';
 import type { StructureOutput } from './structure.js';
 import type { BindingAccumulator } from '../binding-accumulator.js';
-import type { ParsedFile } from 'gitnexus-shared';
+import type { ParsedFile } from 'yummygraph-shared';
 import type {
   ExtractedFetchCall,
   ExtractedRoute,

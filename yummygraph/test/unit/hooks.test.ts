@@ -1,12 +1,12 @@
 /**
  * Regression Tests: Claude Code Hooks
  *
- * Tests the hook scripts (gitnexus-hook.cjs and gitnexus-hook.js) that run
+ * Tests the hook scripts (yummygraph-hook.cjs and yummygraph-hook.js) that run
  * as PreToolUse and PostToolUse hooks in Claude Code.
  *
  * Covers:
  * - extractPattern: pattern extraction from Grep/Glob/Bash tool inputs
- * - findGitNexusDir: .gitnexus directory discovery
+ * - findYummyGraphDir: .yummygraph directory discovery
  * - handlePostToolUse: staleness detection after git mutations
  * - cwd validation: rejects relative paths (defense-in-depth)
  * - shell injection: verifies no shell: true in spawnSync calls
@@ -26,7 +26,7 @@ import { runHook, parseHookOutput } from '../utils/hook-test-helpers.js';
 
 // ─── Paths to both hook variants ────────────────────────────────────
 
-const CJS_HOOK = path.resolve(__dirname, '..', '..', 'hooks', 'claude', 'gitnexus-hook.cjs');
+const CJS_HOOK = path.resolve(__dirname, '..', '..', 'hooks', 'claude', 'yummygraph-hook.cjs');
 const CJS_HOOK_LOCK = path.resolve(__dirname, '..', '..', 'hooks', 'claude', 'hook-lock.cjs');
 const RESOLVE_CJS = path.resolve(
   __dirname,
@@ -41,7 +41,7 @@ const RESOLVE_PLUGIN_CJS = path.resolve(
   '..',
   '..',
   '..',
-  'gitnexus-claude-plugin',
+  'yummygraph-claude-plugin',
   'hooks',
   'resolve-analyze-cmd.cjs',
 );
@@ -50,16 +50,16 @@ const PLUGIN_HOOK = path.resolve(
   '..',
   '..',
   '..',
-  'gitnexus-claude-plugin',
+  'yummygraph-claude-plugin',
   'hooks',
-  'gitnexus-hook.js',
+  'yummygraph-hook.js',
 );
 const PLUGIN_HOOK_LOCK = path.resolve(
   __dirname,
   '..',
   '..',
   '..',
-  'gitnexus-claude-plugin',
+  'yummygraph-claude-plugin',
   'hooks',
   'hook-lock.js',
 );
@@ -76,20 +76,20 @@ const PLUGIN_HOOK_DB_PROBE = path.resolve(
   '..',
   '..',
   '..',
-  'gitnexus-claude-plugin',
+  'yummygraph-claude-plugin',
   'hooks',
   'hook-db-lock-probe.cjs',
 );
 
-// ─── Test fixtures: temporary .gitnexus directory ───────────────────
+// ─── Test fixtures: temporary .yummygraph directory ───────────────────
 
 let tmpDir: string;
-let gitNexusDir: string;
+let yummyGraphDir: string;
 
 beforeAll(() => {
-  tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-hook-test-'));
-  gitNexusDir = path.join(tmpDir, '.gitnexus');
-  fs.mkdirSync(gitNexusDir, { recursive: true });
+  tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-hook-test-'));
+  yummyGraphDir = path.join(tmpDir, '.yummygraph');
+  fs.mkdirSync(yummyGraphDir, { recursive: true });
 
   // Initialize a bare git repo so git rev-parse HEAD works
   runGit(tmpDir, ['init']);
@@ -135,7 +135,7 @@ function initGitRepo(dir: string) {
 }
 
 function createGlobalRegistry(homeDir: string, marker: 'both' | 'registry' | 'repos' = 'both') {
-  const registryDir = path.join(homeDir, '.gitnexus');
+  const registryDir = path.join(homeDir, '.yummygraph');
   fs.mkdirSync(registryDir, { recursive: true });
   if (marker === 'both' || marker === 'repos') {
     fs.mkdirSync(path.join(registryDir, 'repos'), { recursive: true });
@@ -150,21 +150,21 @@ function writeExecutable(filePath: string, content: string) {
 }
 
 function createHookToolDir(options: {
-  gitnexusStderr?: string;
-  gitnexusMarkerPath?: string;
+  yummygraphStderr?: string;
+  yummygraphMarkerPath?: string;
   lsofOutput?: string;
   lsofOutputLines?: string[];
   psOutput?: string;
   psOutputByPid?: Record<string, string>;
   lsofSleepMs?: number;
 }) {
-  const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-hook-bin-'));
-  const gitnexusStderr = JSON.stringify(options.gitnexusStderr ?? '');
-  const markerPath = JSON.stringify(options.gitnexusMarkerPath ?? '');
+  const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-hook-bin-'));
+  const yummygraphStderr = JSON.stringify(options.yummygraphStderr ?? '');
+  const markerPath = JSON.stringify(options.yummygraphMarkerPath ?? '');
 
-  const fakeGitNexus = `#!/usr/bin/env node\nconst fs = require('fs');\nconst marker = ${markerPath};\nif (marker) fs.writeFileSync(marker, 'called');\nprocess.stderr.write(${gitnexusStderr});\n`;
-  writeExecutable(path.join(binDir, 'gitnexus'), fakeGitNexus);
-  writeExecutable(path.join(binDir, 'gitnexus-cli.js'), fakeGitNexus);
+  const fakeYummyGraph = `#!/usr/bin/env node\nconst fs = require('fs');\nconst marker = ${markerPath};\nif (marker) fs.writeFileSync(marker, 'called');\nprocess.stderr.write(${yummygraphStderr});\n`;
+  writeExecutable(path.join(binDir, 'yummygraph'), fakeYummyGraph);
+  writeExecutable(path.join(binDir, 'yummygraph-cli.js'), fakeYummyGraph);
 
   const lsofOutput =
     options.lsofOutputLines != null
@@ -195,9 +195,9 @@ function hookEnv(binDir: string) {
   return {
     ...process.env,
     PATH: `${binDir}${path.delimiter}${process.env.PATH || ''}`,
-    GITNEXUS_HOOK_CLI_PATH: path.join(binDir, 'gitnexus-cli.js'),
-    GITNEXUS_HOOK_LSOF_PATH: path.join(binDir, 'lsof'),
-    GITNEXUS_HOOK_PS_PATH: path.join(binDir, 'ps'),
+    YUMMYGRAPH_HOOK_CLI_PATH: path.join(binDir, 'yummygraph-cli.js'),
+    YUMMYGRAPH_HOOK_LSOF_PATH: path.join(binDir, 'lsof'),
+    YUMMYGRAPH_HOOK_PS_PATH: path.join(binDir, 'ps'),
   };
 }
 
@@ -250,7 +250,7 @@ describe('Shell injection regression', () => {
  * asks ``CreateProcess`` to use ``STARTF_USESHOWWINDOW`` with
  * ``SW_SHOWDEFAULT`` and a black console window flashes onto the
  * user's desktop for each call. Under active Claude Code / MCP /
- * gitnexus-serve use that's a near-continuous stream of pop-ups —
+ * yummygraph-serve use that's a near-continuous stream of pop-ups —
  * unusable in practice on Windows.
  *
  * ``windowsHide`` is a no-op on POSIX (silently dropped), so the
@@ -272,91 +272,91 @@ describe('Shell injection regression', () => {
 describe('windowsHide regression', () => {
   // Hook-layer files. Adding a new hook file MUST be reflected here.
   const HOOK_FILES: Array<readonly [string, string]> = [
-    ['gitnexus/hooks/claude/gitnexus-hook.cjs', CJS_HOOK],
-    ['gitnexus/hooks/claude/resolve-analyze-cmd.cjs', RESOLVE_CJS],
-    ['gitnexus-claude-plugin/hooks/resolve-analyze-cmd.cjs', RESOLVE_PLUGIN_CJS],
+    ['yummygraph/hooks/claude/yummygraph-hook.cjs', CJS_HOOK],
+    ['yummygraph/hooks/claude/resolve-analyze-cmd.cjs', RESOLVE_CJS],
+    ['yummygraph-claude-plugin/hooks/resolve-analyze-cmd.cjs', RESOLVE_PLUGIN_CJS],
     [
-      'gitnexus/hooks/antigravity/gitnexus-antigravity-hook.cjs',
-      path.resolve(__dirname, '..', '..', 'hooks', 'antigravity', 'gitnexus-antigravity-hook.cjs'),
+      'yummygraph/hooks/antigravity/yummygraph-antigravity-hook.cjs',
+      path.resolve(__dirname, '..', '..', 'hooks', 'antigravity', 'yummygraph-antigravity-hook.cjs'),
     ],
     [
-      'gitnexus/hooks/claude/hook-db-lock-probe.cjs',
+      'yummygraph/hooks/claude/hook-db-lock-probe.cjs',
       path.resolve(__dirname, '..', '..', 'hooks', 'claude', 'hook-db-lock-probe.cjs'),
     ],
-    ['gitnexus-claude-plugin/hooks/gitnexus-hook.js', PLUGIN_HOOK],
+    ['yummygraph-claude-plugin/hooks/yummygraph-hook.js', PLUGIN_HOOK],
     [
-      'gitnexus-claude-plugin/hooks/hook-db-lock-probe.cjs',
+      'yummygraph-claude-plugin/hooks/hook-db-lock-probe.cjs',
       path.resolve(
         __dirname,
         '..',
         '..',
         '..',
-        'gitnexus-claude-plugin',
+        'yummygraph-claude-plugin',
         'hooks',
         'hook-db-lock-probe.cjs',
       ),
     ],
     [
-      'gitnexus-cursor-integration/hooks/gitnexus-hook.cjs',
+      'yummygraph-cursor-integration/hooks/yummygraph-hook.cjs',
       path.resolve(
         __dirname,
         '..',
         '..',
         '..',
-        'gitnexus-cursor-integration',
+        'yummygraph-cursor-integration',
         'hooks',
-        'gitnexus-hook.cjs',
+        'yummygraph-hook.cjs',
       ),
     ],
   ];
 
   // Source-tree files. Every file that imports a spawn-family
   // function from ``child_process`` belongs here. Discovered via
-  //   grep -rn "from 'child_process'" -- gitnexus/src/
+  //   grep -rn "from 'child_process'" -- yummygraph/src/
   // plus the explicit ``await import('child_process')`` callers in
   // local-backend.ts.
   const SRC_FILES: Array<readonly [string, string]> = [
     [
-      'gitnexus/src/cli/analyze.ts',
+      'yummygraph/src/cli/analyze.ts',
       path.resolve(__dirname, '..', '..', 'src', 'cli', 'analyze.ts'),
     ],
-    ['gitnexus/src/cli/setup.ts', path.resolve(__dirname, '..', '..', 'src', 'cli', 'setup.ts')],
-    ['gitnexus/src/cli/wiki.ts', path.resolve(__dirname, '..', '..', 'src', 'cli', 'wiki.ts')],
+    ['yummygraph/src/cli/setup.ts', path.resolve(__dirname, '..', '..', 'src', 'cli', 'setup.ts')],
+    ['yummygraph/src/cli/wiki.ts', path.resolve(__dirname, '..', '..', 'src', 'cli', 'wiki.ts')],
     [
-      'gitnexus/src/core/embeddings/embedder.ts',
+      'yummygraph/src/core/embeddings/embedder.ts',
       path.resolve(__dirname, '..', '..', 'src', 'core', 'embeddings', 'embedder.ts'),
     ],
     [
-      'gitnexus/src/core/git-staleness.ts',
+      'yummygraph/src/core/git-staleness.ts',
       path.resolve(__dirname, '..', '..', 'src', 'core', 'git-staleness.ts'),
     ],
     [
-      'gitnexus/src/core/lbug/extension-loader.ts',
+      'yummygraph/src/core/lbug/extension-loader.ts',
       path.resolve(__dirname, '..', '..', 'src', 'core', 'lbug', 'extension-loader.ts'),
     ],
     [
-      'gitnexus/src/core/run-analyze.ts',
+      'yummygraph/src/core/run-analyze.ts',
       path.resolve(__dirname, '..', '..', 'src', 'core', 'run-analyze.ts'),
     ],
     [
-      'gitnexus/src/core/wiki/cursor-client.ts',
+      'yummygraph/src/core/wiki/cursor-client.ts',
       path.resolve(__dirname, '..', '..', 'src', 'core', 'wiki', 'cursor-client.ts'),
     ],
     [
-      'gitnexus/src/core/wiki/generator.ts',
+      'yummygraph/src/core/wiki/generator.ts',
       path.resolve(__dirname, '..', '..', 'src', 'core', 'wiki', 'generator.ts'),
     ],
     [
-      'gitnexus/src/mcp/local/local-backend.ts',
+      'yummygraph/src/mcp/local/local-backend.ts',
       path.resolve(__dirname, '..', '..', 'src', 'mcp', 'local', 'local-backend.ts'),
     ],
     [
-      'gitnexus/src/server/git-clone.ts',
+      'yummygraph/src/server/git-clone.ts',
       path.resolve(__dirname, '..', '..', 'src', 'server', 'git-clone.ts'),
     ],
     // New post-upstream-merge (May 2026 sync):
     [
-      'gitnexus/src/storage/git.ts',
+      'yummygraph/src/storage/git.ts',
       path.resolve(__dirname, '..', '..', 'src', 'storage', 'git.ts'),
     ],
   ];
@@ -429,9 +429,9 @@ describe('Windows .cmd extension handling', () => {
     });
   }
 
-  it('Plugin hook uses .cmd extension for Windows gitnexus binary', () => {
+  it('Plugin hook uses .cmd extension for Windows yummygraph binary', () => {
     const source = fs.readFileSync(PLUGIN_HOOK, 'utf-8');
-    expect(source).toContain('gitnexus.cmd');
+    expect(source).toContain('yummygraph.cmd');
   });
 });
 
@@ -622,7 +622,7 @@ describe('PreToolUse concurrency guard', () => {
       // Regression: an earlier revision returned `() => {}` (truthy no-op) on
       // mkdirSync failure, which left callers — `if (!release) return;` — to
       // proceed unguarded and reintroduce the #1486 fan-out on read-only or
-      // cross-user `.gitnexus/` setups. The guard must fail closed (null).
+      // cross-user `.yummygraph/` setups. The guard must fail closed (null).
       const source = fs.readFileSync(lockPath, 'utf-8');
       const slotFn = source.slice(
         source.indexOf('function acquireHookSlot'),
@@ -647,7 +647,7 @@ describe('PreToolUse concurrency guard (integration)', () => {
   ] as const) {
     it(`${label}: hook exits silently when all MAX_INFLIGHT slots hold live pids`, async () => {
       const { spawn } = await import('child_process');
-      const lockDir = path.join(gitNexusDir, '.hook-locks');
+      const lockDir = path.join(yummyGraphDir, '.hook-locks');
       fs.mkdirSync(lockDir, { recursive: true });
 
       // Spawn 3 long-sleeping node child processes to use as live PIDs.
@@ -705,7 +705,7 @@ describe('PreToolUse concurrency guard (integration)', () => {
     });
 
     it(`${label}: hook reclaims a slot held by a dead pid`, () => {
-      const lockDir = path.join(gitNexusDir, '.hook-locks');
+      const lockDir = path.join(yummyGraphDir, '.hook-locks');
       fs.mkdirSync(lockDir, { recursive: true });
       // PID 1 exists on every POSIX system (init); on Windows process.kill(1,0)
       // throws. Use a definitely-dead PID instead: a very large number unlikely
@@ -748,7 +748,7 @@ describe('PreToolUse concurrency guard (integration)', () => {
       // O_CREAT|O_EXCL slot scheme makes this a hard cap, not the soft cap
       // that the count-then-claim approach gives.
       const { spawn } = await import('child_process');
-      const lockDir = path.join(gitNexusDir, '.hook-locks');
+      const lockDir = path.join(yummyGraphDir, '.hook-locks');
       // Clean any leftover slot files.
       try {
         for (const f of fs.readdirSync(lockDir)) fs.unlinkSync(path.join(lockDir, f));
@@ -759,7 +759,7 @@ describe('PreToolUse concurrency guard (integration)', () => {
 
       // We use child workers that just claim a slot via the same algorithm
       // and then sleep, so we can observe the on-disk state under contention
-      // without spawning the real gitnexus augment CLI.
+      // without spawning the real yummygraph augment CLI.
       const claimerScript = `
         const fs = require('fs'); const path = require('path');
         const lockDir = ${JSON.stringify(lockDir)};
@@ -884,12 +884,12 @@ describe('Cross-platform DB lock probe (source)', () => {
       const p = fs.readFileSync(probePath, 'utf-8');
       expect(p).toContain('win-rm-list-json.ps1');
       expect(p).toContain('/proc/');
-      expect(p).toContain('linuxProcScanFindGitNexusServer');
-      expect(p).toContain('unixLsofPsFindGitNexusServer');
-      expect(p).toContain('hasGitNexusServerOwnerWindows');
-      expect(p).toContain('GITNEXUS_HOOK_LSOF_PATH');
-      expect(p).toContain('GITNEXUS_HOOK_POWERSHELL_PATH');
-      expect(p).toContain('GITNEXUS_HOOK_LINUX_PROC_BUDGET_MS');
+      expect(p).toContain('linuxProcScanFindYummyGraphServer');
+      expect(p).toContain('unixLsofPsFindYummyGraphServer');
+      expect(p).toContain('hasYummyGraphServerOwnerWindows');
+      expect(p).toContain('YUMMYGRAPH_HOOK_LSOF_PATH');
+      expect(p).toContain('YUMMYGRAPH_HOOK_POWERSHELL_PATH');
+      expect(p).toContain('YUMMYGRAPH_HOOK_LINUX_PROC_BUDGET_MS');
     });
   }
 });
@@ -901,9 +901,9 @@ describe('PreToolUse augmentation filtering (integration)', () => {
     ['CJS', CJS_HOOK],
     ['Plugin', PLUGIN_HOOK],
   ] as const) {
-    it(`${label}: emits valid GitNexus augmentation context`, () => {
+    it(`${label}: emits valid YummyGraph augmentation context`, () => {
       const binDir = createHookToolDir({
-        gitnexusStderr: '[GitNexus] 1 related symbol found:\n\nvalidateUser (src/auth.ts)\n',
+        yummygraphStderr: '[YummyGraph] 1 related symbol found:\n\nvalidateUser (src/auth.ts)\n',
       });
       try {
         const result = runHook(
@@ -921,7 +921,7 @@ describe('PreToolUse augmentation filtering (integration)', () => {
         const output = parseHookOutput(result.stdout);
         expect(output).not.toBeNull();
         expect(output!.hookEventName).toBe('PreToolUse');
-        expect(output!.additionalContext).toContain('[GitNexus] 1 related symbol found');
+        expect(output!.additionalContext).toContain('[YummyGraph] 1 related symbol found');
       } finally {
         fs.rmSync(binDir, { recursive: true, force: true });
       }
@@ -931,9 +931,9 @@ describe('PreToolUse augmentation filtering (integration)', () => {
       const markerPath = path.join(os.tmpdir(), 'gn-hook-lockwarn-' + process.pid + '-' + label);
       fs.rmSync(markerPath, { force: true });
       const binDir = createHookToolDir({
-        gitnexusMarkerPath: markerPath,
-        gitnexusStderr:
-          'GitNexus: FTS extension load failed: IO exception: Could not set lock on file : /tmp/repo/.gitnexus/lbug\n',
+        yummygraphMarkerPath: markerPath,
+        yummygraphStderr:
+          'YummyGraph: FTS extension load failed: IO exception: Could not set lock on file : /tmp/repo/.yummygraph/lbug\n',
       });
       try {
         const result = runHook(
@@ -951,7 +951,7 @@ describe('PreToolUse augmentation filtering (integration)', () => {
         expect(result.stdout.trim()).toBe('');
         expect(fs.existsSync(markerPath)).toBe(true);
 
-        // Finding #18: when GITNEXUS_DEBUG=1 is set, the discarded prefix is
+        // Finding #18: when YUMMYGRAPH_DEBUG=1 is set, the discarded prefix is
         // recoverable on the hook's stderr (not silently dropped).
         const debugResult = runHook(
           hookPath,
@@ -962,7 +962,7 @@ describe('PreToolUse augmentation filtering (integration)', () => {
             cwd: tmpDir,
           },
           undefined,
-          { env: { ...hookEnv(binDir), GITNEXUS_DEBUG: '1' } },
+          { env: { ...hookEnv(binDir), YUMMYGRAPH_DEBUG: '1' } },
         );
         expect(debugResult.stderr).toContain('augment stderr discarded prefix');
         expect(debugResult.stderr).toContain('Could not set lock on file');
@@ -973,16 +973,16 @@ describe('PreToolUse augmentation filtering (integration)', () => {
     });
 
     it.skipIf(process.platform === 'win32')(
-      `${label}: skips augment when a GitNexus MCP process owns the repo DB`,
+      `${label}: skips augment when a YummyGraph MCP process owns the repo DB`,
       () => {
-        const markerPath = path.join(os.tmpdir(), `gitnexus-hook-called-${process.pid}-${label}`);
-        const lbugPath = path.join(gitNexusDir, 'lbug');
+        const markerPath = path.join(os.tmpdir(), `yummygraph-hook-called-${process.pid}-${label}`);
+        const lbugPath = path.join(yummyGraphDir, 'lbug');
         fs.writeFileSync(lbugPath, '');
         fs.rmSync(markerPath, { force: true });
         const binDir = createHookToolDir({
-          gitnexusMarkerPath: markerPath,
+          yummygraphMarkerPath: markerPath,
           lsofOutput: '12345\n',
-          psOutput: 'node /tmp/node_modules/.bin/gitnexus mcp\n',
+          psOutput: 'node /tmp/node_modules/.bin/yummygraph mcp\n',
         });
         try {
           const result = runHook(
@@ -999,7 +999,7 @@ describe('PreToolUse augmentation filtering (integration)', () => {
 
           expect(result.stdout.trim()).toBe('');
           expect(result.status).toBe(0);
-          expect(result.stderr).toContain('[GitNexus] augment skipped');
+          expect(result.stderr).toContain('[YummyGraph] augment skipped');
           expect(fs.existsSync(markerPath)).toBe(false);
         } finally {
           fs.rmSync(markerPath, { force: true });
@@ -1017,15 +1017,15 @@ describe.skipIf(process.platform === 'win32')(
       ['CJS', CJS_HOOK],
       ['Plugin', PLUGIN_HOOK],
     ] as const) {
-      it(`${label}: skips augment for real node_modules/gitnexus ps line (npx child)`, () => {
+      it(`${label}: skips augment for real node_modules/yummygraph ps line (npx child)`, () => {
         const markerPath = path.join(os.tmpdir(), `gn-hook-prodps-${process.pid}-${label}`);
-        const lbugPath = path.join(gitNexusDir, 'lbug');
+        const lbugPath = path.join(yummyGraphDir, 'lbug');
         fs.writeFileSync(lbugPath, '');
         fs.rmSync(markerPath, { force: true });
         const binDir = createHookToolDir({
-          gitnexusMarkerPath: markerPath,
+          yummygraphMarkerPath: markerPath,
           lsofOutput: '99901\n',
-          psOutput: 'node /tmp/node_modules/gitnexus/dist/cli/index.js mcp\n',
+          psOutput: 'node /tmp/node_modules/yummygraph/dist/cli/index.js mcp\n',
         });
         try {
           const result = runHook(
@@ -1041,7 +1041,7 @@ describe.skipIf(process.platform === 'win32')(
           );
           expect(result.stdout.trim()).toBe('');
           expect(result.status).toBe(0);
-          expect(result.stderr).toContain('[GitNexus] augment skipped');
+          expect(result.stderr).toContain('[YummyGraph] augment skipped');
           expect(fs.existsSync(markerPath)).toBe(false);
         } finally {
           fs.rmSync(markerPath, { force: true });
@@ -1049,16 +1049,16 @@ describe.skipIf(process.platform === 'win32')(
         }
       });
 
-      it(`${label}: npx parent command line is NOT treated as GitNexus server owner`, () => {
+      it(`${label}: npx parent command line is NOT treated as YummyGraph server owner`, () => {
         const markerPath = path.join(os.tmpdir(), `gn-hook-npx-${process.pid}-${label}`);
-        const lbugPath = path.join(gitNexusDir, 'lbug');
+        const lbugPath = path.join(yummyGraphDir, 'lbug');
         fs.writeFileSync(lbugPath, '');
         fs.rmSync(markerPath, { force: true });
         const binDir = createHookToolDir({
-          gitnexusMarkerPath: markerPath,
-          gitnexusStderr: '[GitNexus] 1 related symbol found:\n\nvalidateUser (src/auth.ts)\n',
+          yummygraphMarkerPath: markerPath,
+          yummygraphStderr: '[YummyGraph] 1 related symbol found:\n\nvalidateUser (src/auth.ts)\n',
           lsofOutput: '99902\n',
-          psOutput: 'npx -y gitnexus@latest mcp\n',
+          psOutput: 'npx -y yummygraph@latest mcp\n',
         });
         try {
           const result = runHook(
@@ -1081,15 +1081,15 @@ describe.skipIf(process.platform === 'win32')(
         }
       });
 
-      it(`${label}: skips augment for gitnexus serve child`, () => {
+      it(`${label}: skips augment for yummygraph serve child`, () => {
         const markerPath = path.join(os.tmpdir(), `gn-hook-serve-${process.pid}-${label}`);
-        const lbugPath = path.join(gitNexusDir, 'lbug');
+        const lbugPath = path.join(yummyGraphDir, 'lbug');
         fs.writeFileSync(lbugPath, '');
         fs.rmSync(markerPath, { force: true });
         const binDir = createHookToolDir({
-          gitnexusMarkerPath: markerPath,
+          yummygraphMarkerPath: markerPath,
           lsofOutput: '99903\n',
-          psOutput: 'node /repo/node_modules/gitnexus/dist/cli/index.js serve\n',
+          psOutput: 'node /repo/node_modules/yummygraph/dist/cli/index.js serve\n',
         });
         try {
           const result = runHook(
@@ -1105,7 +1105,7 @@ describe.skipIf(process.platform === 'win32')(
           );
           expect(result.stdout.trim()).toBe('');
           expect(result.status).toBe(0);
-          expect(result.stderr).toContain('[GitNexus] augment skipped');
+          expect(result.stderr).toContain('[YummyGraph] augment skipped');
           expect(fs.existsSync(markerPath)).toBe(false);
         } finally {
           fs.rmSync(markerPath, { force: true });
@@ -1115,19 +1115,19 @@ describe.skipIf(process.platform === 'win32')(
 
       it(`${label}: ENOENT lsof → augment still runs (fail-open)`, () => {
         const markerPath = path.join(os.tmpdir(), `gn-hook-enoent-${process.pid}-${label}`);
-        const lbugPath = path.join(gitNexusDir, 'lbug');
+        const lbugPath = path.join(yummyGraphDir, 'lbug');
         fs.writeFileSync(lbugPath, '');
         fs.rmSync(markerPath, { force: true });
         const binDir = createHookToolDir({
-          gitnexusMarkerPath: markerPath,
-          gitnexusStderr: '[GitNexus] 1 related symbol found:\n\nvalidateUser (src/auth.ts)\n',
+          yummygraphMarkerPath: markerPath,
+          yummygraphStderr: '[YummyGraph] 1 related symbol found:\n\nvalidateUser (src/auth.ts)\n',
           lsofOutput: '',
           psOutput: '',
         });
         try {
           const env = {
             ...hookEnv(binDir),
-            GITNEXUS_HOOK_LSOF_PATH: path.join(binDir, '__missing_lsof__'),
+            YUMMYGRAPH_HOOK_LSOF_PATH: path.join(binDir, '__missing_lsof__'),
           };
           const result = runHook(
             hookPath,
@@ -1151,11 +1151,11 @@ describe.skipIf(process.platform === 'win32')(
 
       it(`${label}: ETIMEDOUT lsof → augment skipped (fail-closed)`, () => {
         const markerPath = path.join(os.tmpdir(), `gn-hook-etime-${process.pid}-${label}`);
-        const lbugPath = path.join(gitNexusDir, 'lbug');
+        const lbugPath = path.join(yummyGraphDir, 'lbug');
         fs.writeFileSync(lbugPath, '');
         fs.rmSync(markerPath, { force: true });
         const binDir = createHookToolDir({
-          gitnexusMarkerPath: markerPath,
+          yummygraphMarkerPath: markerPath,
           lsofSleepMs: 5000,
           psOutput: '',
         });
@@ -1173,7 +1173,7 @@ describe.skipIf(process.platform === 'win32')(
           );
           expect(result.stdout.trim()).toBe('');
           expect(result.status).toBe(0);
-          expect(result.stderr).toContain('[GitNexus] augment skipped');
+          expect(result.stderr).toContain('[YummyGraph] augment skipped');
           expect(fs.existsSync(markerPath)).toBe(false);
         } finally {
           fs.rmSync(markerPath, { force: true });
@@ -1181,14 +1181,14 @@ describe.skipIf(process.platform === 'win32')(
         }
       });
 
-      it(`${label}: non-GitNexus ps line → augment runs`, () => {
+      it(`${label}: non-YummyGraph ps line → augment runs`, () => {
         const markerPath = path.join(os.tmpdir(), `gn-hook-other-${process.pid}-${label}`);
-        const lbugPath = path.join(gitNexusDir, 'lbug');
+        const lbugPath = path.join(yummyGraphDir, 'lbug');
         fs.writeFileSync(lbugPath, '');
         fs.rmSync(markerPath, { force: true });
         const binDir = createHookToolDir({
-          gitnexusMarkerPath: markerPath,
-          gitnexusStderr: '[GitNexus] 1 related symbol found:\n\nvalidateUser (src/auth.ts)\n',
+          yummygraphMarkerPath: markerPath,
+          yummygraphStderr: '[YummyGraph] 1 related symbol found:\n\nvalidateUser (src/auth.ts)\n',
           lsofOutput: '99904\n',
           psOutput: '/usr/bin/bash -l\n',
         });
@@ -1213,18 +1213,18 @@ describe.skipIf(process.platform === 'win32')(
         }
       });
 
-      it(`${label}: multiple PIDs — skip if any ps line is GitNexus MCP`, () => {
+      it(`${label}: multiple PIDs — skip if any ps line is YummyGraph MCP`, () => {
         const markerPath = path.join(os.tmpdir(), `gn-hook-multi-${process.pid}-${label}`);
-        const lbugPath = path.join(gitNexusDir, 'lbug');
+        const lbugPath = path.join(yummyGraphDir, 'lbug');
         fs.writeFileSync(lbugPath, '');
         fs.rmSync(markerPath, { force: true });
         const binDir = createHookToolDir({
-          gitnexusMarkerPath: markerPath,
-          gitnexusStderr: '[GitNexus] 1 related symbol found:\n\nvalidateUser (src/auth.ts)\n',
+          yummygraphMarkerPath: markerPath,
+          yummygraphStderr: '[YummyGraph] 1 related symbol found:\n\nvalidateUser (src/auth.ts)\n',
           lsofOutputLines: ['111', '222'],
           psOutputByPid: {
             '111': 'vim /tmp/x\n',
-            '222': 'node /x/node_modules/gitnexus/dist/cli/index.js mcp\n',
+            '222': 'node /x/node_modules/yummygraph/dist/cli/index.js mcp\n',
           },
         });
         try {
@@ -1241,7 +1241,7 @@ describe.skipIf(process.platform === 'win32')(
           );
           expect(result.stdout.trim()).toBe('');
           expect(result.status).toBe(0);
-          expect(result.stderr).toContain('[GitNexus] augment skipped');
+          expect(result.stderr).toContain('[YummyGraph] augment skipped');
           expect(fs.existsSync(markerPath)).toBe(false);
         } finally {
           fs.rmSync(markerPath, { force: true });
@@ -1251,19 +1251,19 @@ describe.skipIf(process.platform === 'win32')(
 
       it(`${label}: ps ENOENT → augment runs (ignore that PID)`, () => {
         const markerPath = path.join(os.tmpdir(), `gn-hook-pseno-${process.pid}-${label}`);
-        const lbugPath = path.join(gitNexusDir, 'lbug');
+        const lbugPath = path.join(yummyGraphDir, 'lbug');
         fs.writeFileSync(lbugPath, '');
         fs.rmSync(markerPath, { force: true });
         const binDir = createHookToolDir({
-          gitnexusMarkerPath: markerPath,
-          gitnexusStderr: '[GitNexus] 1 related symbol found:\n\nvalidateUser (src/auth.ts)\n',
+          yummygraphMarkerPath: markerPath,
+          yummygraphStderr: '[YummyGraph] 1 related symbol found:\n\nvalidateUser (src/auth.ts)\n',
           lsofOutput: '99905\n',
           psOutput: '',
         });
         try {
           const env = {
             ...hookEnv(binDir),
-            GITNEXUS_HOOK_PS_PATH: path.join(binDir, '__missing_ps__'),
+            YUMMYGRAPH_HOOK_PS_PATH: path.join(binDir, '__missing_ps__'),
           };
           const result = runHook(
             hookPath,
@@ -1298,7 +1298,7 @@ describe('PostToolUse staleness detection (integration)', () => {
     it(`${label}: emits stale notification when HEAD differs from meta`, () => {
       // Write meta.json with a different commit
       fs.writeFileSync(
-        path.join(gitNexusDir, 'meta.json'),
+        path.join(yummyGraphDir, 'meta.json'),
         JSON.stringify({ lastCommit: 'aaaaaaa0000000000000000000000000deadbeef', stats: {} }),
       );
 
@@ -1320,7 +1320,7 @@ describe('PostToolUse staleness detection (integration)', () => {
     it(`${label}: silent when HEAD matches meta lastCommit`, () => {
       const head = getHeadCommit();
       fs.writeFileSync(
-        path.join(gitNexusDir, 'meta.json'),
+        path.join(yummyGraphDir, 'meta.json'),
         JSON.stringify({ lastCommit: head, stats: {} }),
       );
 
@@ -1369,7 +1369,7 @@ describe('PostToolUse staleness detection (integration)', () => {
 
     it(`${label}: includes --embeddings in suggestion when meta had embeddings`, () => {
       fs.writeFileSync(
-        path.join(gitNexusDir, 'meta.json'),
+        path.join(yummyGraphDir, 'meta.json'),
         JSON.stringify({ lastCommit: 'deadbeef', stats: { embeddings: 42 } }),
       );
 
@@ -1388,7 +1388,7 @@ describe('PostToolUse staleness detection (integration)', () => {
 
     it(`${label}: omits --embeddings when meta had no embeddings`, () => {
       fs.writeFileSync(
-        path.join(gitNexusDir, 'meta.json'),
+        path.join(yummyGraphDir, 'meta.json'),
         JSON.stringify({ lastCommit: 'deadbeef', stats: { embeddings: 0 } }),
       );
 
@@ -1407,7 +1407,7 @@ describe('PostToolUse staleness detection (integration)', () => {
 
     it(`${label}: detects git rebase as a mutation`, () => {
       fs.writeFileSync(
-        path.join(gitNexusDir, 'meta.json'),
+        path.join(yummyGraphDir, 'meta.json'),
         JSON.stringify({ lastCommit: 'oldcommit', stats: {} }),
       );
 
@@ -1426,7 +1426,7 @@ describe('PostToolUse staleness detection (integration)', () => {
 
     it(`${label}: detects git cherry-pick as a mutation`, () => {
       fs.writeFileSync(
-        path.join(gitNexusDir, 'meta.json'),
+        path.join(yummyGraphDir, 'meta.json'),
         JSON.stringify({ lastCommit: 'oldcommit', stats: {} }),
       );
 
@@ -1444,7 +1444,7 @@ describe('PostToolUse staleness detection (integration)', () => {
 
     it(`${label}: detects git pull as a mutation`, () => {
       fs.writeFileSync(
-        path.join(gitNexusDir, 'meta.json'),
+        path.join(yummyGraphDir, 'meta.json'),
         JSON.stringify({ lastCommit: 'oldcommit', stats: {} }),
       );
 
@@ -1500,7 +1500,7 @@ describe('Global registry lookup', () => {
     ['Plugin', PLUGIN_HOOK],
   ] as const) {
     it(`${label}: PostToolUse stays silent for unindexed repo under global registry`, () => {
-      const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-home-'));
+      const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-home-'));
       const repoDir = path.join(homeDir, 'work', 'unindexed');
       try {
         createGlobalRegistry(homeDir);
@@ -1522,7 +1522,7 @@ describe('Global registry lookup', () => {
     });
 
     it(`${label}: PreToolUse stays silent for unindexed repo under global registry`, () => {
-      const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-home-'));
+      const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-home-'));
       const repoDir = path.join(homeDir, 'work', 'unindexed');
       try {
         createGlobalRegistry(homeDir);
@@ -1543,14 +1543,14 @@ describe('Global registry lookup', () => {
     });
 
     it(`${label}: PostToolUse emits stale for indexed repo under parent global registry`, () => {
-      const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-home-'));
+      const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-home-'));
       const repoDir = path.join(homeDir, 'work', 'indexed-repo');
       try {
         createGlobalRegistry(homeDir);
-        fs.mkdirSync(path.join(repoDir, '.gitnexus'), { recursive: true });
+        fs.mkdirSync(path.join(repoDir, '.yummygraph'), { recursive: true });
         initGitRepo(repoDir);
         fs.writeFileSync(
-          path.join(repoDir, '.gitnexus', 'meta.json'),
+          path.join(repoDir, '.yummygraph', 'meta.json'),
           JSON.stringify({ lastCommit: 'oldcommit', stats: {} }),
         );
 
@@ -1572,7 +1572,7 @@ describe('Global registry lookup', () => {
 
     for (const marker of ['registry', 'repos'] as const) {
       it(`${label}: PostToolUse skips global registry with only ${marker} marker`, () => {
-        const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-home-'));
+        const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-home-'));
         const repoDir = path.join(homeDir, 'work', `unindexed-${marker}`);
         try {
           createGlobalRegistry(homeDir, marker);
@@ -1606,17 +1606,17 @@ describe('Linked git worktree resolution', () => {
     it(`${label}: PostToolUse emits stale from a linked worktree pointing at an indexed canonical repo`, () => {
       // Layout mirrors `git worktree add ../<repo>-worktrees/feature-x`:
       //   <root>/main-repo/.git              (canonical)
-      //   <root>/main-repo/.gitnexus/        (only here)
-      //   <root>/main-repo-worktrees/feat/   (linked worktree, no .gitnexus)
-      const root = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-worktree-'));
+      //   <root>/main-repo/.yummygraph/        (only here)
+      //   <root>/main-repo-worktrees/feat/   (linked worktree, no .yummygraph)
+      const root = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-worktree-'));
       const mainRepo = path.join(root, 'main-repo');
       const worktreePath = path.join(root, 'main-repo-worktrees', 'feat');
       try {
         fs.mkdirSync(mainRepo, { recursive: true });
         initGitRepo(mainRepo);
-        fs.mkdirSync(path.join(mainRepo, '.gitnexus'), { recursive: true });
+        fs.mkdirSync(path.join(mainRepo, '.yummygraph'), { recursive: true });
         fs.writeFileSync(
-          path.join(mainRepo, '.gitnexus', 'meta.json'),
+          path.join(mainRepo, '.yummygraph', 'meta.json'),
           JSON.stringify({ lastCommit: 'oldcommit', stats: {} }),
         );
 
@@ -1624,9 +1624,9 @@ describe('Linked git worktree resolution', () => {
         fs.mkdirSync(path.dirname(worktreePath), { recursive: true });
         runGit(mainRepo, ['worktree', 'add', '-b', 'feat', worktreePath]);
 
-        // Sanity: walking up from the worktree never reaches `.gitnexus`.
-        expect(fs.existsSync(path.join(worktreePath, '.gitnexus'))).toBe(false);
-        expect(fs.existsSync(path.join(path.dirname(worktreePath), '.gitnexus'))).toBe(false);
+        // Sanity: walking up from the worktree never reaches `.yummygraph`.
+        expect(fs.existsSync(path.join(worktreePath, '.yummygraph'))).toBe(false);
+        expect(fs.existsSync(path.join(path.dirname(worktreePath), '.yummygraph'))).toBe(false);
 
         const result = runHook(hookPath, {
           hook_event_name: 'PostToolUse',
@@ -1644,14 +1644,14 @@ describe('Linked git worktree resolution', () => {
       }
     });
 
-    it(`${label}: PostToolUse silent from a linked worktree when canonical repo has no .gitnexus`, () => {
-      const root = fs.mkdtempSync(path.join(os.tmpdir(), 'gitnexus-worktree-'));
+    it(`${label}: PostToolUse silent from a linked worktree when canonical repo has no .yummygraph`, () => {
+      const root = fs.mkdtempSync(path.join(os.tmpdir(), 'yummygraph-worktree-'));
       const mainRepo = path.join(root, 'main-repo');
       const worktreePath = path.join(root, 'main-repo-worktrees', 'feat');
       try {
         fs.mkdirSync(mainRepo, { recursive: true });
         initGitRepo(mainRepo);
-        // Note: NO .gitnexus/ in the canonical repo.
+        // Note: NO .yummygraph/ in the canonical repo.
 
         fs.mkdirSync(path.dirname(worktreePath), { recursive: true });
         runGit(mainRepo, ['worktree', 'add', '-b', 'feat', worktreePath]);
@@ -1740,7 +1740,7 @@ describe('PostToolUse with missing/corrupt meta.json', () => {
     ['Plugin', PLUGIN_HOOK],
   ] as const) {
     it(`${label}: emits stale when meta.json does not exist`, () => {
-      const metaPath = path.join(gitNexusDir, 'meta.json');
+      const metaPath = path.join(yummyGraphDir, 'meta.json');
       const hadMeta = fs.existsSync(metaPath);
       if (hadMeta) fs.unlinkSync(metaPath);
 
@@ -1763,7 +1763,7 @@ describe('PostToolUse with missing/corrupt meta.json', () => {
     });
 
     it(`${label}: emits stale when meta.json is corrupt`, () => {
-      const metaPath = path.join(gitNexusDir, 'meta.json');
+      const metaPath = path.join(yummyGraphDir, 'meta.json');
       fs.writeFileSync(metaPath, 'not valid json!!!');
 
       const result = runHook(hookPath, {

@@ -5,9 +5,9 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import prettierConfig from 'eslint-config-prettier';
 import requireSafeParse from './eslint-rules/require-safe-parse.mjs';
 
-// Local plugin hosting custom rules that enforce GitNexus-specific invariants
+// Local plugin hosting custom rules that enforce YummyGraph-specific invariants
 // (currently: the Windows-SIGSEGV-safe parser entrypoint).
-const gitnexusLocalPlugin = {
+const yummygraphLocalPlugin = {
   rules: {
     'require-safe-parse': requireSafeParse,
   },
@@ -52,12 +52,12 @@ export default [
       '**/dist/**',
       '**/node_modules/**',
       '**/coverage/**',
-      'gitnexus/vendor/**',
-      'gitnexus-web/src/vendor/**',
-      'gitnexus/test/fixtures/**',
-      'gitnexus-web/test/fixtures/**',
-      'gitnexus-web/playwright-report/**',
-      'gitnexus-web/test-results/**',
+      'yummygraph/vendor/**',
+      'yummygraph-web/src/vendor/**',
+      'yummygraph/test/fixtures/**',
+      'yummygraph-web/test/fixtures/**',
+      'yummygraph-web/playwright-report/**',
+      'yummygraph-web/test-results/**',
       '**/*.d.ts',
       '.claude/**',
       '.history/**',
@@ -101,11 +101,11 @@ export default [
   },
 
   // CLI/server packages — `console.log` IS the contract (CLI tool data output
-  // on stdout, e.g. `gitnexus query | jq`; server pretty-printed banners).
+  // on stdout, e.g. `yummygraph query | jq`; server pretty-printed banners).
   // Diagnostic logging (`warn`/`error`/`debug`/`info`) goes through pino like
   // the rest of the codebase.
   {
-    files: ['gitnexus/src/cli/**/*.ts', 'gitnexus/src/server/**/*.ts'],
+    files: ['yummygraph/src/cli/**/*.ts', 'yummygraph/src/server/**/*.ts'],
     rules: {
       'no-console': ['error', { allow: ['log'] }],
     },
@@ -116,8 +116,8 @@ export default [
   // must fail lint. CLI/server are exempt above (legitimate stdout output).
   // Tests, bin scripts, and the logger module itself remain exempt.
   {
-    files: ['gitnexus/src/**/*.ts'],
-    ignores: ['gitnexus/src/cli/**', 'gitnexus/src/server/**', 'gitnexus/src/core/logger.ts'],
+    files: ['yummygraph/src/**/*.ts'],
+    ignores: ['yummygraph/src/cli/**', 'yummygraph/src/server/**', 'yummygraph/src/core/logger.ts'],
     rules: {
       'no-console': 'error',
     },
@@ -132,11 +132,11 @@ export default [
   // MCP entrypoint and inherits stricter discipline than the rest of cli/.
   {
     files: [
-      'gitnexus/src/mcp/**/*.ts',
-      'gitnexus/src/core/lbug/**/*.ts',
-      'gitnexus/src/core/embeddings/**/*.ts',
-      'gitnexus/src/core/tree-sitter/**/*.ts',
-      'gitnexus/src/cli/mcp.ts',
+      'yummygraph/src/mcp/**/*.ts',
+      'yummygraph/src/core/lbug/**/*.ts',
+      'yummygraph/src/core/embeddings/**/*.ts',
+      'yummygraph/src/core/tree-sitter/**/*.ts',
+      'yummygraph/src/cli/mcp.ts',
     ],
     rules: {
       'no-console': ['error', { allow: ['error'] }],
@@ -152,18 +152,18 @@ export default [
   // rule), the helper itself (`safe-parse.ts`), and the `grpc-patterns/proto.ts`
   // grammar-load smoke test (filtered by string-literal-arg skip in the rule).
   {
-    files: ['gitnexus/src/core/**/*.ts'],
+    files: ['yummygraph/src/core/**/*.ts'],
     plugins: {
-      gitnexus: gitnexusLocalPlugin,
+      yummygraph: yummygraphLocalPlugin,
     },
     rules: {
-      'gitnexus/require-safe-parse': 'error',
+      'yummygraph/require-safe-parse': 'error',
     },
   },
 
-  // React-specific rules for gitnexus-web
+  // React-specific rules for yummygraph-web
   {
-    files: ['gitnexus-web/src/**/*.{ts,tsx}'],
+    files: ['yummygraph-web/src/**/*.{ts,tsx}'],
     plugins: {
       'react-hooks': reactHooks,
     },
@@ -184,7 +184,7 @@ export default [
   // mcpStdoutWriteSelectors here alongside the safeClose selectors. Without
   // this, lbug-adapter would silently lose its MCP stdout-write protection.
   {
-    files: ['gitnexus/src/core/lbug/lbug-adapter.ts'],
+    files: ['yummygraph/src/core/lbug/lbug-adapter.ts'],
     rules: {
       'no-restricted-syntax': [
         'error',

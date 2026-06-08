@@ -24,7 +24,7 @@
  * Python's `getPythonFileIndex` WeakMap pattern (PR #1918).
  */
 
-import type { ParsedImport, WorkspaceIndex } from 'gitnexus-shared';
+import type { ParsedImport, WorkspaceIndex } from 'yummygraph-shared';
 
 export interface SwiftResolveContext {
   readonly fromFile: string;

@@ -1,5 +1,5 @@
-name: Setup GitNexus Web
-description: Setup Node.js 22, build gitnexus-shared, install web dependencies
+name: Setup YummyGraph Web
+description: Setup Node.js 22, build yummygraph-shared, install web dependencies
 
 runs:
   using: composite
@@ -9,14 +9,14 @@ runs:
         # Vite 7 requires Node ^20.19.0 || >=22.12.0 (require(esm) support).
         node-version: 22
         cache: npm
-        cache-dependency-path: gitnexus-web/package-lock.json
+        cache-dependency-path: yummygraph-web/package-lock.json
 
-    - name: Build gitnexus-shared
+    - name: Build yummygraph-shared
       run: npm install && npm run build
       shell: bash
-      working-directory: gitnexus-shared
+      working-directory: yummygraph-shared
 
     - name: Install web dependencies
       run: npm ci
       shell: bash
-      working-directory: gitnexus-web
+      working-directory: yummygraph-web

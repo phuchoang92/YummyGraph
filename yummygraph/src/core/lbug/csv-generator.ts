@@ -15,14 +15,14 @@
 import fs from 'fs/promises';
 import { createWriteStream, WriteStream } from 'fs';
 import path from 'path';
-import type { GraphNode, GraphRelationship } from 'gitnexus-shared';
+import type { GraphNode, GraphRelationship } from 'yummygraph-shared';
 import { KnowledgeGraph } from '../graph/types.js';
 import { NodeTableName } from './schema.js';
 import { parseTruthyEnv } from '../ingestion/utils/env.js';
 
 /**
  * Deterministic output ordering — optional (out-of-core / windowed-resolve
- * enabler). When `GITNEXUS_SORT_GRAPH_OUTPUT` is set, nodes and relationships
+ * enabler). When `YUMMYGRAPH_SORT_GRAPH_OUTPUT` is set, nodes and relationships
  * are emitted sorted by their (unique, dedup-key) graph `id` rather than in
  * graph-insertion order, making the CSV a pure function of the graph's node/edge
  * SET instead of of emit order. Default off returns the iterator untouched, so
@@ -241,7 +241,7 @@ export const streamAllCSVsToDisk = async (
 ): Promise<StreamedCSVResult> => {
   // Deterministic (id-sorted) node/relationship row order when enabled;
   // default off = today's graph-insertion order (byte-identical).
-  const sortOutput = parseTruthyEnv(process.env.GITNEXUS_SORT_GRAPH_OUTPUT);
+  const sortOutput = parseTruthyEnv(process.env.YUMMYGRAPH_SORT_GRAPH_OUTPUT);
   // Remove stale CSVs from previous crashed runs, then recreate
   try {
     await fs.rm(csvDir, { recursive: true, force: true });

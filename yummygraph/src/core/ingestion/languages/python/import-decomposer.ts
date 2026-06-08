@@ -11,7 +11,7 @@
  * `ParsedImport` shape — see `interpret.ts`.
  */
 
-import type { Capture, CaptureMatch } from 'gitnexus-shared';
+import type { Capture, CaptureMatch } from 'yummygraph-shared';
 import {
   findChild,
   nodeToCapture,

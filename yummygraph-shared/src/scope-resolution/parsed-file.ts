@@ -41,13 +41,13 @@
  * ## Source-of-truth invariant
  *
  * `ParsedFile` is the single semantic model consumed by both the legacy
- * DAG (`gitnexus/src/core/ingestion/` outside `scope-resolution/`) and
- * the scope-resolution pipeline (`gitnexus/src/core/ingestion/scope-resolution/`).
+ * DAG (`yummygraph/src/core/ingestion/` outside `scope-resolution/`) and
+ * the scope-resolution pipeline (`yummygraph/src/core/ingestion/scope-resolution/`).
  * Downstream passes MUST NOT build a parallel parse representation; if
  * a pass needs AST-level facts that `ParsedFile` doesn't expose, it
  * should reuse the orchestrator's `treeCache` rather than re-invoke
  * `parser.parse(...)` on its own. See the
- * `ScopeResolver` contract (`gitnexus/src/core/ingestion/scope-resolution/contract/scope-resolver.ts`)
+ * `ScopeResolver` contract (`yummygraph/src/core/ingestion/scope-resolution/contract/scope-resolver.ts`)
  * for the full list of invariants downstream consumers rely on.
  */
 

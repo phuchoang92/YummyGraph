@@ -1,5 +1,5 @@
 /**
- * Read-only / permission-denied write paths for ensureGitNexusIgnored (#1549, PR #1550).
+ * Read-only / permission-denied write paths for ensureYummyGraphIgnored (#1549, PR #1550).
  * Separate from repo-manager.test.ts: Vitest cannot vi.spyOn ESM namespace exports of
  * fs/promises; a delegating vi.mock is required for cross-platform mock rejects.
  */
@@ -28,17 +28,17 @@ vi.mock('fs/promises', async (importOriginal) => {
 });
 
 import fs from 'fs/promises';
-import { ensureGitNexusIgnored } from '../../src/storage/repo-manager.js';
+import { ensureYummyGraphIgnored } from '../../src/storage/repo-manager.js';
 import { _captureLogger } from '../../src/core/logger.js';
 import { createTempDir } from '../helpers/test-db.js';
 
 const samePath = (a: string, b: string) => path.normalize(a) === path.normalize(b);
 
-describe('ensureGitNexusIgnored — mocked writeFile (EROFS / EACCES / EPERM)', () => {
+describe('ensureYummyGraphIgnored — mocked writeFile (EROFS / EACCES / EPERM)', () => {
   let tmpRepo: Awaited<ReturnType<typeof createTempDir>>;
 
   beforeEach(async () => {
-    tmpRepo = await createTempDir('gitnexus-ro-ignore-mock-');
+    tmpRepo = await createTempDir('yummygraph-ro-ignore-mock-');
     fswCtx.writeFileMock.mockClear();
     fswCtx.writeFileMock.mockImplementation((...args) => fswCtx.realWrite!(...args));
   });
@@ -50,7 +50,7 @@ describe('ensureGitNexusIgnored — mocked writeFile (EROFS / EACCES / EPERM)', 
   it.each(['EROFS', 'EACCES', 'EPERM'] as const)(
     'tolerates %s on .git/info/exclude write and logs a warn',
     async (code) => {
-      const gitignorePath = path.join(tmpRepo.dbPath, '.gitnexus', '.gitignore');
+      const gitignorePath = path.join(tmpRepo.dbPath, '.yummygraph', '.gitignore');
       await fs.mkdir(path.dirname(gitignorePath), { recursive: true });
       await fs.writeFile(gitignorePath, '*\n', 'utf-8');
 
@@ -62,7 +62,7 @@ describe('ensureGitNexusIgnored — mocked writeFile (EROFS / EACCES / EPERM)', 
       fswCtx.writeFileMock.mockRejectedValueOnce(Object.assign(new Error('mock ro'), { code }));
 
       try {
-        await expect(ensureGitNexusIgnored(tmpRepo.dbPath)).resolves.not.toThrow();
+        await expect(ensureYummyGraphIgnored(tmpRepo.dbPath)).resolves.not.toThrow();
         expect(fswCtx.writeFileMock).toHaveBeenCalled();
         expect(
           cap
@@ -83,15 +83,15 @@ describe('ensureGitNexusIgnored — mocked writeFile (EROFS / EACCES / EPERM)', 
   );
 
   it.each(['EROFS', 'EACCES', 'EPERM'] as const)(
-    'tolerates %s on .gitnexus/.gitignore write and logs a warn',
+    'tolerates %s on .yummygraph/.gitignore write and logs a warn',
     async (code) => {
       const cap = _captureLogger();
-      const gitignorePath = path.join(tmpRepo.dbPath, '.gitnexus', '.gitignore');
+      const gitignorePath = path.join(tmpRepo.dbPath, '.yummygraph', '.gitignore');
 
       fswCtx.writeFileMock.mockRejectedValueOnce(Object.assign(new Error('mock ro'), { code }));
 
       try {
-        await expect(ensureGitNexusIgnored(tmpRepo.dbPath)).resolves.not.toThrow();
+        await expect(ensureYummyGraphIgnored(tmpRepo.dbPath)).resolves.not.toThrow();
         expect(fswCtx.writeFileMock).toHaveBeenCalled();
         expect(
           cap
@@ -102,7 +102,7 @@ describe('ensureGitNexusIgnored — mocked writeFile (EROFS / EACCES / EPERM)', 
                 r.code === code &&
                 typeof r.path === 'string' &&
                 samePath(String(r.path), gitignorePath) &&
-                String(r.msg ?? '').includes('.gitnexus/.gitignore'),
+                String(r.msg ?? '').includes('.yummygraph/.gitignore'),
             ),
         ).toBe(true);
       } finally {
