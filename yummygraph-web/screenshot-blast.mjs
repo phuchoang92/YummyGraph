@@ -48,6 +48,20 @@ try {
 
   await page.screenshot({ path: OUT, fullPage: false });
   console.log('screenshot saved →', OUT);
+
+  // Prove the panel is draggable: grab the header and move it to the centre.
+  const header = page.getByText('Blast Radius', { exact: true });
+  const box = await header.boundingBox();
+  if (box) {
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(box.x + 420, box.y + 260, { steps: 24 });
+    await page.mouse.move(box.x + 440, box.y + 280, { steps: 6 });
+    await page.mouse.up();
+    await page.waitForTimeout(700);
+    await page.screenshot({ path: '/tmp/blast-radius-dragged.png', fullPage: false });
+    console.log('dragged screenshot saved → /tmp/blast-radius-dragged.png');
+  }
 } catch (err) {
   console.error('FAILED:', err.message);
   await page.screenshot({ path: '/tmp/blast-radius-failure.png' }).catch(() => {});

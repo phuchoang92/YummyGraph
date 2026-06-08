@@ -137,7 +137,9 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle>((_, ref) => {
   const handleBlastRadius = useCallback(() => {
     if (!graph || !appSelectedNode) return;
     setBlast(computeBlastRadius(graph, appSelectedNode.id, { direction: 'upstream' }));
-  }, [graph, appSelectedNode]);
+    // Close the code overlay so the (draggable) summary panel is fully visible.
+    setCodePanelOpen(false);
+  }, [graph, appSelectedNode, setCodePanelOpen]);
 
   const handleToggleAIHighlights = useCallback(() => {
     if (isAIHighlightsEnabled) {

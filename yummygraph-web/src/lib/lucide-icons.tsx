@@ -67,6 +67,7 @@ export {
   FolderOpen,
   GitBranch,
   Globe,
+  GripVertical,
   Hash,
   Heart,
   HelpCircle,

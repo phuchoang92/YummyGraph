@@ -5,7 +5,8 @@
  * clusters touched, and a risk rating, plus a clickable list to jump to any
  * affected symbol.
  */
-import { Zap, X, AlertTriangle } from '@/lib/lucide-icons';
+import { useRef, useState, useCallback } from 'react';
+import { Zap, X, AlertTriangle, GripVertical } from '@/lib/lucide-icons';
 import type { BlastRadiusResult } from '../lib/blast-radius';
 import { blastDepthColor, riskColor } from '../lib/blast-radius';
 
@@ -23,6 +24,48 @@ const depthBucketLabel = (depth: number): string => {
 export const BlastRadiusPanel = ({ result, onClose, onFocusNode }: BlastRadiusPanelProps) => {
   const risk = riskColor(result.risk);
 
+  // Draggable: lets the user move the panel out from under the code/file panels
+  // and see it (and the graph behind it) entirely. Position is relative to the
+  // graph container (the panel's offsetParent) and clamped on-screen.
+  const panelRef = useRef<HTMLDivElement>(null);
+  const dragOffset = useRef<{ dx: number; dy: number } | null>(null);
+  const [pos, setPos] = useState<{ left: number; top: number }>({ left: 16, top: 16 });
+  const [dragging, setDragging] = useState(false);
+
+  const onPointerDown = useCallback((e: React.PointerEvent) => {
+    const panel = panelRef.current;
+    if (!panel) return;
+    const rect = panel.getBoundingClientRect();
+    dragOffset.current = { dx: e.clientX - rect.left, dy: e.clientY - rect.top };
+    setDragging(true);
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    e.preventDefault();
+  }, []);
+
+  const onPointerMove = useCallback((e: React.PointerEvent) => {
+    const panel = panelRef.current;
+    const offset = dragOffset.current;
+    if (!panel || !offset) return;
+    const parent = (panel.offsetParent as HTMLElement | null)?.getBoundingClientRect();
+    const baseLeft = parent?.left ?? 0;
+    const baseTop = parent?.top ?? 0;
+    const maxLeft = Math.max(0, (parent?.width ?? window.innerWidth) - panel.offsetWidth);
+    const maxTop = Math.max(0, (parent?.height ?? window.innerHeight) - panel.offsetHeight);
+    const left = Math.min(Math.max(0, e.clientX - offset.dx - baseLeft), maxLeft);
+    const top = Math.min(Math.max(0, e.clientY - offset.dy - baseTop), maxTop);
+    setPos({ left, top });
+  }, []);
+
+  const endDrag = useCallback((e: React.PointerEvent) => {
+    dragOffset.current = null;
+    setDragging(false);
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {
+      /* pointer already released */
+    }
+  }, []);
+
   // Group impacted nodes by depth for a scannable list.
   const byDepth = new Map<number, typeof result.nodes>();
   for (const node of result.nodes) {
@@ -33,15 +76,31 @@ export const BlastRadiusPanel = ({ result, onClose, onFocusNode }: BlastRadiusPa
   const depths = Array.from(byDepth.keys()).sort((a, b) => a - b);
 
   return (
-    <div className="absolute top-4 left-4 z-30 flex max-h-[calc(100%-2rem)] w-80 animate-slide-up flex-col rounded-xl border border-border-subtle bg-elevated/95 shadow-2xl backdrop-blur-md">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-border-subtle px-4 py-3">
+    <div
+      ref={panelRef}
+      style={{ left: pos.left, top: pos.top }}
+      className={`absolute z-40 flex max-h-[calc(100%-2rem)] w-80 flex-col rounded-xl border border-border-subtle bg-elevated/95 shadow-2xl backdrop-blur-md ${
+        dragging ? 'cursor-grabbing select-none' : 'animate-slide-up'
+      }`}
+    >
+      {/* Header — drag handle */}
+      <div
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={endDrag}
+        onPointerCancel={endDrag}
+        className={`flex touch-none items-center justify-between border-b border-border-subtle px-4 py-3 ${
+          dragging ? 'cursor-grabbing' : 'cursor-grab'
+        }`}
+      >
         <div className="flex items-center gap-2">
+          <GripVertical className="h-4 w-4 text-text-muted" />
           <Zap className="h-4 w-4 text-red-400" />
           <span className="text-sm font-semibold text-text-primary">Blast Radius</span>
         </div>
         <button
           onClick={onClose}
+          onPointerDown={(e) => e.stopPropagation()}
           className="rounded p-1 text-text-muted transition-colors hover:bg-white/10 hover:text-text-primary"
           title="Clear blast radius"
         >
