@@ -1,4 +1,12 @@
-import { useEffect, useCallback, useMemo, useState, forwardRef, useImperativeHandle } from 'react';
+import {
+  useEffect,
+  useCallback,
+  useMemo,
+  useState,
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+} from 'react';
 import {
   ZoomIn,
   ZoomOut,
@@ -12,6 +20,7 @@ import {
   Network,
   GitBranch,
   Target,
+  Zap,
 } from '@/lib/lucide-icons';
 import { useSigma } from '../hooks/useSigma';
 import { useAppState } from '../hooks/useAppState';
@@ -25,6 +34,8 @@ import {
 } from '../lib/graph-adapter';
 import type { GraphNode } from 'yummygraph-shared';
 import { QueryFAB } from './QueryFAB';
+import { BlastRadiusPanel } from './BlastRadiusPanel';
+import { computeBlastRadius, type BlastRadiusResult } from '../lib/blast-radius';
 import Graph from 'graphology';
 import { useTranslation } from 'react-i18next';
 
@@ -41,6 +52,7 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle>((_, ref) => {
     visibleLabels,
     visibleEdgeTypes,
     openCodePanel,
+    setCodePanelOpen,
     depthFilter,
     highlightedNodeIds,
     setHighlightedNodeIds,
@@ -57,6 +69,8 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle>((_, ref) => {
     setGraphViewMode,
   } = useAppState();
   const [hoveredNodeName, setHoveredNodeName] = useState<string | null>(null);
+  // User-initiated blast radius (independent of the AI-chat highlight flow).
+  const [blast, setBlast] = useState<BlastRadiusResult | null>(null);
 
   const effectiveHighlightedNodeIds = useMemo(() => {
     if (!isAIHighlightsEnabled) return highlightedNodeIds;
@@ -115,7 +129,15 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle>((_, ref) => {
 
   const handleStageClick = useCallback(() => {
     setSelectedNode(null);
+    setBlast(null);
   }, [setSelectedNode]);
+
+  // Compute the blast radius (upstream dependents) of the selected symbol and
+  // light it up on the graph as depth-graded red heat.
+  const handleBlastRadius = useCallback(() => {
+    if (!graph || !appSelectedNode) return;
+    setBlast(computeBlastRadius(graph, appSelectedNode.id, { direction: 'upstream' }));
+  }, [graph, appSelectedNode]);
 
   const handleToggleAIHighlights = useCallback(() => {
     if (isAIHighlightsEnabled) {
@@ -154,6 +176,7 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle>((_, ref) => {
     onStageClick: handleStageClick,
     highlightedNodeIds: effectiveHighlightedNodeIds,
     blastRadiusNodeIds: effectiveBlastRadiusNodeIds,
+    blastRadiusDepth: blast?.depthById,
     animatedNodes: effectiveAnimatedNodes,
     visibleEdgeTypes,
     layoutMode: graphViewMode,
@@ -242,6 +265,54 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle>((_, ref) => {
     }
   }, [appSelectedNode, setSigmaSelectedNode]);
 
+  // Drop a stale blast radius when the selection moves to a different symbol.
+  useEffect(() => {
+    setBlast((prev) => (prev && prev.targetId !== appSelectedNode?.id ? null : prev));
+  }, [appSelectedNode?.id]);
+
+  // Select a symbol by name and open its blast radius. If the name is ambiguous,
+  // the highest-impact match wins. Returns false when no symbol matches.
+  const applyBlastByName = useCallback(
+    (name: string): boolean => {
+      if (!graph) return false;
+      const matches = graph.nodes.filter(
+        (n) => n.properties?.name?.toLowerCase() === name.toLowerCase(),
+      );
+      if (matches.length === 0) return false;
+      let best = matches[0];
+      let bestResult = computeBlastRadius(graph, best.id, { direction: 'upstream' });
+      for (const cand of matches.slice(1)) {
+        const r = computeBlastRadius(graph, cand.id, { direction: 'upstream' });
+        if (r.totalCount > bestResult.totalCount) {
+          best = cand;
+          bestResult = r;
+        }
+      }
+      setSelectedNode(best);
+      setBlast(bestResult);
+      // Fit the whole graph so the spread of red "heat" across the blast radius
+      // is visible, rather than zooming into the single target.
+      resetZoom();
+      // Keep the graph (and its heat-map) in view — don't pop the code panel.
+      setCodePanelOpen(false);
+      return true;
+    },
+    [graph, setSelectedNode, resetZoom, setCodePanelOpen],
+  );
+
+  // Deep link `?blast=<symbolName>` auto-opens that symbol's blast radius once
+  // the graph loads — shareable "what breaks if I change X" links / one-click
+  // demos. Also exposes `window.__ygBlast(name)` for the same purpose.
+  const demoBlastAppliedRef = useRef<string | null>(null);
+  useEffect(() => {
+    (window as unknown as { __ygBlast?: (name: string) => boolean }).__ygBlast = applyBlastByName;
+    if (!graph) return;
+    const wanted = new URLSearchParams(window.location.search).get('blast');
+    if (wanted && demoBlastAppliedRef.current !== wanted && applyBlastByName(wanted)) {
+      demoBlastAppliedRef.current = wanted;
+    }
+  }, [graph, applyBlastByName]);
+
   // Focus on selected node
   const handleFocusSelected = useCallback(() => {
     if (appSelectedNode) {
@@ -253,6 +324,7 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle>((_, ref) => {
   const handleClearSelection = useCallback(() => {
     setSelectedNode(null);
     setSigmaSelectedNode(null);
+    setBlast(null);
     resetZoom();
   }, [setSelectedNode, setSigmaSelectedNode, resetZoom]);
 
@@ -340,12 +412,29 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle>((_, ref) => {
           </span>
           <span className="text-xs text-text-muted">({appSelectedNode.label})</span>
           <button
+            onClick={handleBlastRadius}
+            className="ml-2 flex items-center gap-1 rounded-md border border-red-500/40 bg-red-500/15 px-2 py-0.5 text-xs font-medium text-red-300 transition-colors hover:bg-red-500/25"
+            title="Show what breaks if you change this symbol"
+          >
+            <Zap className="h-3 w-3" />
+            Blast radius
+          </button>
+          <button
             onClick={handleClearSelection}
-            className="ml-2 rounded px-2 py-0.5 text-xs text-text-secondary transition-colors hover:bg-white/10 hover:text-text-primary"
+            className="rounded px-2 py-0.5 text-xs text-text-secondary transition-colors hover:bg-white/10 hover:text-text-primary"
           >
             {t('canvas.clear')}
           </button>
         </div>
+      )}
+
+      {/* Blast-radius summary panel */}
+      {blast && (
+        <BlastRadiusPanel
+          result={blast}
+          onClose={() => setBlast(null)}
+          onFocusNode={(nodeId) => focusNode(nodeId)}
+        />
       )}
 
       {/* Graph Controls - Bottom Right */}

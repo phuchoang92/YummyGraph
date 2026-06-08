@@ -8,6 +8,7 @@ import EdgeCurveProgram from '@sigma/edge-curve';
 import { SigmaNodeAttributes, SigmaEdgeAttributes } from '../lib/graph-adapter';
 import type { NodeAnimation } from './useAppState';
 import type { EdgeType } from '../lib/constants';
+import { blastDepthColor } from '../lib/blast-radius';
 // Helper: Parse hex color to RGB
 const hexToRgb = (hex: string): { r: number; g: number; b: number } => {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -60,6 +61,8 @@ interface UseSigmaOptions {
   onStageClick?: () => void;
   highlightedNodeIds?: Set<string>;
   blastRadiusNodeIds?: Set<string>;
+  /** id → hop distance for user-initiated, depth-graded blast-radius heat. */
+  blastRadiusDepth?: Map<string, number>;
   animatedNodes?: Map<string, NodeAnimation>;
   visibleEdgeTypes?: EdgeType[];
   layoutMode?: 'force' | 'tree' | 'circles';
@@ -236,6 +239,7 @@ export const useSigma = (options: UseSigmaOptions = {}): UseSigmaReturn => {
   const selectedNodeRef = useRef<string | null>(null);
   const highlightedRef = useRef<Set<string>>(new Set());
   const blastRadiusRef = useRef<Set<string>>(new Set());
+  const blastRadiusDepthRef = useRef<Map<string, number>>(new Map());
   const animatedNodesRef = useRef<Map<string, NodeAnimation>>(new Map());
   const visibleEdgeTypesRef = useRef<EdgeType[] | null>(null);
 
@@ -271,12 +275,14 @@ export const useSigma = (options: UseSigmaOptions = {}): UseSigmaReturn => {
   useEffect(() => {
     highlightedRef.current = options.highlightedNodeIds || new Set();
     blastRadiusRef.current = options.blastRadiusNodeIds || new Set();
+    blastRadiusDepthRef.current = options.blastRadiusDepth || new Map();
     animatedNodesRef.current = options.animatedNodes || new Map();
     visibleEdgeTypesRef.current = options.visibleEdgeTypes || null;
     sigmaRef.current?.refresh();
   }, [
     options.highlightedNodeIds,
     options.blastRadiusNodeIds,
+    options.blastRadiusDepth,
     options.animatedNodes,
     options.visibleEdgeTypes,
   ]);
@@ -521,6 +527,31 @@ export const useSigma = (options: UseSigmaOptions = {}): UseSigmaReturn => {
           return res;
         }
 
+        // User-initiated blast radius: depth-graded "heat" (hot red for direct
+        // dependents, cooling for transitive). Rendered even while the target
+        // node is selected, so clicking a symbol → "Blast Radius" shows the
+        // impact immediately. Driven by the depthById map (see lib/blast-radius).
+        const blastDepth = blastRadiusDepthRef.current;
+        if (blastDepth.size > 0) {
+          if (node === currentSelected) {
+            res.color = '#ffffff';
+            res.size = (data.size || 8) * 2.0;
+            res.zIndex = 6;
+            res.highlighted = true;
+          } else if (blastDepth.has(node)) {
+            const depth = blastDepth.get(node) || 1;
+            res.color = blastDepthColor(depth);
+            res.size = (data.size || 8) * Math.max(0.9, 1.9 - depth * 0.18);
+            res.zIndex = 4;
+            res.highlighted = true;
+          } else {
+            res.color = dimColor(data.color, 0.12);
+            res.size = (data.size || 8) * 0.35;
+            res.zIndex = 0;
+          }
+          return res;
+        }
+
         // Blast radius takes priority (red highlighting)
         if (hasBlastRadius && !currentSelected) {
           if (isBlastRadiusNode) {
@@ -616,6 +647,29 @@ export const useSigma = (options: UseSigmaOptions = {}): UseSigmaReturn => {
             res.color = brightenColor(data.color, 1.2);
             res.size = Math.max(1, (data.size || 1) * 1.2);
           }
+        }
+
+        // User-initiated blast radius: light up edges between impacted symbols
+        // (and from the target) in red; dim everything else. Mirrors the node
+        // reducer's user-blast branch and runs even with a node selected.
+        const blastDepthEdge = blastRadiusDepthRef.current;
+        if (blastDepthEdge.size > 0) {
+          const graph = graphRef.current;
+          if (graph) {
+            const [source, target] = graph.extremities(edge);
+            const sel = selectedNodeRef.current;
+            const inBlast = (id: string) => id === sel || blastDepthEdge.has(id);
+            if (inBlast(source) && inBlast(target)) {
+              res.color = '#ef4444';
+              res.size = Math.max(2, (data.size || 1) * 3);
+              res.zIndex = 2;
+            } else {
+              res.color = dimColor(data.color, 0.06);
+              res.size = 0.2;
+              res.zIndex = 0;
+            }
+          }
+          return res;
         }
 
         const currentSelected = selectedNodeRef.current;
