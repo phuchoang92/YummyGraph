@@ -45,7 +45,7 @@
   "tryAsking": "Try asking:",
   "footer": "YummyGraph — graph explorer",
   "title": "Help & Reference",
-  "footerLong": "YummyGraph — open source codebase graph explorer",
+  "footerLong": "YummyGraph — codebase graph explorer",
   "docsGithub": "Docs & GitHub ↗",
   "overview": {
     "gettingStarted": "Getting started",
