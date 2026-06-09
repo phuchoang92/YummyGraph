@@ -85,15 +85,65 @@ const getNodeMass = (nodeType: NodeLabel, nodeCount: number): number => {
 };
 
 /**
+ * Greedy circle packing: place each circle (largest first) at the first spot
+ * along an expanding phyllotaxis spiral where it doesn't overlap any already-
+ * placed circle (respecting `gap`). Deterministic and dependency-free; used to
+ * lay out folder "islands" without overlap. Pass `items` pre-sorted by radius
+ * descending for the tightest result.
+ */
+export const packCircles = (
+  items: { id: number; r: number }[],
+  gap = 40,
+): Map<number, { x: number; y: number }> => {
+  const golden = Math.PI * (3 - Math.sqrt(5));
+  const placed: { x: number; y: number; r: number }[] = [];
+  const pos = new Map<number, { x: number; y: number }>();
+  for (const it of items) {
+    if (placed.length === 0) {
+      pos.set(it.id, { x: 0, y: 0 });
+      placed.push({ x: 0, y: 0, r: it.r });
+      continue;
+    }
+    const step = Math.max(it.r, 1);
+    let x = 0;
+    let y = 0;
+    for (let t = 1; t < 200000; t++) {
+      const ang = t * golden;
+      const rad = step * Math.sqrt(t);
+      x = rad * Math.cos(ang);
+      y = rad * Math.sin(ang);
+      let free = true;
+      for (const p of placed) {
+        const minD = p.r + it.r + gap;
+        const dx = p.x - x;
+        const dy = p.y - y;
+        if (dx * dx + dy * dy < minD * minD) {
+          free = false;
+          break;
+        }
+      }
+      if (free) break;
+    }
+    pos.set(it.id, { x, y });
+    placed.push({ x, y, r: it.r });
+  }
+  return pos;
+};
+
+/**
  * Converts the KnowledgeGraph to a graphology Graph for Sigma.js
  * Folders are positioned in a wide spread, children positioned NEAR their parents
  *
  * @param knowledgeGraph - The knowledge graph to convert
  * @param communityMemberships - Optional map of nodeId -> communityIndex for community coloring
+ * @param packIslands - When true, lay each cluster out as a compact, non-overlapping
+ *   disk ("island"). Used when the force layout is paused (folder-hull overlay) so
+ *   folders read as clearly separated groups instead of one hairball.
  */
 export const knowledgeGraphToGraphology = (
   knowledgeGraph: KnowledgeGraph,
   communityMemberships?: Map<string, number>,
+  packIslands = false,
 ): Graph<SigmaNodeAttributes, SigmaEdgeAttributes> => {
   const graph = new Graph<SigmaNodeAttributes, SigmaEdgeAttributes>();
   const nodeCount = knowledgeGraph.nodes.length;
@@ -139,26 +189,55 @@ export const knowledgeGraphToGraphology = (
   // === CLUSTER-BASED POSITIONING ===
   // Calculate cluster centers - each cluster gets a region of the graph
   const clusterCenters = new Map<number, { x: number; y: number }>();
-  if (communityMemberships && communityMemberships.size > 0) {
-    // Find unique community IDs
-    const communities = new Set(communityMemberships.values());
-    const communityCount = communities.size;
-    const clusterSpread = structuralSpread * 0.8; // Clusters spread across 80% of graph
+  // Island mode: per-cluster disk radius + symbol count, for compact sunflower fill.
+  const islandRadius = new Map<number, number>();
+  const clusterMemberCount = new Map<number, number>();
+  const clusterFillIndex = new Map<number, number>(); // running placement index per cluster
+  const symbolTypes = new Set(['Function', 'Class', 'Method', 'Interface']);
 
-    // Position cluster centers using golden angle for even distribution
-    const goldenAngle = Math.PI * (3 - Math.sqrt(5));
-    let idx = 0;
-    communities.forEach((communityId) => {
-      const angle = idx * goldenAngle;
-      const radius = clusterSpread * Math.sqrt((idx + 1) / communityCount);
-      clusterCenters.set(communityId, {
-        x: radius * Math.cos(angle),
-        y: radius * Math.sin(angle),
+  if (communityMemberships && communityMemberships.size > 0) {
+    if (packIslands) {
+      // Size each folder's island by its symbol count, then pack the islands so
+      // they don't overlap — yields clearly separated folder "islands".
+      knowledgeGraph.nodes.forEach((n) => {
+        if (!symbolTypes.has(n.label)) return;
+        const ci = communityMemberships.get(n.id);
+        if (ci === undefined) return;
+        clusterMemberCount.set(ci, (clusterMemberCount.get(ci) ?? 0) + 1);
       });
-      idx++;
-    });
+      const NODE_GAP = 16; // intra-island spacing
+      const ISLAND_PAD = 18;
+      const items = Array.from(clusterMemberCount.entries())
+        .map(([ci, count]) => ({ id: ci, r: ISLAND_PAD + NODE_GAP * Math.sqrt(count) }))
+        .sort((a, b) => b.r - a.r);
+      items.forEach(({ id, r }) => islandRadius.set(id, r));
+      // Generous breathing room between islands — scaled to island size (the
+      // largest island sets the spacing) with a floor, so folders read as
+      // clearly distinct groups rather than touching blobs.
+      const maxIslandRadius = items.length ? items[0].r : 0;
+      const islandGap = Math.max(160, maxIslandRadius * 1.5);
+      packCircles(items, islandGap).forEach((p, ci) => clusterCenters.set(ci, p));
+    } else {
+      // Find unique community IDs
+      const communities = new Set(communityMemberships.values());
+      const communityCount = communities.size;
+      const clusterSpread = structuralSpread * 0.8; // Clusters spread across 80% of graph
+
+      // Position cluster centers using golden angle for even distribution
+      const goldenAngle = Math.PI * (3 - Math.sqrt(5));
+      let idx = 0;
+      communities.forEach((communityId) => {
+        const angle = idx * goldenAngle;
+        const radius = clusterSpread * Math.sqrt((idx + 1) / communityCount);
+        clusterCenters.set(communityId, {
+          x: radius * Math.cos(angle),
+          y: radius * Math.sin(angle),
+        });
+        idx++;
+      });
+    }
   }
-  // Jitter within cluster (tighter than childJitter)
+  // Jitter within cluster (tighter than childJitter) — used in non-island mode.
   const clusterJitter = Math.sqrt(nodeCount) * 1.5;
 
   // Store positions for parent lookup
@@ -209,13 +288,26 @@ export const knowledgeGraphToGraphology = (
 
     // Check if this is a symbol node with a community assignment
     const communityIndex = communityMemberships?.get(nodeId);
-    const symbolTypes = new Set(['Function', 'Class', 'Method', 'Interface']);
     const clusterCenter = communityIndex !== undefined ? clusterCenters.get(communityIndex) : null;
 
     if (clusterCenter && symbolTypes.has(node.label)) {
-      // CLUSTER-BASED POSITIONING: Position near cluster center with tight jitter
-      x = clusterCenter.x + (Math.random() - 0.5) * clusterJitter;
-      y = clusterCenter.y + (Math.random() - 0.5) * clusterJitter;
+      if (packIslands) {
+        // ISLAND FILL: lay the folder's symbols out as a compact sunflower disk
+        // inside its packed island, so each folder reads as a separate cluster.
+        const r = islandRadius.get(communityIndex!) ?? 40;
+        const count = clusterMemberCount.get(communityIndex!) ?? 1;
+        const j = clusterFillIndex.get(communityIndex!) ?? 0;
+        clusterFillIndex.set(communityIndex!, j + 1);
+        const golden = Math.PI * (3 - Math.sqrt(5));
+        const ang = j * golden;
+        const rr = (r - 6) * Math.sqrt((j + 0.5) / count);
+        x = clusterCenter.x + rr * Math.cos(ang);
+        y = clusterCenter.y + rr * Math.sin(ang);
+      } else {
+        // CLUSTER-BASED POSITIONING: Position near cluster center with tight jitter
+        x = clusterCenter.x + (Math.random() - 0.5) * clusterJitter;
+        y = clusterCenter.y + (Math.random() - 0.5) * clusterJitter;
+      }
     } else {
       // HIERARCHY-BASED POSITIONING: Position near parent
       const parentId = childToParent.get(nodeId);

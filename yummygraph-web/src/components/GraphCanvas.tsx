@@ -282,6 +282,7 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle>((_, ref) => {
       sigmaGraph = knowledgeGraphToGraphology(
         graph,
         showHulls ? folderMemberships : communityMemberships,
+        showHulls, // pack folders into separated islands when hulls are on
       );
     }
 
