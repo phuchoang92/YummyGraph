@@ -31,12 +31,12 @@ const shortcuts = [
 ];
 
 const nodeColors = [
-  { color: '#10b981', labelKey: 'nodeTypes.function', descKey: 'nodeTypes.functionDesc' },
-  { color: '#3b82f6', labelKey: 'nodeTypes.file', descKey: 'nodeTypes.fileDesc' },
-  { color: '#f59e0b', labelKey: 'nodeTypes.class', descKey: 'nodeTypes.classDesc' },
-  { color: '#14b8a6', labelKey: 'nodeTypes.method', descKey: 'nodeTypes.methodDesc' },
-  { color: '#ec4899', labelKey: 'nodeTypes.interface', descKey: 'nodeTypes.interfaceDesc' },
-  { color: '#6366f1', labelKey: 'nodeTypes.folder', descKey: 'nodeTypes.folderDesc' },
+  { color: '#00ff88', labelKey: 'nodeTypes.function', descKey: 'nodeTypes.functionDesc' },
+  { color: '#00ccff', labelKey: 'nodeTypes.file', descKey: 'nodeTypes.fileDesc' },
+  { color: '#ffb300', labelKey: 'nodeTypes.class', descKey: 'nodeTypes.classDesc' },
+  { color: '#00ffaa', labelKey: 'nodeTypes.method', descKey: 'nodeTypes.methodDesc' },
+  { color: '#ff79c6', labelKey: 'nodeTypes.interface', descKey: 'nodeTypes.interfaceDesc' },
+  { color: '#00aaff', labelKey: 'nodeTypes.folder', descKey: 'nodeTypes.folderDesc' },
 ];
 
 const getStatusItems = (t: (key: string) => string, nodeCount: number, edgeCount: number) => [
@@ -47,7 +47,7 @@ const getStatusItems = (t: (key: string) => string, nodeCount: number, edgeCount
           width: 8,
           height: 8,
           borderRadius: '50%',
-          background: '#34d399',
+          background: '#00ff88',
           display: 'inline-block',
           flexShrink: 0,
         }}
@@ -58,7 +58,7 @@ const getStatusItems = (t: (key: string) => string, nodeCount: number, edgeCount
   },
   {
     badge: (
-      <span style={{ fontSize: 12, fontWeight: 500, color: '#a78bfa', flexShrink: 0 }}>
+      <span style={{ fontSize: 12, fontWeight: 500, color: '#00ff88', flexShrink: 0 }}>
         {nodeCount}
       </span>
     ),
@@ -67,7 +67,7 @@ const getStatusItems = (t: (key: string) => string, nodeCount: number, edgeCount
   },
   {
     badge: (
-      <span style={{ fontSize: 12, fontWeight: 500, color: '#60a5fa', flexShrink: 0 }}>
+      <span style={{ fontSize: 12, fontWeight: 500, color: '#00aaff', flexShrink: 0 }}>
         {edgeCount}
       </span>
     ),
@@ -80,7 +80,7 @@ const getStatusItems = (t: (key: string) => string, nodeCount: number, edgeCount
         style={{
           fontSize: 11,
           fontWeight: 500,
-          color: '#34d399',
+          color: '#00ff88',
           flexShrink: 0,
           whiteSpace: 'nowrap',
         }}
@@ -107,7 +107,7 @@ const kbdStyle: React.CSSProperties = {
 
 const kbdWinStyle: React.CSSProperties = {
   ...kbdStyle,
-  color: '#93c5fd',
+  color: '#7fd4ff',
 };
 
 function TabContent({
@@ -141,7 +141,7 @@ function TabContent({
             background: 'rgba(255,255,255,0.04)',
             borderRadius: 10,
             padding: '12px 14px',
-            borderLeft: '2px solid #a78bfa',
+            borderLeft: '2px solid #00ff88',
           }}
         >
           <p style={{ fontSize: 13, fontWeight: 500, color: '#e2e2e8', margin: '0 0 4px' }}>
@@ -157,7 +157,7 @@ function TabContent({
             background: 'rgba(255,255,255,0.04)',
             borderRadius: 10,
             padding: '12px 14px',
-            borderLeft: '2px solid #34d399',
+            borderLeft: '2px solid #00ff88',
           }}
         >
           <p style={{ fontSize: 13, fontWeight: 500, color: '#e2e2e8', margin: '0 0 4px' }}>
@@ -173,7 +173,7 @@ function TabContent({
             background: 'rgba(255,255,255,0.04)',
             borderRadius: 10,
             padding: '12px 14px',
-            borderLeft: '2px solid #60a5fa',
+            borderLeft: '2px solid #00aaff',
           }}
         >
           <p style={{ fontSize: 13, fontWeight: 500, color: '#e2e2e8', margin: '0 0 4px' }}>
@@ -195,7 +195,7 @@ function TabContent({
             background: 'rgba(255,255,255,0.04)',
             borderRadius: 10,
             padding: '12px 14px',
-            borderLeft: '2px solid #fbbf24',
+            borderLeft: '2px solid #ffb300',
           }}
         >
           <p style={{ fontSize: 13, fontWeight: 500, color: '#e2e2e8', margin: '0 0 4px' }}>
@@ -297,7 +297,7 @@ function TabContent({
           style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 10, padding: '12px 14px' }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-            <Filter style={{ width: 14, height: 14, color: '#a78bfa', flexShrink: 0 }} />
+            <Filter style={{ width: 14, height: 14, color: '#00ff88', flexShrink: 0 }} />
             <p style={{ fontSize: 12, fontWeight: 500, color: '#e2e2e8', margin: 0 }}>
               {t('search.filterPanel')}
             </p>
@@ -325,7 +325,7 @@ function TabContent({
               <code
                 style={{
                   fontSize: 11,
-                  color: '#a78bfa',
+                  color: '#00ff88',
                   background: 'rgba(167,139,250,0.1)',
                   borderRadius: 4,
                   padding: '1px 6px',
@@ -365,7 +365,7 @@ function TabContent({
             padding: '12px 14px',
           }}
         >
-          <p style={{ fontSize: 12, fontWeight: 500, color: '#a78bfa', margin: '0 0 4px' }}>
+          <p style={{ fontSize: 12, fontWeight: 500, color: '#00ff88', margin: '0 0 4px' }}>
             {t('ai.semanticReady')}
           </p>
           <p style={{ fontSize: 12, color: '#9ca3af', margin: 0, lineHeight: 1.6 }}>
@@ -441,7 +441,7 @@ function TabContent({
           <span
             style={{
               fontSize: 11,
-              color: '#93c5fd',
+              color: '#7fd4ff',
               textTransform: 'uppercase',
               letterSpacing: '0.08em',
               textAlign: 'center',
@@ -587,7 +587,7 @@ export const HelpPanel = ({ isOpen, onClose, nodeCount, edgeCount }: HelpPanelPr
                 borderRadius: 12,
               }}
             >
-              <HelpCircle style={{ width: 20, height: 20, color: '#a78bfa' }} />
+              <HelpCircle style={{ width: 20, height: 20, color: '#00ff88' }} />
             </div>
             <div>
               <h2 style={{ fontSize: 16, fontWeight: 600, color: '#e2e2e8', margin: 0 }}>
@@ -648,7 +648,7 @@ export const HelpPanel = ({ isOpen, onClose, nodeCount, edgeCount }: HelpPanelPr
                     padding: '8px 10px',
                     fontSize: 12,
                     fontFamily: 'inherit',
-                    color: isActive ? '#a78bfa' : '#9ca3af',
+                    color: isActive ? '#00ff88' : '#9ca3af',
                     cursor: 'pointer',
                     transition: 'all 0.15s',
                     width: '100%',
@@ -668,7 +668,7 @@ export const HelpPanel = ({ isOpen, onClose, nodeCount, edgeCount }: HelpPanelPr
                 >
                   <span
                     style={{
-                      color: isActive ? '#a78bfa' : '#6b7280',
+                      color: isActive ? '#00ff88' : '#6b7280',
                       display: 'flex',
                       flexShrink: 0,
                     }}

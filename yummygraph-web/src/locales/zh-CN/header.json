@@ -12,5 +12,15 @@
   "aiSettings": "AI 设置",
   "help": "帮助",
   "language": "语言",
-  "selectLanguage": "选择语言"
+  "selectLanguage": "选择语言",
+  "theme": "主题",
+  "selectTheme": "选择主题",
+  "themes": {
+    "dark": "暗色",
+    "light": "亮色",
+    "dracula": "德古拉",
+    "yummy": "Yummy",
+    "angry": "愤怒",
+    "idea": "灵感"
+  }
 }

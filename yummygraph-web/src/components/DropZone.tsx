@@ -10,6 +10,7 @@ import { useBackend } from '../hooks/useBackend';
 import { OnboardingGuide } from './OnboardingGuide';
 import { AnalyzeOnboarding } from './AnalyzeOnboarding';
 import { RepoLanding } from './RepoLanding';
+import { ThemeSwitcher } from './ThemeSwitcher';
 import { useTranslation } from 'react-i18next';
 import { formatBackendError } from '../i18n/error-messages';
 
@@ -66,20 +67,20 @@ function SuccessCard() {
 
   return (
     <div
-      className="relative overflow-hidden rounded-3xl border border-emerald-500/20 bg-surface p-7"
+      className="relative overflow-hidden rounded-3xl border border-accent/20 bg-surface p-7"
       role="status"
       aria-live="polite"
     >
       {/* Success glow */}
-      <div className="pointer-events-none absolute -top-20 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-emerald-500/8 blur-3xl" />
+      <div className="pointer-events-none absolute -top-20 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-accent/8 blur-3xl" />
 
       <div className="relative">
         {/* Animated check icon */}
-        <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 shadow-[0_0_30px_rgba(16,185,129,0.15)]">
-          <Check className="h-8 w-8 text-emerald-400" />
+        <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-accent/30 bg-gradient-to-br from-accent/20 to-accent/10 shadow-[0_0_30px_rgba(16,185,129,0.15)]">
+          <Check className="h-8 w-8 text-accent" />
         </div>
 
-        <h2 className="mb-2 text-center text-lg font-semibold text-emerald-400">
+        <h2 className="mb-2 text-center text-lg font-semibold text-accent">
           {t('success.title')}
         </h2>
         <p className="text-center text-sm leading-relaxed text-text-secondary">
@@ -92,7 +93,7 @@ function SuccessCard() {
             {[0, 1, 2].map((i) => (
               <div
                 key={i}
-                className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400/60"
+                className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent/60"
                 style={{ animationDelay: `${i * 200}ms` }}
               />
             ))}
@@ -292,6 +293,11 @@ export const DropZone = ({ onServerConnect }: DropZoneProps) => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-void p-8">
+      {/* Theme picker — fixed top-right, available across every onboarding phase */}
+      <div className="fixed top-4 right-4 z-20">
+        <ThemeSwitcher />
+      </div>
+
       {/* Background gradient effects */}
       <div className="pointer-events-none fixed inset-0">
         <div className="absolute top-1/4 left-1/4 h-96 w-96 rounded-full bg-accent/10 blur-3xl" />

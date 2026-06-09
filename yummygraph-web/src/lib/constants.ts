@@ -1,43 +1,44 @@
 import type { NodeLabel } from 'yummygraph-shared';
 
-// Node colors by type - slightly muted for less visual noise
+// Node colors by type — harmonized to the Phosphor Terminal accent family
+// (phosphor green + the design's panel accents: blue, cyan, pink, purple, amber, orange)
 export const NODE_COLORS: Record<NodeLabel, string> = {
-  Project: '#a855f7', // Purple - prominent
-  Package: '#8b5cf6', // Violet
-  Module: '#7c3aed', // Violet darker
-  Folder: '#6366f1', // Indigo
-  File: '#3b82f6', // Blue
-  Class: '#f59e0b', // Amber - stands out
-  Function: '#10b981', // Emerald
-  Method: '#14b8a6', // Teal
-  Variable: '#64748b', // Slate - muted (less important)
-  Interface: '#ec4899', // Pink
-  Enum: '#f97316', // Orange
-  Decorator: '#eab308', // Yellow
-  Import: '#475569', // Slate darker - very muted
-  Type: '#a78bfa', // Violet light
-  CodeElement: '#64748b', // Slate - muted
-  Community: '#818cf8', // Indigo light - cluster indicator
-  Process: '#f43f5e', // Rose - execution flow indicator
-  Section: '#60a5fa', // Blue light - structural section
-  Struct: '#f59e0b', // Amber - like Class
-  Trait: '#ec4899', // Pink - like Interface
-  Impl: '#14b8a6', // Teal - like Method
-  TypeAlias: '#a78bfa', // Violet light - like Type
-  Const: '#64748b', // Slate - like Variable
-  Static: '#64748b', // Slate - like Variable
-  Namespace: '#7c3aed', // Violet - like Module
-  Union: '#f97316', // Orange - like Enum
-  Typedef: '#a78bfa', // Violet light - like Type
-  Macro: '#eab308', // Yellow - like Decorator
-  Property: '#64748b', // Slate - like Variable
-  Record: '#f59e0b', // Amber - like Class
-  Delegate: '#14b8a6', // Teal - like Method
-  Annotation: '#eab308', // Yellow - like Decorator
-  Constructor: '#10b981', // Emerald - like Function
-  Template: '#a78bfa', // Violet light - like Type
-  Route: '#f43f5e', // Rose - like Process
-  Tool: '#a855f7', // Purple - like Project
+  Project: '#aa88ff', // Accent-purple - prominent container
+  Package: '#9d7bff', // Purple - structural
+  Module: '#8b6aff', // Deep purple - container
+  Folder: '#00aaff', // Accent-blue
+  File: '#00ccff', // Bright cyan-blue
+  Class: '#ffb300', // Amber - stands out
+  Function: '#00ff88', // Phosphor green - the hero element
+  Method: '#00ffaa', // Accent-cyan
+  Variable: '#7a9e8a', // Muted green (text-2) - less important
+  Interface: '#ff79c6', // Accent-pink
+  Enum: '#ff6644', // Accent-orange
+  Decorator: '#ffd166', // Light amber - modifier
+  Import: '#3a5a48', // Text-3 - very muted
+  Type: '#c4a8ff', // Light purple
+  CodeElement: '#7a9e8a', // Muted green
+  Community: '#88c0ff', // Soft blue - cluster indicator
+  Process: '#ff4444', // Red - execution flow indicator
+  Section: '#00aaff', // Accent-blue - structural section
+  Struct: '#ffb300', // Amber - like Class
+  Trait: '#ff79c6', // Pink - like Interface
+  Impl: '#00ffaa', // Cyan - like Method
+  TypeAlias: '#c4a8ff', // Light purple - like Type
+  Const: '#7a9e8a', // Muted - like Variable
+  Static: '#7a9e8a', // Muted - like Variable
+  Namespace: '#8b6aff', // Deep purple - like Module
+  Union: '#ff6644', // Orange - like Enum
+  Typedef: '#c4a8ff', // Light purple - like Type
+  Macro: '#ffd166', // Light amber - like Decorator
+  Property: '#7a9e8a', // Muted - like Variable
+  Record: '#ffb300', // Amber - like Class
+  Delegate: '#00ffaa', // Cyan - like Method
+  Annotation: '#ffd166', // Light amber - like Decorator
+  Constructor: '#00ff88', // Phosphor green - like Function
+  Template: '#c4a8ff', // Light purple - like Type
+  Route: '#ff4444', // Red - like Process
+  Tool: '#aa88ff', // Accent-purple - like Project
 };
 
 // Node sizes by type - clear visual hierarchy with dramatic size differences
@@ -83,18 +84,18 @@ export const NODE_SIZES: Record<NodeLabel, number> = {
 
 // Community color palette for cluster-based coloring
 export const COMMUNITY_COLORS = [
-  '#ef4444', // red
-  '#f97316', // orange
-  '#eab308', // yellow
-  '#22c55e', // green
-  '#06b6d4', // cyan
-  '#3b82f6', // blue
-  '#8b5cf6', // violet
-  '#d946ef', // fuchsia
-  '#ec4899', // pink
-  '#f43f5e', // rose
-  '#14b8a6', // teal
-  '#84cc16', // lime
+  '#00ff88', // phosphor green
+  '#00ffaa', // cyan
+  '#00aaff', // blue
+  '#aa88ff', // purple
+  '#ff79c6', // pink
+  '#ffb300', // amber
+  '#ff6644', // orange
+  '#00cc66', // dim green
+  '#88c0ff', // soft blue
+  '#c4a8ff', // light purple
+  '#ffd166', // light amber
+  '#ff4444', // red
 ];
 
 export const getCommunityColor = (communityIndex: number): string => {
@@ -183,9 +184,9 @@ export const DEFAULT_VISIBLE_EDGES: EdgeType[] = [
 // Edge display info for UI
 export const EDGE_INFO: Record<EdgeType, { color: string; label: string }> = {
   CONTAINS: { color: '#2d5a3d', label: 'Contains' },
-  DEFINES: { color: '#0e7490', label: 'Defines' },
-  IMPORTS: { color: '#1d4ed8', label: 'Imports' },
-  CALLS: { color: '#7c3aed', label: 'Calls' },
-  EXTENDS: { color: '#c2410c', label: 'Extends' },
-  IMPLEMENTS: { color: '#be185d', label: 'Implements' },
+  DEFINES: { color: '#0a8a7a', label: 'Defines' }, // dim cyan
+  IMPORTS: { color: '#2a6fb0', label: 'Imports' }, // dim blue
+  CALLS: { color: '#00cc66', label: 'Calls' }, // primary-dim green
+  EXTENDS: { color: '#cc8800', label: 'Extends' }, // amber-dim
+  IMPLEMENTS: { color: '#bb4d88', label: 'Implements' }, // dim pink
 };

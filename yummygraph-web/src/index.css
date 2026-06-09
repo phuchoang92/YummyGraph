@@ -4,38 +4,44 @@
    TAILWIND V4 THEME CONFIGURATION
 ═══════════════════════════════════════════════════════════════ */
 @theme {
-  /* Backgrounds */
-  --color-void: #06060a;
-  --color-deep: #0a0a10;
-  --color-surface: #101018;
-  --color-elevated: #16161f;
-  --color-hover: #1c1c28;
+  /* ── Surface stack — phosphor terminal (bg → bg-3, green-tinted, never pure black) ── */
+  --color-void: #080c0a; /* bg    — deepest canvas, carries the scanline */
+  --color-deep: #0b100d; /* bg-1- — layout separators / outer chrome */
+  --color-surface: #0d1210; /* bg-1  — default panel background */
+  --color-elevated: #131c16; /* bg-2  — cards, secondary surfaces */
+  --color-hover: #1a2620; /* bg-3  — hover / active / inputs / code */
 
-  /* Borders */
-  --color-border-subtle: #1e1e2a;
-  --color-border-default: #2a2a3a;
+  /* Borders — 1px solid everywhere; no border-radius without one */
+  --color-border-subtle: #1e2e24; /* border   — structural edges, panels */
+  --color-border-default: #243628; /* border-2 — inputs, lighter dividers */
 
-  /* Text */
-  --color-text-primary: #e4e4ed;
-  --color-text-secondary: #8888a0;
-  --color-text-muted: #5a5a70;
+  /* Text — four-tier, soft green-tinted (never pure #fff for body) */
+  --color-text-primary: #c8ddd2; /* text   */
+  --color-text-secondary: #7a9e8a; /* text-2 */
+  --color-text-muted: #3a5a48; /* text-3 */
 
-  /* Accent */
-  --color-accent: #7c3aed;
-  --color-accent-dim: #5b21b6;
+  /* Accent — phosphor green (a highlight, not a fill) */
+  --color-accent: #00ff88; /* primary     */
+  --color-accent-dim: #00cc66; /* primary-dim */
+  --color-accent-mute: #004422; /* primary-mute — workhorse bg for active states */
 
-  /* Node colors */
-  --color-node-file: #3b82f6;
-  --color-node-folder: #6366f1;
-  --color-node-class: #f59e0b;
-  --color-node-function: #10b981;
-  --color-node-interface: #ec4899;
-  --color-node-import: #6b7280;
-  --color-node-method: #14b8a6;
+  /* Semantic accents */
+  --color-amber: #ffb300;
+  --color-red: #ff4444;
 
-  /* Fonts */
-  --font-sans: 'Outfit', system-ui, sans-serif;
+  /* Node colors — categorical graph palette, harmonized to the accent family */
+  --color-node-file: #00aaff; /* accent-blue   */
+  --color-node-folder: #aa88ff; /* accent-purple */
+  --color-node-class: #ffb300; /* amber         */
+  --color-node-function: #00ff88; /* primary       */
+  --color-node-interface: #ff79c6; /* accent-pink   */
+  --color-node-import: #7a9e8a; /* muted         */
+  --color-node-method: #00ffaa; /* accent-cyan   */
+
+  /* Fonts — terminal + editorial pairing. Mono for body/UI, Syne for headings. */
+  --font-sans: 'JetBrains Mono', 'Fira Code', monospace;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-display: 'Syne', sans-serif;
 
   /* Animations */
   --animate-breathe: breathe 3s ease-in-out infinite;
@@ -44,22 +50,138 @@
   --animate-slide-up: slide-up 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --animate-fade-in: fade-in 0.3s ease-out;
 
-  /* Box shadows */
-  --shadow-glow: 0 0 20px rgba(124, 58, 237, 0.4);
-  --shadow-glow-soft: 0 0 40px rgba(124, 58, 237, 0.15);
+  /* Box shadows — black-alpha for depth; the single colored shadow is the phosphor glow */
+  --shadow-glow: 0 0 12px rgba(0, 255, 136, 0.3); /* button-glow  */
+  --shadow-glow-soft: 0 0 20px rgba(0, 255, 136, 0.4); /* landing-glow */
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   THEME VARIANTS — six moods sharing one token structure.
+   Applied at runtime via [data-theme] on <html>; every theme
+   overrides the color tokens above while preserving the contrast
+   hierarchy. The @theme block defines the Dark (default) palette.
+═══════════════════════════════════════════════════════════════ */
+:root {
+  /* Dark scanline tint (default; matches the phosphor accent) */
+  --scanline-color: rgba(0, 255, 136, 0.012);
+}
+
+/* ── Dark · Focused · Phosphor Green · deep charcoal (explicit = @theme base) ── */
+:root[data-theme='dark'] {
+  --scanline-color: rgba(0, 255, 136, 0.012);
+}
+
+/* ── Light · Explain · Forest Green · warm white ── */
+:root[data-theme='light'] {
+  --color-void: #ece8dd;
+  --color-deep: #f2efe6;
+  --color-surface: #faf8f1;
+  --color-elevated: #ffffff;
+  --color-hover: #e6e1d3;
+  --color-border-subtle: #d8d2c2;
+  --color-border-default: #c7bfa9;
+  --color-text-primary: #1e2a22;
+  --color-text-secondary: #4d6353;
+  --color-text-muted: #8b9a8d;
+  --color-accent: #1f8f4e;
+  --color-accent-dim: #15703c;
+  --color-accent-mute: #d2ecd9;
+  --scanline-color: transparent; /* Light disables scanlines */
+  --shadow-glow: 0 0 12px rgba(31, 143, 78, 0.25);
+  --shadow-glow-soft: 0 0 20px rgba(31, 143, 78, 0.2);
+}
+
+/* ── Dracula · Nervous · Electric Purple · deep navy ── */
+:root[data-theme='dracula'] {
+  --color-void: #15141f;
+  --color-deep: #1a1827;
+  --color-surface: #1e1c2e;
+  --color-elevated: #262338;
+  --color-hover: #322d4a;
+  --color-border-subtle: #322f44;
+  --color-border-default: #44405c;
+  --color-text-primary: #e8e4f5;
+  --color-text-secondary: #a89fc7;
+  --color-text-muted: #645d80;
+  --color-accent: #bd93f9;
+  --color-accent-dim: #9d6ff0;
+  --color-accent-mute: #2d2640;
+  --scanline-color: rgba(189, 147, 249, 0.014);
+  --shadow-glow: 0 0 12px rgba(189, 147, 249, 0.3);
+  --shadow-glow-soft: 0 0 20px rgba(189, 147, 249, 0.4);
+}
+
+/* ── Yummy · Love · Bubblegum Pink · dark plum ── */
+:root[data-theme='yummy'] {
+  --color-void: #14090f;
+  --color-deep: #1a0d15;
+  --color-surface: #20111b;
+  --color-elevated: #2b1726;
+  --color-hover: #3a1f33;
+  --color-border-subtle: #3a2235;
+  --color-border-default: #4d2e45;
+  --color-text-primary: #f5d9e8;
+  --color-text-secondary: #c79ab0;
+  --color-text-muted: #82596f;
+  --color-accent: #ff79c6;
+  --color-accent-dim: #f04fa5;
+  --color-accent-mute: #4a1834;
+  --scanline-color: rgba(255, 121, 198, 0.016);
+  --shadow-glow: 0 0 12px rgba(255, 121, 198, 0.3);
+  --shadow-glow-soft: 0 0 20px rgba(255, 121, 198, 0.4);
+}
+
+/* ── Angry · Angry · Hot Orange · charred red ── */
+:root[data-theme='angry'] {
+  --color-void: #120705;
+  --color-deep: #190a07;
+  --color-surface: #1f0d09;
+  --color-elevated: #2b120c;
+  --color-hover: #3a1810;
+  --color-border-subtle: #3a1d14;
+  --color-border-default: #4d281a;
+  --color-text-primary: #f5ddd2;
+  --color-text-secondary: #c79a8a;
+  --color-text-muted: #82594a;
+  --color-accent: #ff6644;
+  --color-accent-dim: #f0451f;
+  --color-accent-mute: #4a1c10;
+  --scanline-color: rgba(255, 102, 68, 0.016);
+  --shadow-glow: 0 0 12px rgba(255, 102, 68, 0.3);
+  --shadow-glow-soft: 0 0 20px rgba(255, 102, 68, 0.4);
+}
+
+/* ── Idea · Idea · Golden Yellow · cool navy ── */
+:root[data-theme='idea'] {
+  --color-void: #070a12;
+  --color-deep: #0a0e19;
+  --color-surface: #0d121f;
+  --color-elevated: #131a2b;
+  --color-hover: #1a233a;
+  --color-border-subtle: #1d2840;
+  --color-border-default: #28354d;
+  --color-text-primary: #e8ecf5;
+  --color-text-secondary: #9aa6c7;
+  --color-text-muted: #5a6580;
+  --color-accent: #ffd84d;
+  --color-accent-dim: #f0c020;
+  --color-accent-mute: #3a3210;
+  --scanline-color: rgba(255, 216, 77, 0.014);
+  --shadow-glow: 0 0 12px rgba(255, 216, 77, 0.3);
+  --shadow-glow-soft: 0 0 20px rgba(255, 216, 77, 0.4);
 }
 
 /* Keyframes */
 @keyframes breathe {
   0%,
   100% {
-    border-color: #2a2a3a;
-    box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.3);
+    border-color: #243628;
+    box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.3);
   }
 
   50% {
-    border-color: #7c3aed;
-    box-shadow: 0 0 40px 10px rgba(124, 58, 237, 0.3);
+    border-color: #00ff88;
+    box-shadow: 0 0 40px 10px rgba(0, 255, 136, 0.3);
   }
 }
 
@@ -67,12 +189,12 @@
   0%,
   100% {
     transform: scale(1);
-    box-shadow: 0 0 40px rgba(124, 58, 237, 0.4);
+    box-shadow: 0 0 40px rgba(0, 255, 136, 0.4);
   }
 
   50% {
     transform: scale(1.1);
-    box-shadow: 0 0 80px rgba(124, 58, 237, 0.6);
+    box-shadow: 0 0 80px rgba(0, 255, 136, 0.6);
   }
 }
 
@@ -110,6 +232,13 @@
   }
 }
 
+/* Streaming-text cursor — phosphor terminal blink */
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
 /* ═══════════════════════════════════════════════════════════════
    REDUCED MOTION — respect OS-level motion preferences (WCAG 2.3.3)
 ═══════════════════════════════════════════════════════════════ */
@@ -142,6 +271,25 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* CRT scanlines — the identity signal. Tint adapts to the active theme
+     (disabled on Light). 2px transparent + 2px tinted stripe, repeating. */
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent 0,
+    transparent 2px,
+    var(--scanline-color, rgba(0, 255, 136, 0.012)) 2px,
+    var(--scanline-color, rgba(0, 255, 136, 0.012)) 4px
+  );
+}
+
+/* Headings & brand marks use the Syne display face (never body/UI text) */
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -149,25 +297,26 @@ body {
 ═══════════════════════════════════════════════════════════════ */
 .scrollbar-thin {
   scrollbar-width: thin;
-  scrollbar-color: #2a2a3a #0a0a10;
+  scrollbar-color: #243628 transparent;
 }
 
 .scrollbar-thin::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 .scrollbar-thin::-webkit-scrollbar-track {
-  background: var(--color-deep);
+  background: transparent;
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb {
   background: var(--color-border-default);
-  border-radius: 4px;
+  border-radius: 2px;
+  transition: background 150ms ease;
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-muted);
+  background: var(--color-accent-mute);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -200,7 +349,7 @@ body {
 
 .chat-prose strong {
   font-weight: 600;
-  color: #fff;
+  color: var(--color-accent-dim);
 }
 
 .chat-prose em {
@@ -208,34 +357,37 @@ body {
   color: var(--color-text-secondary);
 }
 
-/* Headers */
+/* Headers — Syne display face; h1/h2 in phosphor green, h3 in body text */
 .chat-prose h1,
 .chat-prose h2,
 .chat-prose h3,
 .chat-prose h4 {
-  font-weight: 600;
-  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-accent);
   margin-top: 1.5em;
   margin-bottom: 0.5em;
   line-height: 1.3;
 }
 
 .chat-prose h1 {
-  font-size: 1.25em;
+  font-size: 1.35em;
 }
 
 .chat-prose h2 {
-  font-size: 1.125em;
+  font-size: 1.15em;
 }
 
 .chat-prose h3 {
   font-size: 1em;
+  color: var(--color-text-primary);
 }
 
 .chat-prose h4 {
   font-size: 0.875em;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.1em;
   color: var(--color-text-secondary);
 }
 
@@ -269,15 +421,15 @@ body {
   margin: 0.25em 0;
 }
 
-/* Inline code - VS Code style */
+/* Inline code — bg-3 fill, 1px border, amber text */
 .chat-prose code:not([class*='language-']) {
-  padding: 0.2em 0.5em;
-  background: rgba(110, 118, 129, 0.2);
-  border-radius: 6px;
+  padding: 0.1em 0.4em;
+  background: var(--color-hover);
+  border-radius: 3px;
   font-family: var(--font-mono);
   font-size: 0.875em;
-  color: #e6b450 !important;
-  border: 1px solid rgba(110, 118, 129, 0.3);
+  color: var(--color-amber) !important;
+  border: 1px solid var(--color-border-subtle);
   font-weight: 500;
 }
 
@@ -285,7 +437,7 @@ body {
 .chat-prose a code:not([class*='language-']),
 .chat-prose strong code:not([class*='language-']),
 .chat-prose em code:not([class*='language-']) {
-  color: #e6b450 !important;
+  color: var(--color-amber) !important;
 }
 
 /* Code blocks */
@@ -295,14 +447,15 @@ body {
   overflow: hidden;
 }
 
-/* Blockquotes */
+/* Blockquotes — primary-dim left rail, primary-mute wash */
 .chat-prose blockquote {
   margin: 1em 0;
   padding: 0.5em 1em;
-  border-left: 3px solid var(--color-accent);
-  background: var(--color-surface);
-  border-radius: 0 6px 6px 0;
+  border-left: 3px solid var(--color-accent-dim);
+  background: var(--color-accent-mute);
+  border-radius: 0 4px 4px 0;
   color: var(--color-text-secondary);
+  font-style: italic;
 }
 
 .chat-prose blockquote p {
@@ -324,7 +477,7 @@ body {
 }
 
 .chat-prose a:not(.code-ref-btn):hover {
-  color: #a78bfa;
+  color: var(--color-accent-dim);
 }
 
 /* Tables */
@@ -343,9 +496,9 @@ body {
 }
 
 .chat-prose th {
-  background: var(--color-surface);
+  background: var(--color-hover);
   font-weight: 600;
-  color: var(--color-text-secondary);
+  color: var(--color-accent);
 }
 
 .chat-prose tr:nth-child(even) td {

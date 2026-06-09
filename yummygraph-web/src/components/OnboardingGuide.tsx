@@ -37,7 +37,7 @@ function CopyButton({ text }: { text: string }) {
       aria-label={copied ? t('guide.copiedAria') : t('guide.copyAria')}
       className={`shrink-0 cursor-pointer rounded-md px-2 py-1 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:outline-none ${
         copied
-          ? 'bg-emerald-400/10 text-emerald-400'
+          ? 'bg-accent/10 text-accent'
           : 'text-text-muted hover:bg-white/5 hover:text-text-primary'
       } `}
     >
@@ -70,7 +70,7 @@ function TerminalWindow({
         <div className="flex gap-1.5">
           <div className="h-2.5 w-2.5 rounded-full bg-red-500/60" />
           <div className="h-2.5 w-2.5 rounded-full bg-yellow-500/60" />
-          <div className="h-2.5 w-2.5 rounded-full bg-emerald-500/60" />
+          <div className="h-2.5 w-2.5 rounded-full bg-accent/60" />
         </div>
         <span className="flex-1 text-center font-mono text-[11px] text-text-muted">{label}</span>
         <CopyButton text={command} />
@@ -95,8 +95,8 @@ type StepState = 'waiting' | 'active' | 'done';
 function StepDot({ state, number }: { state: StepState; number: number }) {
   if (state === 'done') {
     return (
-      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-emerald-500/50 bg-emerald-500/20">
-        <Check className="h-3 w-3 text-emerald-400" />
+      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-accent/50 bg-accent/20">
+        <Check className="h-3 w-3 text-accent" />
       </div>
     );
   }
@@ -144,7 +144,7 @@ function StepRow({
             <span
               className={`text-sm font-medium transition-colors duration-200 ${
                 state === 'done'
-                  ? 'text-emerald-400'
+                  ? 'text-accent'
                   : state === 'active'
                     ? 'text-text-primary'
                     : 'text-text-muted'
@@ -153,7 +153,7 @@ function StepRow({
               {title}
             </span>
             {state === 'done' && (
-              <span className="animate-fade-in font-mono text-[10px] tracking-wider text-emerald-400/60 uppercase">
+              <span className="animate-fade-in font-mono text-[10px] tracking-wider text-accent/60 uppercase">
                 {t('guide.done')}
               </span>
             )}

@@ -12,5 +12,15 @@
   "aiSettings": "AI Settings",
   "help": "Help",
   "language": "Language",
-  "selectLanguage": "Select language"
+  "selectLanguage": "Select language",
+  "theme": "Theme",
+  "selectTheme": "Select theme",
+  "themes": {
+    "dark": "Dark",
+    "light": "Light",
+    "dracula": "Dracula",
+    "yummy": "Yummy",
+    "angry": "Angry",
+    "idea": "Idea"
+  }
 }

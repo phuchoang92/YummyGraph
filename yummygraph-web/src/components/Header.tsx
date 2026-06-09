@@ -24,19 +24,20 @@ import { GraphNode } from 'yummygraph-shared';
 import { EmbeddingStatus } from './EmbeddingStatus';
 import { RepoAnalyzer } from './RepoAnalyzer';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { ThemeSwitcher } from './ThemeSwitcher';
 import { translateProgressMessage } from '../i18n/progress';
 
 // Color mapping for node types in search results
 const NODE_TYPE_COLORS: Record<string, string> = {
-  Folder: '#6366f1',
-  File: '#3b82f6',
-  Function: '#10b981',
-  Class: '#f59e0b',
-  Method: '#14b8a6',
-  Interface: '#ec4899',
-  Variable: '#64748b',
-  Import: '#475569',
-  Type: '#a78bfa',
+  Folder: '#00aaff',
+  File: '#00ccff',
+  Function: '#00ff88',
+  Class: '#ffb300',
+  Method: '#00ffaa',
+  Interface: '#ff79c6',
+  Variable: '#7a9e8a',
+  Import: '#3a5a48',
+  Type: '#c4a8ff',
 };
 
 interface HeaderProps {
@@ -420,7 +421,7 @@ export const Header = ({
                   >
                     <span
                       className="h-2.5 w-2.5 flex-shrink-0 rounded-full"
-                      style={{ backgroundColor: NODE_TYPE_COLORS[node.label] || '#6b7280' }}
+                      style={{ backgroundColor: NODE_TYPE_COLORS[node.label] || '#7a9e8a' }}
                     />
                     <span className="flex-1 truncate text-sm font-medium">
                       {node.properties.name}
@@ -448,6 +449,8 @@ export const Header = ({
 
         {/* Embedding Status */}
         <EmbeddingStatus />
+
+        <ThemeSwitcher />
 
         <LanguageSwitcher />
 

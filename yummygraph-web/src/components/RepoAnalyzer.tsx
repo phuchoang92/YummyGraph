@@ -140,11 +140,11 @@ function DoneState({ repoName }: { repoName: string }) {
       role="status"
       aria-live="polite"
     >
-      <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-emerald-500/30 bg-emerald-500/15 shadow-[0_0_20px_rgba(16,185,129,0.15)]">
-        <Check className="h-6 w-6 text-emerald-400" />
+      <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-accent/30 bg-accent/15 shadow-[0_0_20px_rgba(16,185,129,0.15)]">
+        <Check className="h-6 w-6 text-accent" />
       </div>
       <div className="text-center">
-        <p className="text-sm font-medium text-emerald-400">{t('repoAnalyzer.complete')}</p>
+        <p className="text-sm font-medium text-accent">{t('repoAnalyzer.complete')}</p>
         <p className="mt-0.5 font-mono text-xs text-text-muted">{repoName}</p>
       </div>
       <p className="text-xs text-text-secondary">{t('repoAnalyzer.loadingGraph')}</p>
@@ -337,7 +337,7 @@ export const RepoAnalyzer = ({ variant, onComplete, onCancel }: RepoAnalyzerProp
             {githubUrl.length > 10 && (
               <div className="shrink-0">
                 {isValidGithubUrl(githubUrl) ? (
-                  <Check className="h-3.5 w-3.5 text-emerald-400" />
+                  <Check className="h-3.5 w-3.5 text-accent" />
                 ) : (
                   <AlertCircle className="h-3.5 w-3.5 text-text-muted" />
                 )}
@@ -389,7 +389,7 @@ export const RepoAnalyzer = ({ variant, onComplete, onCancel }: RepoAnalyzerProp
             {gitlabUrl.length > 10 && (
               <div className="shrink-0">
                 {isValidGitlabUrl(gitlabUrl) ? (
-                  <Check className="h-3.5 w-3.5 text-emerald-400" />
+                  <Check className="h-3.5 w-3.5 text-accent" />
                 ) : (
                   <AlertCircle className="h-3.5 w-3.5 text-text-muted" />
                 )}
@@ -440,7 +440,7 @@ export const RepoAnalyzer = ({ variant, onComplete, onCancel }: RepoAnalyzerProp
               className="flex-1 border-none bg-transparent font-mono text-sm text-text-primary outline-none placeholder:text-text-muted disabled:opacity-50"
             />
             {localPath.trim().length > 1 && (
-              <Check className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
+              <Check className="h-3.5 w-3.5 shrink-0 text-accent" />
             )}
           </div>
           {/* Native folder picker + Browse button — below the input */}

@@ -85,6 +85,7 @@ export {
   PanelLeft,
   PanelLeftClose,
   PanelRightClose,
+  Palette,
   Pause,
   Play,
   RefreshCw,

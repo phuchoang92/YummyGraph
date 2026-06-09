@@ -569,9 +569,9 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle>((_, ref) => {
 
       {/* Layout running indicator */}
       {isLayoutRunning && (
-        <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 animate-fade-in items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/20 px-3 py-1.5 backdrop-blur-sm">
-          <div className="h-2 w-2 animate-ping rounded-full bg-emerald-400" />
-          <span className="text-xs font-medium text-emerald-400">
+        <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 animate-fade-in items-center gap-2 rounded-full border border-accent/30 bg-accent/20 px-3 py-1.5 backdrop-blur-sm">
+          <div className="h-2 w-2 animate-ping rounded-full bg-accent" />
+          <span className="text-xs font-medium text-accent">
             {t('canvas.layoutOptimizing')}
           </span>
         </div>
