@@ -1,6 +1,6 @@
 {
   "tabs": {
-    "chat": "Nexus AI",
+    "chat": "YumAI",
     "processes": "流程"
   },
   "suggestions": {
@@ -31,7 +31,7 @@
   },
   "roles": {
     "you": "你",
-    "assistant": "Nexus AI"
+    "assistant": "YumAI"
   },
   "newBadge": "新"
 }

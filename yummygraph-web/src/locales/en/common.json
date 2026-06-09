@@ -1,7 +1,7 @@
 {
   "app": {
     "name": "YummyGraph",
-    "nexusAI": "Nexus AI"
+    "nexusAI": "YumAI"
   },
   "actions": {
     "cancel": "Cancel",
