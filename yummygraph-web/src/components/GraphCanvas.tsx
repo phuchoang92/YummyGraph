@@ -21,8 +21,10 @@ import {
   GitBranch,
   Target,
   Zap,
+  Boxes,
 } from '@/lib/lucide-icons';
 import { useSigma } from '../hooks/useSigma';
+import { useFolderHulls } from '../hooks/useFolderHulls';
 import { useAppState } from '../hooks/useAppState';
 import {
   knowledgeGraphToGraphology,
@@ -71,6 +73,9 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle>((_, ref) => {
   const [hoveredNodeName, setHoveredNodeName] = useState<string | null>(null);
   // User-initiated blast radius (independent of the AI-chat highlight flow).
   const [blast, setBlast] = useState<BlastRadiusResult | null>(null);
+  // Folder/module boundary overlay.
+  const hullCanvasRef = useRef<HTMLCanvasElement>(null);
+  const [showHulls, setShowHulls] = useState(false);
 
   const effectiveHighlightedNodeIds = useMemo(() => {
     if (!isAIHighlightsEnabled) return highlightedNodeIds;
@@ -101,6 +106,28 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle>((_, ref) => {
   const nodeById = useMemo(() => {
     if (!graph) return new Map<string, GraphNode>();
     return new Map(graph.nodes.map((n) => [n.id, n]));
+  }, [graph]);
+
+  // nodeId -> folder index (by directory of filePath). Feeding this to the force
+  // layout instead of community memberships clusters symbols by folder, so the
+  // boundary hulls wrap tight groups (and nodes get per-folder colors).
+  const folderMemberships = useMemo(() => {
+    const m = new Map<string, number>();
+    if (!graph) return m;
+    const idxByDir = new Map<string, number>();
+    for (const n of graph.nodes) {
+      const fp = n.properties?.filePath;
+      if (!fp) continue;
+      const slash = fp.lastIndexOf('/');
+      const dir = slash >= 0 ? fp.slice(0, slash) : '';
+      let idx = idxByDir.get(dir);
+      if (idx === undefined) {
+        idx = idxByDir.size;
+        idxByDir.set(dir, idx);
+      }
+      m.set(n.id, idx);
+    }
+    return m;
   }, [graph]);
 
   const handleNodeClick = useCallback(
@@ -182,6 +209,15 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle>((_, ref) => {
     animatedNodes: effectiveAnimatedNodes,
     visibleEdgeTypes,
     layoutMode: graphViewMode,
+    noForceLayout: showHulls,
+  });
+
+  // Folder/module boundary regions — only in Force view, where the folder
+  // clustering applies and hulls are tight.
+  useFolderHulls({
+    sigmaRef,
+    canvasRef: hullCanvasRef,
+    enabled: showHulls && graphViewMode === 'force',
   });
 
   const handleViewModeChange = useCallback(
@@ -239,11 +275,16 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle>((_, ref) => {
           }
         }
       });
-      sigmaGraph = knowledgeGraphToGraphology(graph, communityMemberships);
+      // When folder boundaries are on, cluster by folder instead of community
+      // so the hulls wrap tight groups.
+      sigmaGraph = knowledgeGraphToGraphology(
+        graph,
+        showHulls ? folderMemberships : communityMemberships,
+      );
     }
 
     setSigmaGraph(sigmaGraph);
-  }, [graph, nodeById, setSigmaGraph, graphViewMode]);
+  }, [graph, nodeById, setSigmaGraph, graphViewMode, showHulls, folderMemberships]);
 
   // Update node visibility when filters change
   useEffect(() => {
@@ -398,6 +439,9 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle>((_, ref) => {
         className="sigma-container h-full w-full cursor-grab active:cursor-grabbing"
       />
 
+      {/* Folder/module boundary overlay (drawn above the graph, below the panels) */}
+      <canvas ref={hullCanvasRef} className="pointer-events-none absolute inset-0 z-[5]" />
+
       {/* Hovered node tooltip - only show when NOT selected */}
       {hoveredNodeName && !sigmaSelectedNode && (
         <div className="pointer-events-none absolute top-4 left-1/2 z-20 -translate-x-1/2 animate-fade-in rounded-lg border border-border-subtle bg-elevated/95 px-3 py-1.5 backdrop-blur-sm">
@@ -502,6 +546,24 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle>((_, ref) => {
           title={isLayoutRunning ? t('canvas.stopLayout') : t('canvas.runLayout')}
         >
           {isLayoutRunning ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+        </button>
+
+        {/* Folder boundaries toggle */}
+        <button
+          onClick={() => {
+            const next = !showHulls;
+            setShowHulls(next);
+            if (next && graphViewMode !== 'force') setGraphViewMode('force');
+          }}
+          className={`flex h-9 w-9 items-center justify-center rounded-md border transition-all ${
+            showHulls
+              ? 'border-accent bg-accent/20 text-accent'
+              : 'border-border-subtle bg-elevated text-text-secondary hover:bg-hover hover:text-text-primary'
+          }`}
+          title={showHulls ? 'Hide folder boundaries' : 'Show folder boundaries'}
+          data-testid="folder-hulls-toggle"
+        >
+          <Boxes className="h-4 w-4" />
         </button>
       </div>
 

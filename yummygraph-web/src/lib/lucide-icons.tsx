@@ -49,6 +49,7 @@ export {
   AtSign,
   Brain,
   Box,
+  Boxes,
   Braces,
   Check,
   ChevronDown,

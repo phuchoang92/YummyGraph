@@ -66,6 +66,10 @@ interface UseSigmaOptions {
   animatedNodes?: Map<string, NodeAnimation>;
   visibleEdgeTypes?: EdgeType[];
   layoutMode?: 'force' | 'tree' | 'circles';
+  // When true, skip the ForceAtlas2 physics in force mode and keep the seeded
+  // positions (used for folder-clustered view so groups stay spatially separated
+  // instead of being merged into one blob by the physics).
+  noForceLayout?: boolean;
 }
 
 interface UseSigmaReturn {
@@ -1541,6 +1545,10 @@ export const useSigma = (options: UseSigmaOptions = {}): UseSigmaReturn => {
         runTreeLayout(newGraph);
       } else if (options.layoutMode === 'circles') {
         runCirclesLayout(newGraph);
+      } else if (options.noForceLayout) {
+        // Keep the folder-seeded positions (groups already separated); don't run
+        // FA2, which would pull the folders into a single blob.
+        sigma.refresh();
       } else {
         runLayout(newGraph);
       }
@@ -1549,6 +1557,7 @@ export const useSigma = (options: UseSigmaOptions = {}): UseSigmaReturn => {
     },
     [
       options.layoutMode,
+      options.noForceLayout,
       runLayout,
       runTreeLayout,
       runCirclesLayout,
