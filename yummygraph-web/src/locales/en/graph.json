@@ -129,7 +129,9 @@
     "runLayout": "Run Layout Again",
     "layoutOptimizing": "Layout optimizing...",
     "turnOffHighlights": "Turn off all highlights",
-    "turnOnHighlights": "Turn on AI highlights"
+    "turnOnHighlights": "Turn on AI highlights",
+    "showFolderBoundaries": "Show folder boundaries",
+    "hideFolderBoundaries": "Hide folder boundaries"
   },
   "processes": {
     "unknownStep": "Unknown",

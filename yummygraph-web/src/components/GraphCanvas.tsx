@@ -38,6 +38,7 @@ import type { GraphNode } from 'yummygraph-shared';
 import { QueryFAB } from './QueryFAB';
 import { BlastRadiusPanel } from './BlastRadiusPanel';
 import { computeBlastRadius, type BlastRadiusResult } from '../lib/blast-radius';
+import { getStoredShowHulls, setStoredShowHulls } from '../lib/view-prefs';
 import Graph from 'graphology';
 import { useTranslation } from 'react-i18next';
 
@@ -73,9 +74,10 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle>((_, ref) => {
   const [hoveredNodeName, setHoveredNodeName] = useState<string | null>(null);
   // User-initiated blast radius (independent of the AI-chat highlight flow).
   const [blast, setBlast] = useState<BlastRadiusResult | null>(null);
-  // Folder/module boundary overlay.
+  // Folder/module boundary overlay (toggle persisted across reloads).
   const hullCanvasRef = useRef<HTMLCanvasElement>(null);
-  const [showHulls, setShowHulls] = useState(false);
+  const [showHulls, setShowHulls] = useState(getStoredShowHulls);
+  useEffect(() => setStoredShowHulls(showHulls), [showHulls]);
 
   const effectiveHighlightedNodeIds = useMemo(() => {
     if (!isAIHighlightsEnabled) return highlightedNodeIds;
@@ -212,12 +214,12 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle>((_, ref) => {
     noForceLayout: showHulls,
   });
 
-  // Folder/module boundary regions — only in Force view, where the folder
-  // clustering applies and hulls are tight.
+  // Folder/module boundary regions — available in every layout; folder members
+  // sit together in Force/Tree/Circles alike, so the hulls stay tight.
   useFolderHulls({
     sigmaRef,
     canvasRef: hullCanvasRef,
-    enabled: showHulls && graphViewMode === 'force',
+    enabled: showHulls,
   });
 
   const handleViewModeChange = useCallback(
@@ -373,14 +375,15 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle>((_, ref) => {
 
   return (
     <div className="relative h-full w-full bg-void">
-      {/* Background gradient */}
+      {/* Background gradient — follows the active theme (surface stack + a faint
+          accent glow). CSS vars cascade, so it updates on theme switch. */}
       <div className="pointer-events-none absolute inset-0">
         <div
           className="absolute inset-0"
           style={{
             background: `
-              radial-gradient(circle at 50% 50%, rgba(124, 58, 237, 0.03) 0%, transparent 70%),
-              linear-gradient(to bottom, #06060a, #0a0a10)
+              radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--color-accent) 4%, transparent) 0%, transparent 70%),
+              linear-gradient(to bottom, var(--color-void), var(--color-deep))
             `,
           }}
         />
@@ -550,17 +553,13 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle>((_, ref) => {
 
         {/* Folder boundaries toggle */}
         <button
-          onClick={() => {
-            const next = !showHulls;
-            setShowHulls(next);
-            if (next && graphViewMode !== 'force') setGraphViewMode('force');
-          }}
+          onClick={() => setShowHulls((prev) => !prev)}
           className={`flex h-9 w-9 items-center justify-center rounded-md border transition-all ${
             showHulls
               ? 'border-accent bg-accent/20 text-accent'
               : 'border-border-subtle bg-elevated text-text-secondary hover:bg-hover hover:text-text-primary'
           }`}
-          title={showHulls ? 'Hide folder boundaries' : 'Show folder boundaries'}
+          title={showHulls ? t('canvas.hideFolderBoundaries') : t('canvas.showFolderBoundaries')}
           data-testid="folder-hulls-toggle"
         >
           <Boxes className="h-4 w-4" />

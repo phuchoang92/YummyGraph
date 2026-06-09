@@ -129,7 +129,9 @@
     "runLayout": "重新运行布局",
     "layoutOptimizing": "正在优化布局...",
     "turnOffHighlights": "关闭全部高亮",
-    "turnOnHighlights": "开启 AI 高亮"
+    "turnOnHighlights": "开启 AI 高亮",
+    "showFolderBoundaries": "显示文件夹边界",
+    "hideFolderBoundaries": "隐藏文件夹边界"
   },
   "processes": {
     "unknownStep": "未知",

@@ -434,6 +434,11 @@ export const useSigma = (options: UseSigmaOptions = {}): UseSigmaReturn => {
         const font = settings.labelFont || 'JetBrains Mono, monospace';
         const weight = settings.labelWeight || '500';
 
+        // Theme-aware pill colors (read live so they track the active theme).
+        const root = getComputedStyle(document.documentElement);
+        const pillBg = root.getPropertyValue('--color-elevated').trim() || '#131c16';
+        const pillText = root.getPropertyValue('--color-text-primary').trim() || '#c8ddd2';
+
         context.font = `${weight} ${size}px ${font}`;
         const textWidth = context.measureText(label).width;
 
@@ -446,8 +451,8 @@ export const useSigma = (options: UseSigmaOptions = {}): UseSigmaReturn => {
         const width = textWidth + paddingX * 2;
         const radius = 4;
 
-        // Dark background pill
-        context.fillStyle = '#12121c';
+        // Themed background pill
+        context.fillStyle = pillBg;
         context.beginPath();
         context.roundRect(x - width / 2, y - height / 2, width, height, radius);
         context.fill();
@@ -457,8 +462,8 @@ export const useSigma = (options: UseSigmaOptions = {}): UseSigmaReturn => {
         context.lineWidth = 2;
         context.stroke();
 
-        // Label text - light color
-        context.fillStyle = '#f5f5f7';
+        // Label text - themed primary text color
+        context.fillStyle = pillText;
         context.textAlign = 'center';
         context.textBaseline = 'middle';
         context.fillText(label, x, y);
@@ -763,7 +768,28 @@ export const useSigma = (options: UseSigmaOptions = {}): UseSigmaReturn => {
       }
     });
 
+    // Theme-aware chrome — read label / default node+edge colors from the active
+    // theme's CSS variables and re-apply whenever the theme attribute flips so
+    // labels stay legible on light and dark surfaces alike.
+    const applyThemeColors = () => {
+      const cs = getComputedStyle(document.documentElement);
+      const label = cs.getPropertyValue('--color-text-primary').trim() || '#c8ddd2';
+      const edge = cs.getPropertyValue('--color-border-default').trim() || '#243628';
+      const node = cs.getPropertyValue('--color-text-muted').trim() || '#3a5a48';
+      sigma.setSetting('labelColor', { color: label });
+      sigma.setSetting('defaultEdgeColor', edge);
+      sigma.setSetting('defaultNodeColor', node);
+      sigma.refresh();
+    };
+    applyThemeColors();
+    const themeObserver = new MutationObserver(applyThemeColors);
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+
     return () => {
+      themeObserver.disconnect();
       if (treeLayoutFrameRef.current) {
         cancelAnimationFrame(treeLayoutFrameRef.current);
         treeLayoutFrameRef.current = null;
